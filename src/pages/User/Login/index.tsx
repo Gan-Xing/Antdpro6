@@ -16,11 +16,11 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
+import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
-import Settings from '../../../../config/defaultSettings';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
+import Settings from '../../../../config/defaultSettings';
 
 const ActionIcons = () => {
   const langClassName = useEmotionCss(({ token }) => {
@@ -85,7 +85,7 @@ const LoginMessage: React.FC<{
 
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
-  const [type, setType] = useState<string>('account');
+  const [type, setType] = useState<string>('email');
   const { initialState, setInitialState } = useModel('@@initialState');
 
   const containerClassName = useEmotionCss(() => {
@@ -190,6 +190,13 @@ const Login: React.FC = () => {
             centered
             items={[
               {
+                key: 'email',
+                label: intl.formatMessage({
+                  id: 'pages.login.emailLogin.tab',
+                  defaultMessage: '邮箱登录',
+                }),
+              },
+              {
                 key: 'account',
                 label: intl.formatMessage({
                   id: 'pages.login.accountLogin.tab',
@@ -205,6 +212,62 @@ const Login: React.FC = () => {
               },
             ]}
           />
+          {status === 'error' && loginType === 'email' && (
+            <LoginMessage
+              content={intl.formatMessage({
+                id: 'pages.login.emailLogin.errorMessage',
+                defaultMessage: '邮箱或密码错误',
+              })}
+            />
+          )}
+          {type === 'email' && (
+            <>
+              <ProFormText
+                name="email"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined />,
+                }}
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.email.placeholder',
+                  defaultMessage: '邮箱',
+                })}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="pages.login.email.required"
+                        defaultMessage="请输入邮箱!"
+                      />
+                    ),
+                  },
+                ]}
+              />
+              <ProFormText.Password
+                name="password"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined />,
+                }}
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.password.placeholder',
+                  defaultMessage: '密码',
+                })}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="pages.login.password.required"
+                        defaultMessage="请输入密码！"
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </>
+          )}
 
           {status === 'error' && loginType === 'account' && (
             <LoginMessage
