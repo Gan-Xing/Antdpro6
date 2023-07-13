@@ -1,6 +1,7 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
+import testAPI from './constants';
 
 // 错误处理方案： 错误类型
 enum ErrorShowType {
@@ -89,8 +90,17 @@ export const errorConfig: RequestConfig = {
   requestInterceptors: [
     (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token = 123');
-      return { ...config, url };
+      if (testAPI) {
+        const url = config?.url;
+        return {
+          ...config,
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          url,
+        };
+      } else {
+        const url = config?.url?.concat('?token = 123');
+        return { ...config, url };
+      }
     },
   ],
 

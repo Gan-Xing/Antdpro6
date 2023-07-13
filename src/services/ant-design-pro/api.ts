@@ -1,15 +1,22 @@
 // @ts-ignore
 /* eslint-disable */
+import testAPI from '@/constants';
 import { request } from '@umijs/max';
-const testAPI = 'https://pmtest.qiuzhi99.com/api'; // 新的baseURL
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
-  return request<{
-    data: API.CurrentUser;
-  }>('/api/currentUser', {
-    method: 'GET',
-    ...(options || {}),
-  });
+  if (testAPI) {
+    return request<API.CurrentUser>('/users/profile', {
+      method: 'GET',
+      ...(options || {}),
+    });
+  } else {
+    return request<{
+      data: API.CurrentUser;
+    }>('/api/currentUser', {
+      method: 'GET',
+      ...(options || {}),
+    });
+  }
 }
 
 /** 退出登录接口 POST /api/login/outLogin */
@@ -23,8 +30,8 @@ export async function outLogin(options?: { [key: string]: any }) {
 /** 登录接口 POST /api/login/account */
 export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
   const { type, email, password } = body;
-  if (type === 'email') {
-    return request<API.LoginResult>(`${testAPI}/users/login`, {
+  if (testAPI) {
+    return request<API.LoginResult>('/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

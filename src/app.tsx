@@ -6,10 +6,10 @@ import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
+import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
+import testAPI from './constants';
 import { errorConfig } from './requestErrorConfig';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-import React from 'react';
-import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -27,7 +27,11 @@ export async function getInitialState(): Promise<{
       const msg = await queryCurrentUser({
         skipErrorHandler: true,
       });
-      return msg.data;
+      if ('data' in msg) {
+        return msg.data;
+      } else {
+        return msg;
+      }
     } catch (error) {
       history.push(loginPath);
     }
@@ -132,5 +136,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const request = {
+  baseURL: testAPI,
   ...errorConfig,
 };
