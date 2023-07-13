@@ -46,6 +46,18 @@ export default [
     ],
   },
   {
+    path: '/auth',
+    name: 'auth',
+    icon: 'table',
+    routes: [
+      {
+        path: '/auth/users',
+        name: 'users',
+        component: './Auth/Users',
+      },
+    ],
+  },
+  {
     name: 'list.table-list',
     icon: 'table',
     path: '/list',
