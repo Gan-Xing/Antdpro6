@@ -106,7 +106,7 @@ export async function removeRule(options?: { [key: string]: any }) {
 /** 获取列表 GET /api/users */
 export async function queryList(
   url: string,
-  params: {
+  params?: {
     // query
     /** 当前的页码 */
     current?: number;
@@ -120,7 +120,7 @@ export async function queryList(
     method: 'GET',
     params: {
       ...params,
-      ...sort,
+      sorter: sort,
       ...filter,
     },
   });

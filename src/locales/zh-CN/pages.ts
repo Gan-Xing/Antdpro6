@@ -75,4 +75,6 @@ export default {
   'pages.users.status': '在职状态',
   'pages.users.createTime': '创建时间',
   'pages.searchTable.editting': '编辑',
+  'pages.searchTable.users.roles.placeholder': '请选择角色',
+  'pages.searchTable.users.department.placeholder': '请选择部门',
 };

@@ -1,3 +1,4 @@
+import useQueryList from '@/hooks/useQueryList';
 import { addRule, queryList, removeRule, updateRule } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -11,7 +12,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, message, Tag } from 'antd';
+import { Button, Drawer, message, Select, Tag, TreeSelect } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -96,7 +97,8 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.UsersListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.UsersListItem[]>([]);
-
+  const { items: roles } = useQueryList('/roles');
+  const { items: department } = useQueryList('/departments');
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
@@ -130,6 +132,10 @@ const TableList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.users.gender" defaultMessage="性别" />,
       dataIndex: 'gender',
+      valueEnum: {
+        男: { text: '男' },
+        女: { text: '男' },
+      },
     },
     {
       title: <FormattedMessage id="pages.users.isSuperAdmin" defaultMessage="是否超级管理员" />,
@@ -137,17 +143,57 @@ const TableList: React.FC = () => {
       render: (dom) => {
         return dom ? <Tag color="success">是</Tag> : <Tag color="default">否</Tag>;
       },
+      valueEnum: {
+        ture: { text: '是' },
+        false: { text: '否' },
+      },
     },
     {
       title: <FormattedMessage id="pages.users.department" defaultMessage="部门" />,
       dataIndex: 'department',
       renderText: (val: { depName: string }) => val?.depName,
+      renderFormItem: () => {
+        return (
+          <TreeSelect
+            showSearch
+            style={{ width: '100%' }}
+            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+            placeholder={intl.formatMessage({
+              id: 'pages.searchTable.users.department.placeholder',
+              defaultMessage: '请选择部门',
+            })}
+            allowClear
+            treeDefaultExpandAll
+            treeData={department}
+          />
+        );
+      },
     },
     {
       title: <FormattedMessage id="pages.users.roles" defaultMessage="角色" />,
       dataIndex: 'roles',
       renderText: (val: { name: string }[]) => {
         return val.map((item) => item.name).join(', ');
+      },
+      renderFormItem() {
+        return (
+          <Select
+            showSearch
+            placeholder={intl.formatMessage({
+              id: 'pages.searchTable.users.roles.placeholder',
+              defaultMessage: '请选择角色',
+            })}
+            allowClear
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+            options={roles?.map((role) => ({
+              label: role.name,
+              value: role.id,
+            }))}
+          />
+        );
       },
     },
     {
@@ -156,9 +202,14 @@ const TableList: React.FC = () => {
       render: (dom) => {
         return dom === '在职' ? <Tag color="success">是</Tag> : <Tag color="default">否</Tag>;
       },
+      valueEnum: {
+        在职: { text: '在职' },
+        离职: { text: '离职' },
+      },
     },
     {
       title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
+      hideInSearch: true,
       dataIndex: 'createdAt',
       valueType: 'date',
     },
