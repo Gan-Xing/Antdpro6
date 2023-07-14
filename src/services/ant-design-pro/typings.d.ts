@@ -32,6 +32,15 @@ declare namespace API {
     currentAuthority?: string;
   };
 
+  type RefreshResult = {
+    refreshToken?: string;
+    success?: boolean;
+    token?: string;
+    status?: string;
+    type?: string;
+    currentAuthority?: string;
+  };
+
   type PageParams = {
     current?: number;
     pageSize?: number;
@@ -68,6 +77,10 @@ declare namespace API {
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;
+  };
+
+  type refreshParams = {
+    refreshToken: string;
   };
 
   type RuleList = {

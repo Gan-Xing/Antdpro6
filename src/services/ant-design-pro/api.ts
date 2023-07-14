@@ -51,6 +51,17 @@ export async function login(body: API.LoginParams, options?: { [key: string]: an
   }
 }
 
+export async function refreshToken(body: API.refreshParams, options?: { [key: string]: any }) {
+  return request<API.RefreshResult>('/users/refresh', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 此处后端没有提供注释 GET /api/notices */
 export async function getNotices(options?: { [key: string]: any }) {
   return request<API.NoticeIconList>('/api/notices', {
@@ -122,6 +133,33 @@ export async function queryList(
       ...params,
       sorter: sort,
       ...filter,
+    },
+  });
+}
+/** 新建规则 POST /api/rule */
+export async function addItems(url: string, options?: { [key: string]: any }) {
+  return request<API.UsersListItem>(url, {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+/** 新建规则 PUT /api/rule */
+export async function updateItem(url: string, options?: { [key: string]: any }) {
+  return request<API.RuleListItem>(url, {
+    method: 'PUT',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+/** 删除规则 DELETE /api/rule */
+export async function removeItem(url: string, options?: { [key: string]: any }) {
+  return request<Record<string, any>>(url, {
+    method: 'DELETE',
+    data: {
+      ...(options || {}),
     },
   });
 }

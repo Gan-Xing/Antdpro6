@@ -23,6 +23,7 @@ export default {
   'menu.form.advanced-form': '高级表单',
   'menu.auth': '授权管理',
   'menu.auth.users': '员工管理',
+  'menu.auth.roles': '角色管理',
   'menu.list': '列表页',
   'menu.list.table-list': '查询表格',
   'menu.list.basic-list': '标准列表',

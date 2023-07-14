@@ -1,7 +1,9 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
+import jwt_decode from 'jwt-decode';
 import testAPI from './constants';
+import { refreshToken } from './services/ant-design-pro/api';
 
 // 错误处理方案： 错误类型
 enum ErrorShowType {
@@ -88,13 +90,39 @@ export const errorConfig: RequestConfig = {
 
   // 请求拦截器
   requestInterceptors: [
-    (config: RequestOptions) => {
+    async (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
       if (testAPI) {
         const url = config?.url;
+        const accessToken = localStorage.getItem('token');
+        if (url?.includes('/users/refresh') || url?.includes('/users/login')) {
+          return {
+            ...config,
+            headers: { Authorization: `Bearer ${accessToken}` },
+            url,
+          };
+        }
+        let newToken;
+        // refresh token
+        if (accessToken) {
+          const currentDate = new Date();
+          const decodedToken = jwt_decode<{ exp: number }>(accessToken);
+          // expired
+          if (decodedToken.exp * 1000 < currentDate.getTime()) {
+            // sent refresh token
+            const response = await refreshToken({
+              refreshToken: localStorage.getItem('refreshtoken')!,
+            });
+            if (response.success) {
+              localStorage.setItem('token', response.token!);
+              localStorage.setItem('refreshToken', response.refreshToken!);
+              newToken = response.token;
+            }
+          }
+        }
         return {
           ...config,
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          headers: { Authorization: `Bearer ${newToken ?? accessToken}` },
           url,
         };
       } else {

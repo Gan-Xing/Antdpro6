@@ -1,10 +1,9 @@
-import useQueryList from '@/hooks/useQueryList';
 import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, message, Modal, Select, Tag, TreeSelect } from 'antd';
+import { Button, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
@@ -19,7 +18,7 @@ import Update from './components/Update';
 const handleAdd = async (fields: API.UsersListItem) => {
   const hide = message.loading('正在添加');
   try {
-    await addItems('/users', { ...fields });
+    await addItems('/roles', { ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -39,7 +38,7 @@ const handleAdd = async (fields: API.UsersListItem) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('正在更新');
   try {
-    await updateItem(`/users/${fields.id}`, fields);
+    await updateItem(`/roles/${fields.id}`, fields);
     hide();
 
     message.success('更新成功');
@@ -61,7 +60,7 @@ const handleRemove = async (ids: number[]) => {
   const hide = message.loading('正在删除');
   if (!ids) return true;
   try {
-    await removeItem('/users', {
+    await removeItem('/roles', {
       ids,
     });
     hide();
@@ -91,8 +90,7 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.UsersListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.UsersListItem[]>([]);
-  const { items: roles } = useQueryList('/roles');
-  const { items: department } = useQueryList('/departments');
+
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
@@ -101,9 +99,9 @@ const TableList: React.FC = () => {
 
   const columns: ProColumns<API.UsersListItem>[] = [
     {
-      title: <FormattedMessage id="pages.users.username" defaultMessage="姓名" />,
-      dataIndex: 'username',
-      tip: '员工姓名',
+      title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
+      dataIndex: 'name',
+      tip: '名称',
       render: (dom, entity) => {
         return (
           <a
@@ -118,97 +116,33 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.users.email" defaultMessage="邮箱" />,
-      dataIndex: 'email',
-      copyable: true,
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.users.gender" defaultMessage="性别" />,
-      dataIndex: 'gender',
-      valueEnum: {
-        男: { text: '男' },
-        女: { text: '男' },
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.users.isSuperAdmin" defaultMessage="是否超级管理员" />,
-      dataIndex: 'isAdmin',
-      render: (_, entity) => {
-        return entity?.isAdmin ? <Tag color="success">是</Tag> : <Tag color="default">否</Tag>;
-      },
-      valueEnum: {
-        ture: { text: '是' },
-        false: { text: '否' },
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.users.department" defaultMessage="部门" />,
-      dataIndex: 'department',
-      renderText: (val: { depName: string }) => val?.depName,
-      renderFormItem: () => {
-        return (
-          <TreeSelect
-            showSearch
-            style={{ width: '100%' }}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            placeholder={intl.formatMessage({
-              id: 'pages.searchTable.users.department.placeholder',
-              defaultMessage: '请选择部门',
-            })}
-            allowClear
-            treeDefaultExpandAll
-            treeData={department}
-          />
-        );
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.users.roles" defaultMessage="角色" />,
-      dataIndex: 'roles',
+      title: <FormattedMessage id="pages.roles.permissions" defaultMessage="权限列表" />,
+      dataIndex: 'permissions',
       renderText: (val: { name: string }[]) => {
         return val.map((item) => item.name).join(', ');
       },
-      renderFormItem() {
-        return (
-          <Select
-            showSearch
-            placeholder={intl.formatMessage({
-              id: 'pages.searchTable.users.roles.placeholder',
-              defaultMessage: '请选择角色',
-            })}
-            allowClear
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-            }
-            options={roles?.map((role: { name: string; id: number }) => ({
-              label: role.name,
-              value: role.id,
-            }))}
-          />
-        );
-      },
+      hideInSearch: true,
+      hideInTable: true,
     },
     {
-      title: <FormattedMessage id="pages.users.status" defaultMessage="在职状态" />,
-      dataIndex: 'status',
-      render: (_, entity) => {
-        return entity?.status === '在职' ? (
-          <Tag color="success">是</Tag>
-        ) : (
-          <Tag color="default">否</Tag>
-        );
+      title: <FormattedMessage id="pages.roles.users" defaultMessage="用户列表" />,
+      dataIndex: 'employees',
+      renderText: (val: { username: string }[]) => {
+        return val.map((item) => item.username).join(', ');
       },
-      valueEnum: {
-        在职: { text: '在职' },
-        离职: { text: '离职' },
-      },
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
       hideInSearch: true,
       dataIndex: 'createdAt',
+      valueType: 'date',
+    },
+    {
+      title: <FormattedMessage id="pages.roles.updatedTime" defaultMessage="更新时间" />,
+      hideInSearch: true,
+      hideInTable: true,
+      dataIndex: 'updatedAt',
       valueType: 'date',
     },
     {
@@ -252,8 +186,8 @@ const TableList: React.FC = () => {
     <PageContainer>
       <ProTable<API.UsersListItem, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'menu.auth.users',
-          defaultMessage: '员工管理',
+          id: 'menu.auth.roles',
+          defaultMessage: '角色管理',
         })}
         actionRef={actionRef}
         pagination={{ defaultPageSize: 10 }}
@@ -261,7 +195,6 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        scroll={{ x: 1200 }}
         toolBarRender={() => [
           <Button
             type="primary"
@@ -273,7 +206,7 @@ const TableList: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={async (params, sort, filter) => queryList('/users', params, sort, filter)}
+        request={async (params, sort, filter) => queryList('/roles', params, sort, filter)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
