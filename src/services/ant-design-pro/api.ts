@@ -102,3 +102,26 @@ export async function removeRule(options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
+
+/** 获取列表 GET /api/users */
+export async function queryList(
+  url: string,
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  sort?: { [key: string]: any },
+  filter?: { [key: string]: any },
+) {
+  return request<API.UsersList>(url, {
+    method: 'GET',
+    params: {
+      ...params,
+      ...sort,
+      ...filter,
+    },
+  });
+}

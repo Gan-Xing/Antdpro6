@@ -52,6 +52,24 @@ declare namespace API {
     progress?: number;
   };
 
+  type UsersListItem = {
+    name?: string;
+    id?: number;
+    username?: string;
+    gender?: string;
+    isAdmin?: boolean;
+    email?: string;
+    status?: string;
+    roles?: any[];
+    createdAt?: string;
+  };
+  type UsersList = {
+    data?: UsersListItem[];
+    /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
+  };
+
   type RuleList = {
     data?: RuleListItem[];
     /** 列表的内容总数 */

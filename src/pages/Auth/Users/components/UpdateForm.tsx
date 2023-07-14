@@ -1,12 +1,12 @@
 import {
-  ProFormDateTimePicker,
-  ProFormRadio,
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  StepsForm,
+ProFormDateTimePicker,
+ProFormRadio,
+ProFormSelect,
+ProFormText,
+ProFormTextArea,
+StepsForm
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
+import { FormattedMessage,useIntl } from '@umijs/max';
 import { Modal } from 'antd';
 import React from 'react';
 
@@ -16,13 +16,13 @@ export type FormValueType = {
   type?: string;
   time?: string;
   frequency?: string;
-} & Partial<API.RuleListItem>;
+} & Partial<API.UsersListItem>;
 
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (values: FormValueType) => Promise<void>;
   updateModalOpen: boolean;
-  values: Partial<API.RuleListItem>;
+  values: Partial<API.UsersListItem>;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {

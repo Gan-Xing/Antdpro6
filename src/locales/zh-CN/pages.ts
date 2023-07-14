@@ -66,4 +66,13 @@ export default {
   'pages.searchTable.tenThousand': '万',
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
+  'pages.users.username': '姓名',
+  'pages.users.email': '登录邮箱',
+  'pages.users.gender': '性别',
+  'pages.users.isSuperAdmin': '是否超级管理员',
+  'pages.users.department': '部门',
+  'pages.users.roles': '角色',
+  'pages.users.status': '在职状态',
+  'pages.users.createTime': '创建时间',
+  'pages.searchTable.editting': '编辑',
 };
