@@ -1,5 +1,6 @@
 import { ModalForm } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
+import { Form } from 'antd';
 import React from 'react';
 import BaseForm from './BaseForm';
 interface Props {
@@ -10,8 +11,11 @@ interface Props {
 const Create: React.FC<Props> = (props) => {
   const { open, onOpenChange, onFinish } = props;
   const intl = useIntl();
+  const [form] = Form.useForm();
+
   return (
     <ModalForm
+      form={form}
       title={intl.formatMessage({
         id: 'pages.searchTable.createForm.newRole',
         defaultMessage: '新建角色',
@@ -21,7 +25,7 @@ const Create: React.FC<Props> = (props) => {
       onOpenChange={onOpenChange}
       onFinish={onFinish}
     >
-      <BaseForm />
+      <BaseForm form={form} />
     </ModalForm>
   );
 };

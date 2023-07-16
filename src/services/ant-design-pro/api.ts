@@ -1,7 +1,13 @@
 // @ts-ignore
 /* eslint-disable */
 import testAPI from '@/constants';
+import type { MenuDataItem } from '@ant-design/pro-components';
 import { request } from '@umijs/max';
+
+interface menuResponse {
+  success: boolean;
+  data: MenuDataItem[];
+}
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
   if (testAPI) {
@@ -17,6 +23,13 @@ export async function currentUser(options?: { [key: string]: any }) {
       ...(options || {}),
     });
   }
+}
+
+/** 获取当前的目录 GET /menu/fetch */
+export async function fetchMenuData() {
+  return request<menuResponse>('/menus/fetch', {
+    method: 'GET',
+  });
 }
 
 /** 退出登录接口 POST /api/login/outLogin */

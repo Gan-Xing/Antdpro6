@@ -2,7 +2,7 @@ import { addItems, queryList, removeItem, updateItem } from '@/services/ant-desi
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
+import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
 import { Button, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
@@ -96,7 +96,7 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-
+  const access = useAccess();
   const columns: ProColumns<API.UsersListItem>[] = [
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
@@ -151,15 +151,17 @@ const TableList: React.FC = () => {
       valueType: 'option',
       fixed: 'right',
       render: (_, record) => [
-        <a
-          key="update"
-          onClick={() => {
-            handleUpdateModalOpen(true);
-            setCurrentRow(record);
-          }}
-        >
-          <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-        </a>,
+        access.canUpdateRole && (
+          <a
+            key="update"
+            onClick={() => {
+              handleUpdateModalOpen(true);
+              setCurrentRow(record);
+            }}
+          >
+            <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+          </a>
+        ),
         <a
           key="delete"
           onClick={() => {
@@ -196,15 +198,17 @@ const TableList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
+          access.canCreateRole && (
+            <Button
+              type="primary"
+              key="primary"
+              onClick={() => {
+                handleModalOpen(true);
+              }}
+            >
+              <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+            </Button>
+          ),
         ]}
         request={async (params, sort, filter) => queryList('/roles', params, sort, filter)}
         columns={columns}

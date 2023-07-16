@@ -9,7 +9,7 @@ import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
 import testAPI from './constants';
 import { errorConfig } from './requestErrorConfig';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import { currentUser as queryCurrentUser, fetchMenuData } from './services/ant-design-pro/api';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -62,6 +62,21 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       title: <AvatarName />,
       render: (_, avatarChildren) => {
         return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
+      },
+    },
+    menu: {
+      // 每当 initialState?.currentUser?.userid 发生修改时重新执行 request
+      params: {
+        userId: initialState?.currentUser?.id,
+      },
+      request: async () => {
+        // initialState.currentUser 中包含了所有用户信息
+        const { data, success } = await fetchMenuData();
+        if (success) {
+          return data;
+        } else {
+          return [];
+        }
       },
     },
     waterMarkProps: {

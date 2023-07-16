@@ -16,8 +16,10 @@ export type UpdateFormProps = {
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const { updateModalOpen, onCancel, onSubmit, values } = props;
   const intl = useIntl();
+  const [form] = Form.useForm();
   return (
     <ModalForm
+      form={form}
       title={intl.formatMessage({
         id: 'pages.searchTable.createForm.newUser',
         defaultMessage: '新建用户',
@@ -32,10 +34,9 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       onFinish={onSubmit}
       initialValues={{
         ...values,
-        roleIds: values.roles?.map((role) => role.id),
       }}
     >
-      <BaseForm />
+      <BaseForm permissions={values.permissions} form={form} />
       <Form.Item name="id" label={false}>
         <Input type="hidden" />
       </Form.Item>
