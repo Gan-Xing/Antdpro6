@@ -12,7 +12,7 @@ import {
 import {
   LoginForm,
   ProFormCaptcha,
-  ProFormCheckbox,
+  // ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
@@ -21,6 +21,7 @@ import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
+import * as authUtil from '@/utils/auth';
 
 const ActionIcons = () => {
   const langClassName = useEmotionCss(({ token }) => {
@@ -84,7 +85,7 @@ const LoginMessage: React.FC<{
 };
 
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState, setUserLoginState] = useState<Common.ResponseStructure<Auth.Token>>();
   const [type, setType] = useState<string>('email');
   const { initialState, setInitialState } = useModel('@@initialState');
 
@@ -117,23 +118,22 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const msg = await login({ ...values, type });
-      if ((type === 'email' && msg && msg.success) || msg.status === 'ok') {
+      // const { data, success, message } = await login({ ...values, type });
+      const data = await login({ ...values, type });
+      if (data.data) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
-        if (msg.token) localStorage.setItem('token', msg.token);
-        if (msg.refreshToken) localStorage.setItem('refreshToken', msg.refreshToken);
+        authUtil.setToken(data.data);
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
         return;
       }
-      console.log(msg);
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      setUserLoginState(data);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -143,7 +143,7 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
-  const { status, type: loginType } = userLoginState;
+  const success = userLoginState?.success;
 
   return (
     <div className={containerClassName}>
@@ -211,7 +211,7 @@ const Login: React.FC = () => {
               },
             ]}
           />
-          {status === 'error' && loginType === 'email' && (
+          {success && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.emailLogin.errorMessage',
@@ -268,14 +268,14 @@ const Login: React.FC = () => {
             </>
           )}
 
-          {status === 'error' && loginType === 'account' && (
+          {/* {status === 'error' && loginType === 'account' && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
                 defaultMessage: '账户或密码错误(admin/ant.design)',
               })}
             />
-          )}
+          )} */}
           {type === 'account' && (
             <>
               <ProFormText
@@ -325,7 +325,7 @@ const Login: React.FC = () => {
             </>
           )}
 
-          {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误" />}
+          {/* {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误" />} */}
           {type === 'mobile' && (
             <>
               <ProFormText
@@ -407,7 +407,7 @@ const Login: React.FC = () => {
               />
             </>
           )}
-          {loginType && loginType !== 'email' && (
+          {/* {loginType && loginType !== 'email' && (
             <div
               style={{
                 marginBottom: 24,
@@ -425,7 +425,7 @@ const Login: React.FC = () => {
                 <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
               </a>
             </div>
-          )}
+          )} */}
         </LoginForm>
       </div>
       <Footer />

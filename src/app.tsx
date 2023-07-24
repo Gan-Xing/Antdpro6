@@ -7,9 +7,8 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
-import testAPI from './constants';
-import { errorConfig } from './requestErrorConfig';
 import { currentUser as queryCurrentUser, fetchMenuData } from './services/ant-design-pro/api';
+import { errorConfig } from './utils/request/requestErrorConfig';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -18,9 +17,9 @@ const loginPath = '/user/login';
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.CurrentUser;
+  currentUser?: User.CurrentUser;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<User.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -65,7 +64,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       },
     },
     menu: {
-      // 每当 initialState?.currentUser?.userid 发生修改时重新执行 request
+      // 每当 initialState?.currentUser?.userid
       params: {
         userId: initialState?.currentUser?.id,
       },
@@ -80,7 +79,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       },
     },
     waterMarkProps: {
-      content: testAPI ? '' : initialState?.currentUser?.name,
+      content: initialState?.currentUser?.username,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {
@@ -150,7 +149,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
  * 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
  * @doc https://umijs.org/docs/max/request#配置
  */
+console.log('process.env', process.env);
 export const request = {
-  baseURL: testAPI,
   ...errorConfig,
 };

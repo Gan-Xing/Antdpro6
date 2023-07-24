@@ -2,30 +2,6 @@
 /* eslint-disable */
 
 declare namespace API {
-  type CurrentUser = {
-    id?: number;
-    name?: string;
-    avatar?: string;
-    userid?: string;
-    email?: string;
-    signature?: string;
-    title?: string;
-    group?: string;
-    tags?: { key?: string; label?: string }[];
-    notifyCount?: number;
-    unreadCount?: number;
-    country?: string;
-    access?: string;
-    geographic?: {
-      province?: { label?: string; key?: string };
-      city?: { label?: string; key?: string };
-    };
-    address?: string;
-    phone?: string;
-    isAdmin?: boolean;
-    roles?: any;
-  };
-
   type LoginResult = {
     refreshToken?: string;
     success?: boolean;
@@ -76,15 +52,12 @@ declare namespace API {
     createdAt?: string;
     permissions?: { id: number }[];
   };
+
   type UsersList = {
     data?: UsersListItem[];
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;
-  };
-
-  type refreshParams = {
-    refreshToken: string;
   };
 
   type RuleList = {
