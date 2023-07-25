@@ -91,4 +91,12 @@ export default {
   'pages.roles.permissions': '权限列表',
   'pages.roles.updatedTime': '更新时间',
   'pages.searchTable.createForm.newRole': '新增角色',
+  'pages.permission.name': '权限名称',
+  'pages.permissions.group': '所属权限组',
+  'pages.searchTable.path.placeholder': '请输入路径',
+  'pages.searchTable.method.placeholder': '请输入方法',
+  'pages.permissions.path': '请求路径',
+  'pages.permissions.method': '请求方法',
+  'pages.placeholder': '请输入!',
+  'pages.permissions.permissionGroup': '选择权限组',
 };

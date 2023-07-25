@@ -7,7 +7,7 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
-import { currentUser as queryCurrentUser, fetchMenuData } from './services/ant-design-pro/api';
+import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import { errorConfig } from './utils/request/requestErrorConfig';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -63,21 +63,21 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
       },
     },
-    menu: {
-      // 每当 initialState?.currentUser?.userid
-      params: {
-        userId: initialState?.currentUser?.id,
-      },
-      request: async () => {
-        // initialState.currentUser 中包含了所有用户信息
-        const { data, success } = await fetchMenuData();
-        if (success) {
-          return data;
-        } else {
-          return [];
-        }
-      },
-    },
+    // menu: {
+    //   // 每当 initialState?.currentUser?.userid
+    //   params: {
+    //     userId: initialState?.currentUser?.id,
+    //   },
+    //   request: async () => {
+    //     // initialState.currentUser 中包含了所有用户信息
+    //     const { data, success } = await fetchMenuData();
+    //     if (success) {
+    //       return data;
+    //     } else {
+    //       return [];
+    //     }
+    //   },
+    // },
     waterMarkProps: {
       content: initialState?.currentUser?.username,
     },

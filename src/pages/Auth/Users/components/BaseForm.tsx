@@ -129,7 +129,6 @@ const BaseForm: React.FC<Props> = (props) => {
             filterTreeNode: true,
             showSearch: true,
             treeDefaultExpandAll: true,
-            popupMatchSelectWidth: false,
             autoClearSearchValue: true,
             // multiple: true,
             treeNodeFilterProp: 'title',

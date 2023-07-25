@@ -2,7 +2,7 @@ import { addItems, queryList, removeItem, updateItem } from '@/services/ant-desi
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
-import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
+import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
@@ -95,10 +95,9 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const access = useAccess();
   const columns: ProColumns<API.UsersListItem>[] = [
     {
-      title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
+      title: <FormattedMessage id="pages.permission.name" defaultMessage="权限名称" />,
       dataIndex: 'name',
       tip: '名称',
       render: (dom, entity) => {
@@ -115,19 +114,10 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.roles.permissions" defaultMessage="权限列表" />,
-      dataIndex: 'permissions',
-      renderText: (val: { name: string }[]) => {
-        return val.map((item) => item.name).join(', ');
-      },
-      hideInSearch: true,
-      hideInTable: true,
-    },
-    {
-      title: <FormattedMessage id="pages.roles.users" defaultMessage="用户列表" />,
-      dataIndex: 'employees',
-      renderText: (val: { username: string }[]) => {
-        return val.map((item) => item.username).join(', ');
+      title: <FormattedMessage id="pages.permissions.group" defaultMessage="所属权限组" />,
+      dataIndex: 'permissionGroup',
+      renderText: (val) => {
+        return `${val.parent.name}-${val.name}`;
       },
       hideInSearch: true,
     },
@@ -138,29 +128,20 @@ const TableList: React.FC = () => {
       valueType: 'date',
     },
     {
-      title: <FormattedMessage id="pages.roles.updatedTime" defaultMessage="更新时间" />,
-      hideInSearch: true,
-      hideInTable: true,
-      dataIndex: 'updatedAt',
-      valueType: 'date',
-    },
-    {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
       render: (_, record) => [
-        access.canUpdateRole && (
-          <a
-            key="update"
-            onClick={() => {
-              handleUpdateModalOpen(true);
-              setCurrentRow(record);
-            }}
-          >
-            <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-          </a>
-        ),
+        <a
+          key="update"
+          onClick={() => {
+            handleUpdateModalOpen(true);
+            setCurrentRow(record);
+          }}
+        >
+          <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+        </a>,
         <a
           key="delete"
           onClick={() => {
@@ -187,8 +168,8 @@ const TableList: React.FC = () => {
     <PageContainer>
       <ProTable<API.UsersListItem, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'menu.auth.roles',
-          defaultMessage: '角色管理',
+          id: 'menu.auth.permissions',
+          defaultMessage: '权限管理',
         })}
         actionRef={actionRef}
         pagination={{ defaultPageSize: 10 }}
@@ -197,17 +178,15 @@ const TableList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          access.canCreateRole && (
-            <Button
-              type="primary"
-              key="primary"
-              onClick={() => {
-                handleModalOpen(true);
-              }}
-            >
-              <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-            </Button>
-          ),
+          <Button
+            type="primary"
+            key="primary"
+            onClick={() => {
+              handleModalOpen(true);
+            }}
+          >
+            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+          </Button>,
         ]}
         request={async (params, sort, filter) => queryList('/roles', params, sort, filter)}
         columns={columns}
