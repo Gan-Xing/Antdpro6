@@ -1,9 +1,10 @@
 import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { CarryOutOutlined, FormOutlined, PlusOutlined } from '@ant-design/icons';
+import type { ActionType, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, message, Modal } from 'antd';
+import { Button, message, Modal, Tree } from 'antd';
+import { DataNode } from 'antd/es/tree';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
@@ -14,10 +15,10 @@ import Update, { FormValueType } from './components/Update';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: Permissions.CreateParams) => {
+const handleAdd = async (fields: API.UsersListItem) => {
   const hide = message.loading('正在添加');
   try {
-    await addItems('/permissions', { ...fields });
+    await addItems('/roles', { ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -95,29 +96,97 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const columns: ProColumns<API.UsersListItem>[] = [
+  const columns = [
     {
-      title: <FormattedMessage id="pages.permission.name" defaultMessage="权限名称" />,
+      title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
       dataIndex: 'name',
       tip: '名称',
-      render: (dom, entity) => {
+      render: (dom: any, entity: any) => {
+        console.log('dom,entity', dom, entity);
+        const onSelect = (selectedKeys: React.Key[], info: any) => {
+          console.log('selected', selectedKeys, info);
+        };
+        const treeData: DataNode[] = [
+          {
+            title: 'parent 1',
+            key: '0-0',
+            icon: <CarryOutOutlined />,
+            children: [
+              {
+                title: 'parent 1-0',
+                key: '0-0-0',
+                icon: <CarryOutOutlined />,
+                children: [
+                  { title: 'leaf', key: '0-0-0-0', icon: <CarryOutOutlined /> },
+                  {
+                    title: (
+                      <>
+                        <div>multiple line title</div>
+                        <div>multiple line title</div>
+                      </>
+                    ),
+                    key: '0-0-0-1',
+                    icon: <CarryOutOutlined />,
+                  },
+                  { title: 'leaf', key: '0-0-0-2', icon: <CarryOutOutlined /> },
+                ],
+              },
+              {
+                title: 'parent 1-1',
+                key: '0-0-1',
+                icon: <CarryOutOutlined />,
+                children: [{ title: 'leaf', key: '0-0-1-0', icon: <CarryOutOutlined /> }],
+              },
+              {
+                title: 'parent 1-2',
+                key: '0-0-2',
+                icon: <CarryOutOutlined />,
+                children: [
+                  { title: 'leaf', key: '0-0-2-0', icon: <CarryOutOutlined /> },
+                  {
+                    title: 'leaf',
+                    key: '0-0-2-1',
+                    icon: <CarryOutOutlined />,
+                    switcherIcon: <FormOutlined />,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            title: 'parent 2',
+            key: '0-1',
+            icon: <CarryOutOutlined />,
+            children: [
+              {
+                title: 'parent 2-0',
+                key: '0-1-0',
+                icon: <CarryOutOutlined />,
+                children: [
+                  { title: 'leaf', key: '0-1-0-0', icon: <CarryOutOutlined /> },
+                  { title: 'leaf', key: '0-1-0-1', icon: <CarryOutOutlined /> },
+                ],
+              },
+            ],
+          },
+        ];
         return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
+          <div>
+            <Tree
+              showLine={true}
+              defaultExpandedKeys={['0-0-0']}
+              onSelect={onSelect}
+              treeData={treeData}
+            />
+          </div>
         );
       },
     },
     {
-      title: <FormattedMessage id="pages.permissions.group" defaultMessage="所属权限组" />,
-      dataIndex: 'permissionGroup',
-      renderText: (val) => {
-        return `${val.parent.name}-${val.name}`;
+      title: <FormattedMessage id="pages.menus.permissions" defaultMessage="绑定权限" />,
+      dataIndex: 'permission',
+      renderText: (val: { name: string }) => {
+        return val.name;
       },
       hideInSearch: true,
     },
@@ -132,7 +201,7 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
-      render: (_, record) => [
+      render: (_: any, record: any) => [
         <a
           key="update"
           onClick={() => {
@@ -166,10 +235,10 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.UsersListItem, API.PageParams>
+      <ProTable
         headerTitle={intl.formatMessage({
-          id: 'menu.auth.permissions',
-          defaultMessage: '权限管理',
+          id: 'menu.auth.menus',
+          defaultMessage: '菜单管理',
         })}
         actionRef={actionRef}
         pagination={{ defaultPageSize: 10 }}
@@ -235,7 +304,7 @@ const TableList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as Permissions.CreateParams);
+          const success = await handleAdd(value as API.UsersListItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {

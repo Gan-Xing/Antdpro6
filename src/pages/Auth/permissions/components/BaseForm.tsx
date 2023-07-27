@@ -1,4 +1,5 @@
 // import useQueryList from '@/hooks/useQueryList';
+import useQueryList from '@/hooks/useQueryList';
 import { ProForm, ProFormSelect, ProFormText, ProFormTreeSelect } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { FormInstance } from 'antd';
@@ -19,7 +20,21 @@ const BaseForm: React.FC<Props> = () => {
   // const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
   // const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
 
-  // const { items: permission_groups } = useQueryList('/permission_groups');
+  // const { items: permissions } = useQueryList('/permissiongroups');
+  // console.log(permissions);
+
+  function transformData(data: any) {
+    return data.map((item: any) => ({
+      title: item.name,
+      value: item.id,
+      key: item.id,
+      children: item.children ? transformData(item.children) : [],
+    }));
+  }
+
+  const { items: data } = useQueryList('/permissiongroups');
+  const permissions = transformData(data);
+
   // const onExpand = (expandedKeysValue: Key[]) => {
   //   console.log('onExpand', expandedKeysValue);
   //   // if not set autoExpandParent to false, if children expanded, parent can not collapse.
@@ -94,11 +109,11 @@ const BaseForm: React.FC<Props> = () => {
             defaultMessage: '请求方法',
           })}
           valueEnum={{
-            0: 'GET',
-            1: 'POST',
-            2: 'DELETE',
-            3: 'PUT',
-            4: 'PATCH',
+            GET: 'GET',
+            POST: 'POST',
+            DELETE: 'DELETE',
+            PUT: 'PUT',
+            PATCH: 'PATCH',
           }}
           width="md"
           placeholder={intl.formatMessage({
@@ -137,8 +152,14 @@ const BaseForm: React.FC<Props> = () => {
             fieldNames: {
               label: 'title',
             },
-            treeData: [],
+            treeData: permissions,
           }}
+          rules={[
+            {
+              required: true,
+              message: <FormattedMessage id="pages.placeholder" defaultMessage="请输入！" />,
+            },
+          ]}
         />
       </ProForm.Group>
     </>

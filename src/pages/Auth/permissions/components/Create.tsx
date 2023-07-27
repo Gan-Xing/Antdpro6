@@ -17,10 +17,10 @@ const Create: React.FC<Props> = (props) => {
     <ModalForm
       form={form}
       title={intl.formatMessage({
-        id: 'pages.searchTable.createForm.newRole',
+        id: 'pages.searchTable.createForm.newPermission',
         defaultMessage: '新建权限',
       })}
-      width="420px"
+      width="380px"
       open={open}
       onOpenChange={onOpenChange}
       onFinish={onFinish}

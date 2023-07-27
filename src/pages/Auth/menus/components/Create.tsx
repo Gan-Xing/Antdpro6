@@ -20,7 +20,7 @@ const Create: React.FC<Props> = (props) => {
         id: 'pages.searchTable.createForm.newRole',
         defaultMessage: '新建角色',
       })}
-      width="70%"
+      width="380px"
       open={open}
       onOpenChange={onOpenChange}
       onFinish={onFinish}

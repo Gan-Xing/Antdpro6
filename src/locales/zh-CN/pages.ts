@@ -99,4 +99,9 @@ export default {
   'pages.permissions.method': '请求方法',
   'pages.placeholder': '请输入!',
   'pages.permissions.permissionGroup': '选择权限组',
+  'pages.menus.permissions': '绑定权限',
+  'pages.menus.parentid': '上级菜单',
+  'pages.munus.permission': '选择权限',
+  'pages.select.rules.permission': '请选择权限',
+  'pages.searchTable.createForm.newPermission': '新建权限',
 };

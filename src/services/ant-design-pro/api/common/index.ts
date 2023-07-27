@@ -1,5 +1,5 @@
-import { request } from '@umijs/max';
 import type { MenuDataItem } from '@ant-design/pro-components';
+import { request } from '@umijs/max';
 
 interface menuResponse {
   success: boolean;
@@ -18,7 +18,7 @@ export async function queryList(
   sort?: { [key: string]: any },
   filter?: { [key: string]: any },
 ) {
-  return request<API.UsersList>(url, {
+  return request<Common.ResponseStructure<any>>(url, {
     method: 'GET',
     params: {
       ...params,
@@ -29,7 +29,7 @@ export async function queryList(
 }
 /** 新建规则 POST /api/rule */
 export async function addItems(url: string, options?: { [key: string]: any }) {
-  return request<API.UsersListItem>(url, {
+  return request(url, {
     method: 'POST',
     data: {
       ...(options || {}),
