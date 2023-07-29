@@ -17,8 +17,8 @@ const Create: React.FC<Props> = (props) => {
     <ModalForm
       form={form}
       title={intl.formatMessage({
-        id: 'pages.searchTable.createForm.newRole',
-        defaultMessage: '新建角色',
+        id: 'pages.searchTable.createForm.newMenus',
+        defaultMessage: '新增菜单',
       })}
       width="380px"
       open={open}

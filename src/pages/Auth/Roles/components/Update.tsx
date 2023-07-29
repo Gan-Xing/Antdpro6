@@ -1,22 +1,27 @@
 import { ModalForm } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Form, Input } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import BaseForm from './BaseForm';
-
-export type FormValueType = Partial<API.UsersListItem>;
 
 export type UpdateFormProps = {
   onCancel: (visible: boolean) => void;
-  onSubmit: (values: FormValueType) => Promise<void>;
+  onSubmit: (values: Roles.CreateParams) => Promise<void>;
   updateModalOpen: boolean;
-  values: Partial<API.UsersListItem>;
+  values: Partial<User.UsersEntity>;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const { updateModalOpen, onCancel, onSubmit, values } = props;
   const intl = useIntl();
   const [form] = Form.useForm();
+  useEffect(() => {
+    if (updateModalOpen) {
+      form.setFieldsValue(values);
+    } else {
+      form.resetFields();
+    }
+  }, [updateModalOpen, form, values]);
   return (
     <ModalForm
       form={form}

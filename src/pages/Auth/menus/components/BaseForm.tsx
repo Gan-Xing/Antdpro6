@@ -1,3 +1,4 @@
+import useQueryList from '@/hooks/useQueryList';
 import { ProForm, ProFormText, ProFormTreeSelect } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { FormInstance } from 'antd';
@@ -16,6 +17,18 @@ const BaseForm: React.FC<Props> = () => {
   // );
   // const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
   // const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+
+  function transformData(data: any) {
+    return data.map((item: any) => ({
+      title: item.name,
+      value: item.id,
+      key: item.id,
+      children: item.children ? transformData(item.children) : [],
+    }));
+  }
+
+  const { items: permissiongroupsdata } = useQueryList('/permissiongroups');
+  const permissiongroups = transformData(permissiongroupsdata);
 
   // const { items: permission_groups } = useQueryList('/permission_groups');
   // const onExpand = (expandedKeysValue: Key[]) => {
@@ -110,44 +123,8 @@ const BaseForm: React.FC<Props> = () => {
             fieldNames: {
               label: 'title',
             },
-            treeData: [],
+            treeData: permissiongroups,
           }}
-        />{' '}
-        <ProFormTreeSelect
-          name="permissionGroupId"
-          placeholder={intl.formatMessage({
-            id: 'pages.searchTable.select.placeholder',
-            defaultMessage: '请选择',
-          })}
-          allowClear
-          width="md"
-          secondary
-          label={intl.formatMessage({
-            id: 'pages.munus.permission',
-            defaultMessage: ' 选择权限',
-          })}
-          // tree-select args
-          fieldProps={{
-            showArrow: false,
-            filterTreeNode: true,
-            showSearch: true,
-            treeDefaultExpandAll: true,
-            autoClearSearchValue: true,
-            // multiple: true,
-            treeNodeFilterProp: 'title',
-            fieldNames: {
-              label: 'title',
-            },
-            treeData: [],
-          }}
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage id="pages.select.rules.permission" defaultMessage="请选择权限" />
-              ),
-            },
-          ]}
         />
       </ProForm.Group>
     </>

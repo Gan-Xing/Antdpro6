@@ -20,8 +20,8 @@ export const getRefreshToken = () => {
 
 // 设置token
 export const setToken = (token: Auth.Token) => {
-  wsCache.set(RefreshTokenKey, token.refreshToken, { exp: token.accessExpiresIn });
-  wsCache.set(AccessTokenKey, token.accessToken, { exp: token.refreshExpiresIn });
+  wsCache.set(RefreshTokenKey, token.refreshToken, { exp: token.refreshExpiresIn });
+  wsCache.set(AccessTokenKey, token.accessToken, { exp: token.accessExpiresIn });
 };
 
 // 删除token

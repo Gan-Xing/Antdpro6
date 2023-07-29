@@ -22,7 +22,7 @@ export default {
   'menu.form.step-form.result': '分步表单（完成）',
   'menu.form.advanced-form': '高级表单',
   'menu.auth': '授权管理',
-  'menu.auth.users': '员工管理',
+  'menu.auth.users': '用户管理',
   'menu.auth.roles': '角色管理',
   'menu.auth.permissions': '权限管理',
   'menu.auth.menus': '菜单管理',

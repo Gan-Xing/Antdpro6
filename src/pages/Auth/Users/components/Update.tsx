@@ -4,13 +4,11 @@ import { Form, Input } from 'antd';
 import React from 'react';
 import BaseForm from './BaseForm';
 
-export type FormValueType = Partial<API.UsersListItem>;
-
 export type UpdateFormProps = {
   onCancel: (visible: boolean) => void;
-  onSubmit: (values: FormValueType) => Promise<void>;
+  onSubmit: (values: User.UpdateUserParams) => Promise<void>;
   updateModalOpen: boolean;
-  values: Partial<API.UsersListItem>;
+  values: User.UpdateUserParams;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
@@ -32,7 +30,9 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       onFinish={onSubmit}
       initialValues={{
         ...values,
-        roleIds: values.roles?.map((role) => role.id),
+        roles: values.roles?.map((role: { id: any }) => role.id),
+        gender: values.gender?.toString(), // 将gender值从数字转换为字符串
+        status: values.status?.toString(), // 将gender值从数字转换为字符串
       }}
     >
       <BaseForm />

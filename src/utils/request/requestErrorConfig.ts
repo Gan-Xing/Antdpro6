@@ -1,10 +1,10 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 
+import * as authUtil from '@/utils/auth';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
 import jwt_decode from 'jwt-decode';
 import { config } from './config';
-import * as authUtil from '@/utils/auth';
 // import errorCode from './errorCode';
 // import { useRequest } from 'umi';
 import { refreshToken } from '@/services/ant-design-pro/api';
@@ -14,7 +14,6 @@ const { base_url, request_timeout } = config;
 //   '无效的刷新令牌', // 刷新令牌被删除时，不用提示
 //   '刷新令牌已过期', // 使用刷新令牌，刷新获取新的访问令牌时，结果因为过期失败，此时需要忽略。否则，会导致继续 401，无法跳转到登出界面
 // ];
-console.log('config', config);
 // let requestList: any[] = [];
 // 是否正在刷新中
 // let isRefreshToken = false;

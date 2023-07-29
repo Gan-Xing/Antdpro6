@@ -1,11 +1,5 @@
 import useQueryList from '@/hooks/useQueryList';
-import {
-  ProForm,
-  ProFormCheckbox,
-  ProFormSelect,
-  ProFormText,
-  ProFormTreeSelect,
-} from '@ant-design/pro-components';
+import { ProForm, ProFormCheckbox, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import React from 'react';
 interface Props {
@@ -13,7 +7,6 @@ interface Props {
 }
 const BaseForm: React.FC<Props> = (props) => {
   const { newRecord } = props;
-  const { items: departments } = useQueryList('/departments');
   const { items: roles } = useQueryList('/roles');
   const intl = useIntl();
   return (
@@ -66,8 +59,8 @@ const BaseForm: React.FC<Props> = (props) => {
             defaultMessage: '性别',
           })}
           valueEnum={{
-            男: '男',
-            女: '女',
+            1: '男',
+            0: '女',
           }}
           width="md"
           placeholder={intl.formatMessage({
@@ -107,48 +100,6 @@ const BaseForm: React.FC<Props> = (props) => {
         />
       </ProForm.Group>
       <ProForm.Group>
-        <ProFormTreeSelect
-          name="departmentId"
-          placeholder={intl.formatMessage({
-            id: 'pages.searchTable.select.placeholder',
-            defaultMessage: '请选择',
-          })}
-          allowClear
-          width="md"
-          secondary
-          label={intl.formatMessage({
-            id: 'pages.users.department',
-            defaultMessage: '部门',
-          })}
-          // request={async () => {
-          //   return departments;
-          // }}
-          // tree-select args
-          fieldProps={{
-            showArrow: false,
-            filterTreeNode: true,
-            showSearch: true,
-            treeDefaultExpandAll: true,
-            autoClearSearchValue: true,
-            // multiple: true,
-            treeNodeFilterProp: 'title',
-            fieldNames: {
-              label: 'title',
-            },
-            treeData: departments,
-          }}
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.select.rules.department"
-                  defaultMessage="请选择部门"
-                />
-              ),
-            },
-          ]}
-        />
         <ProFormSelect
           name="status"
           label={intl.formatMessage({
@@ -156,8 +107,8 @@ const BaseForm: React.FC<Props> = (props) => {
             defaultMessage: '在职状态',
           })}
           valueEnum={{
-            在职: '在职',
-            离职: '离职',
+            1: '在职',
+            0: '离职',
           }}
           width="md"
           placeholder={intl.formatMessage({
@@ -178,7 +129,7 @@ const BaseForm: React.FC<Props> = (props) => {
         />
       </ProForm.Group>
       <ProFormCheckbox.Group
-        name="roleIds"
+        name="roles"
         layout="horizontal"
         label={intl.formatMessage({
           id: 'pages.searchTable.users.roles.placeholder',

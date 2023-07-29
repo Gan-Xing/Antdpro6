@@ -38,8 +38,8 @@ export async function addItems(url: string, options?: { [key: string]: any }) {
 }
 /** 新建规则 PUT /api/rule */
 export async function updateItem(url: string, options?: { [key: string]: any }) {
-  return request<API.RuleListItem>(url, {
-    method: 'PUT',
+  return request(url, {
+    method: 'PATCH',
     data: {
       ...(options || {}),
     },
@@ -47,7 +47,7 @@ export async function updateItem(url: string, options?: { [key: string]: any }) 
 }
 /** 删除规则 DELETE /api/rule */
 export async function removeItem(url: string, options?: { [key: string]: any }) {
-  return request<Record<string, any>>(url, {
+  return request(url, {
     method: 'DELETE',
     data: {
       ...(options || {}),

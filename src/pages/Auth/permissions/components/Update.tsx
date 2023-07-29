@@ -4,13 +4,13 @@ import { Form, Input } from 'antd';
 import React from 'react';
 import BaseForm from './BaseForm';
 
-export type FormValueType = Partial<API.UsersListItem>;
+export type FormValueType = Partial<User.UsersEntity>;
 
 export type UpdateFormProps = {
   onCancel: (visible: boolean) => void;
   onSubmit: (values: FormValueType) => Promise<void>;
   updateModalOpen: boolean;
-  values: Partial<API.UsersListItem>;
+  values: Partial<User.UsersEntity>;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {

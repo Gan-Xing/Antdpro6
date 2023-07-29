@@ -37,7 +37,7 @@ const handleAdd = async (fields: Permissions.CreateParams) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('正在更新');
   try {
-    await updateItem(`/roles/${fields.id}`, fields);
+    await updateItem(`/permissions/${fields.id}`, fields);
     hide();
 
     message.success('更新成功');
@@ -59,7 +59,7 @@ const handleRemove = async (ids: number[]) => {
   const hide = message.loading('正在删除');
   if (!ids) return true;
   try {
-    await removeItem('/roles', {
+    await removeItem('/permissions', {
       ids,
     });
     hide();
@@ -87,15 +87,15 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.UsersListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UsersListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<User.UsersEntity>();
+  const [selectedRowsState, setSelectedRows] = useState<User.UsersEntity[]>([]);
 
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const columns: ProColumns<API.UsersListItem>[] = [
+  const columns: ProColumns<User.UsersEntity>[] = [
     {
       title: <FormattedMessage id="pages.permission.name" defaultMessage="权限名称" />,
       dataIndex: 'name',
@@ -125,7 +125,7 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
       hideInSearch: true,
       dataIndex: 'createdAt',
-      valueType: 'date',
+      valueType: 'dateTime',
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
@@ -166,7 +166,7 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.UsersListItem, API.PageParams>
+      <ProTable<User.UsersEntity, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'menu.auth.permissions',
           defaultMessage: '权限管理',
@@ -188,7 +188,7 @@ const TableList: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={async (params, sort, filter) => queryList('/roles', params, sort, filter)}
+        request={async (params, sort, filter) => queryList('/permissions', params, sort, filter)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -261,8 +261,8 @@ const TableList: React.FC = () => {
       />
       <Show
         open={showDetail}
-        currentRow={currentRow as API.UsersListItem}
-        columns={columns as ProDescriptionsItemProps<API.UsersListItem>[]}
+        currentRow={currentRow as User.UsersEntity}
+        columns={columns as ProDescriptionsItemProps<User.UsersEntity>[]}
         onClose={() => {
           setCurrentRow(undefined);
           setShowDetail(false);

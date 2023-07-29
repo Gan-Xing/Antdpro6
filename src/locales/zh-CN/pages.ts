@@ -104,4 +104,5 @@ export default {
   'pages.munus.permission': '选择权限',
   'pages.select.rules.permission': '请选择权限',
   'pages.searchTable.createForm.newPermission': '新建权限',
+  'pages.searchTable.createForm.newMenus': '新增菜单',
 };

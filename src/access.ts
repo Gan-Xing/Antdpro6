@@ -2,7 +2,7 @@
  * @see https://umijs.org/zh-CN/plugins/plugin-access
  * */
 
-const checkPermission = (currentUser: User.CurrentUser, name: string) => {
+const checkPermission = (currentUser: User.UsersEntity, name: string) => {
   return (
     currentUser &&
     currentUser.roles?.some(
@@ -10,7 +10,7 @@ const checkPermission = (currentUser: User.CurrentUser, name: string) => {
     )
   );
 };
-export default function access(initialState: { currentUser?: User.CurrentUser } | undefined) {
+export default function access(initialState: { currentUser?: User.UsersEntity } | undefined) {
   const { currentUser } = initialState ?? {};
   return {
     canAdmin: currentUser && currentUser?.isAdmin,

@@ -17,4 +17,9 @@ declare namespace Common {
     success: boolean;
     showType?: ErrorShowType;
   }
+  interface TreeNode {
+    title: string;
+    key: string;
+    children?: TreeNode[];
+  }
 }

@@ -17,9 +17,9 @@ const loginPath = '/user/login';
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: User.CurrentUser;
+  currentUser?: User.UsersEntity;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<User.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<User.UsersEntity | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -149,7 +149,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
  * 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
  * @doc https://umijs.org/docs/max/request#配置
  */
-console.log('process.env', process.env);
 export const request = {
   ...errorConfig,
 };

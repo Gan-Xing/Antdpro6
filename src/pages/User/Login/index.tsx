@@ -1,6 +1,7 @@
 import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
+import * as authUtil from '@/utils/auth';
 import {
   AlipayCircleOutlined,
   LockOutlined,
@@ -21,7 +22,6 @@ import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
-import * as authUtil from '@/utils/auth';
 
 const ActionIcons = () => {
   const langClassName = useEmotionCss(({ token }) => {
@@ -120,6 +120,7 @@ const Login: React.FC = () => {
       // 登录
       // const { data, success, message } = await login({ ...values, type });
       const data = await login({ ...values, type });
+
       if (data.data) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
@@ -139,7 +140,6 @@ const Login: React.FC = () => {
         id: 'pages.login.failure',
         defaultMessage: '登录失败，请重试！',
       });
-      console.log(error);
       message.error(defaultLoginFailureMessage);
     }
   };

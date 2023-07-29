@@ -4,11 +4,10 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
-import { Button, message, Modal, Select, Tag, TreeSelect } from 'antd';
+import { Button, message, Modal, Select, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
-import type { FormValueType } from './components/Update';
 import Update from './components/Update';
 
 /**
@@ -16,7 +15,7 @@ import Update from './components/Update';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.UsersListItem) => {
+const handleAdd = async (fields: User.UsersEntity) => {
   const hide = message.loading('正在添加');
   try {
     await addItems('/users', { ...fields });
@@ -36,7 +35,7 @@ const handleAdd = async (fields: API.UsersListItem) => {
  *
  * @param fields
  */
-const handleUpdate = async (fields: FormValueType) => {
+const handleUpdate = async (fields: User.UpdateUserParams) => {
   const hide = message.loading('正在更新');
   try {
     await updateItem(`/users/${fields.id}`, fields);
@@ -89,21 +88,20 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.UsersListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UsersListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<User.UsersEntity>();
+  const [selectedRowsState, setSelectedRows] = useState<User.UsersEntity[]>([]);
   const { items: roles } = useQueryList('/roles');
-  const { items: department } = useQueryList('/departments');
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
   const access = useAccess();
-  const columns: ProColumns<API.UsersListItem>[] = [
+  const columns: ProColumns<User.UsersEntity>[] = [
     {
       title: <FormattedMessage id="pages.users.username" defaultMessage="姓名" />,
       dataIndex: 'username',
-      tip: '员工姓名',
+      tip: '用户姓名',
       render: (dom, entity) => {
         return (
           <a
@@ -127,8 +125,8 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.users.gender" defaultMessage="性别" />,
       dataIndex: 'gender',
       valueEnum: {
-        男: { text: '男' },
-        女: { text: '男' },
+        1: { text: '男' },
+        0: { text: '女' },
       },
     },
     {
@@ -140,27 +138,6 @@ const TableList: React.FC = () => {
       valueEnum: {
         ture: { text: '是' },
         false: { text: '否' },
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.users.department" defaultMessage="部门" />,
-      dataIndex: 'department',
-      renderText: (val: { depName: string }) => val?.depName,
-      renderFormItem: () => {
-        return (
-          <TreeSelect
-            showSearch
-            style={{ width: '100%' }}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            placeholder={intl.formatMessage({
-              id: 'pages.searchTable.users.department.placeholder',
-              defaultMessage: '请选择部门',
-            })}
-            allowClear
-            treeDefaultExpandAll
-            treeData={department}
-          />
-        );
       },
     },
     {
@@ -194,22 +171,22 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.users.status" defaultMessage="在职状态" />,
       dataIndex: 'status',
       render: (_, entity) => {
-        return entity?.status === '在职' ? (
+        return entity?.status === '1' ? (
           <Tag color="success">是</Tag>
         ) : (
           <Tag color="default">否</Tag>
         );
       },
       valueEnum: {
-        在职: { text: '在职' },
-        离职: { text: '离职' },
+        1: { text: '在职' },
+        0: { text: '离职' },
       },
     },
     {
       title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
       hideInSearch: true,
       dataIndex: 'createdAt',
-      valueType: 'date',
+      valueType: 'dateTime',
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
@@ -254,10 +231,10 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.UsersListItem, API.PageParams>
+      <ProTable<User.UsersEntity, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'menu.auth.users',
-          defaultMessage: '员工管理',
+          defaultMessage: '用户管理',
         })}
         actionRef={actionRef}
         pagination={{ defaultPageSize: 10 }}
@@ -326,7 +303,7 @@ const TableList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.UsersListItem);
+          const success = await handleAdd(value as User.UsersEntity);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -352,8 +329,8 @@ const TableList: React.FC = () => {
       />
       <Show
         open={showDetail}
-        currentRow={currentRow as API.UsersListItem}
-        columns={columns as ProDescriptionsItemProps<API.UsersListItem>[]}
+        currentRow={currentRow as User.UsersEntity}
+        columns={columns as ProDescriptionsItemProps<User.UsersEntity>[]}
         onClose={() => {
           setCurrentRow(undefined);
           setShowDetail(false);

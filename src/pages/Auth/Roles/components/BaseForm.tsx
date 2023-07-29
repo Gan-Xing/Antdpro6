@@ -7,43 +7,112 @@ import React, { useState } from 'react';
 
 interface Props {
   form: FormInstance<any>;
-  permissions?: { id: number }[];
+  permissions?: { id: number; name: string }[];
 }
 const BaseForm: React.FC<Props> = (props) => {
   const { form, permissions } = props;
   const intl = useIntl();
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<Key[] | { checked: Key[]; halfChecked: Key[] }>(
-    permissions?.map((permission) => `permission-${permission.id}`) ?? [],
+    permissions?.map((item) => `${item.id}${item.name}`) ?? [],
   );
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
 
-  const { items: permission_groups } = useQueryList('/permission_groups');
+  const { items: permission } = useQueryList('/permissions');
+  const transformToTreeData = (
+    data: Permissions.Entity[],
+  ): { treeData: Common.TreeNode[]; nonLeafKeys: string[] } => {
+    // 以key为索引的对象，用于查找和添加子节点
+    let map: { [key: string]: Common.TreeNode } = {};
+    let nonLeafKeys: string[] = [];
+
+    // 首先将所有节点转换为正确的格式，并添加到map中
+    for (let item of data) {
+      let key = `${item.permissionGroup.id}${item.permissionGroup.name}`;
+      let node = map[key];
+      // 如果map中已经存在这个节点，就使用它，否则创建一个新的节点
+      if (!node) {
+        node = {
+          key: key,
+          title: item.permissionGroup.name,
+          children: [],
+        };
+        map[key] = node;
+      }
+
+      // 添加子节点
+      let childKey = `${item.id}${item.name}`;
+      let childNode = {
+        key: childKey,
+        title: item.name,
+      };
+      node.children?.push(childNode);
+      if (node.children && node.children?.length > 0 && !nonLeafKeys.includes(key)) {
+        nonLeafKeys.push(key); // 如果节点有子节点，并且它的key不在nonLeafKeys中，将它的key添加到nonLeafKeys中
+      }
+
+      // 如果存在父节点，将当前节点添加到父节点的children中
+      if (item.permissionGroup.parent) {
+        let parentKey = `${item.permissionGroup.parent.id}${item.permissionGroup.parent.name}`;
+        let parentNode = map[parentKey];
+        if (!parentNode) {
+          parentNode = {
+            key: parentKey,
+            title: item.permissionGroup.parent.name,
+            children: [],
+          };
+          map[parentKey] = parentNode;
+        }
+        // 如果父节点的children数组中还没有这个节点，就添加进去
+        if (!parentNode.children?.includes(node)) {
+          parentNode.children?.push(node);
+          if (
+            parentNode.children &&
+            parentNode.children.length > 0 &&
+            !nonLeafKeys.includes(parentKey)
+          ) {
+            nonLeafKeys.push(parentKey); // 同样，如果父节点有子节点，并且它的key不在nonLeafKeys中，将它的key添加到nonLeafKeys中
+          }
+        }
+      }
+    }
+
+    // 只将map中那些没有父节点的值添加到treeData
+    let treeData = Object.values(map).filter(
+      (node) =>
+        !data.some(
+          (item) =>
+            item.permissionGroup.id + item.permissionGroup.name === node.key &&
+            item.permissionGroup.parent,
+        ),
+    );
+    return {
+      treeData,
+      nonLeafKeys,
+    };
+  };
+  const { treeData, nonLeafKeys } = transformToTreeData(permission);
+
   const onExpand = (expandedKeysValue: Key[]) => {
-    console.log('onExpand', expandedKeysValue);
-    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-    // or, you can remove all expanded children keys.
     setExpandedKeys(expandedKeysValue);
     setAutoExpandParent(false);
   };
 
   const onCheck = (checkedKeysValue: Key[] | { checked: Key[]; halfChecked: Key[] }) => {
-    console.log('onCheck', checkedKeysValue);
+    let nonLeafKeysSet = new Set(nonLeafKeys.map((key) => key.toString()));
     setCheckedKeys(checkedKeysValue);
-    const permissions = (checkedKeysValue as Key[]).filter((key: Key) =>
-      key.toString().startsWith('permission'),
-    );
-    const permissionIds = permissions.map((key: Key) =>
-      Number(key.toString().replace('permission-', '')),
-    );
+    let checkData;
+    if (Array.isArray(checkedKeysValue)) {
+      checkData = checkedKeysValue.filter((item) => !nonLeafKeysSet.has(item.toString()));
+    }
+    const permissions = (checkData as Key[]).map((item) => Number(parseInt(item.toString())));
     form.setFieldsValue({
-      permissionIds,
+      permissions,
     });
   };
 
-  const onSelect = (selectedKeysValue: Key[], info: any) => {
-    console.log('onSelect', info);
+  const onSelect = (selectedKeysValue: Key[]) => {
     setSelectedKeys(selectedKeysValue);
   };
   return (
@@ -68,7 +137,7 @@ const BaseForm: React.FC<Props> = (props) => {
           width="md"
           name="name"
         />
-        <Form.Item name="permissionIds">
+        <Form.Item name="permissions">
           <div>
             选择权限
             <Tree
@@ -80,7 +149,7 @@ const BaseForm: React.FC<Props> = (props) => {
               checkedKeys={checkedKeys}
               onSelect={onSelect}
               selectedKeys={selectedKeys}
-              treeData={permission_groups}
+              treeData={treeData}
             />
           </div>
         </Form.Item>

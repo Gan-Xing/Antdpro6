@@ -7,14 +7,14 @@ import { Button, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
-import Update, { FormValueType } from './components/Update';
+import Update from './components/Update';
 
 /**
  * @en-US Add node
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.UsersListItem) => {
+const handleAdd = async (fields: any) => {
   const hide = message.loading('正在添加');
   try {
     await addItems('/roles', { ...fields });
@@ -34,7 +34,7 @@ const handleAdd = async (fields: API.UsersListItem) => {
  *
  * @param fields
  */
-const handleUpdate = async (fields: FormValueType) => {
+const handleUpdate = async (fields: Roles.CreateParams) => {
   const hide = message.loading('正在更新');
   try {
     await updateItem(`/roles/${fields.id}`, fields);
@@ -87,8 +87,8 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.UsersListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UsersListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<User.UsersEntity>();
+  const [selectedRowsState, setSelectedRows] = useState<User.UsersEntity[]>([]);
 
   /**
    * @en-US International configuration
@@ -96,11 +96,12 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
   const access = useAccess();
-  const columns: ProColumns<API.UsersListItem>[] = [
+  const columns: ProColumns<User.UsersEntity>[] = [
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
       dataIndex: 'name',
       tip: '名称',
+      width: '75px',
       render: (dom, entity) => {
         return (
           <a
@@ -125,9 +126,9 @@ const TableList: React.FC = () => {
     },
     {
       title: <FormattedMessage id="pages.roles.users" defaultMessage="用户列表" />,
-      dataIndex: 'employees',
-      renderText: (val: { username: string }[]) => {
-        return val.map((item) => item.username).join(', ');
+      dataIndex: 'users',
+      renderText: (val) => {
+        return val.map((item: { username: string }) => item.username).join(', ');
       },
       hideInSearch: true,
     },
@@ -185,7 +186,7 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.UsersListItem, API.PageParams>
+      <ProTable<User.UsersEntity, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'menu.auth.roles',
           defaultMessage: '角色管理',
@@ -256,7 +257,7 @@ const TableList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.UsersListItem);
+          const success = await handleAdd(value as Roles.CreateParams);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -282,8 +283,8 @@ const TableList: React.FC = () => {
       />
       <Show
         open={showDetail}
-        currentRow={currentRow as API.UsersListItem}
-        columns={columns as ProDescriptionsItemProps<API.UsersListItem>[]}
+        currentRow={currentRow as User.UsersEntity}
+        columns={columns as ProDescriptionsItemProps<User.UsersEntity>[]}
         onClose={() => {
           setCurrentRow(undefined);
           setShowDetail(false);

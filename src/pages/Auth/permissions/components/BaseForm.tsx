@@ -33,7 +33,8 @@ const BaseForm: React.FC<Props> = () => {
   }
 
   const { items: data } = useQueryList('/permissiongroups');
-  const permissions = transformData(data);
+  const permissiongroups = transformData(data);
+  console.log('permissiongroups', permissiongroups);
 
   // const onExpand = (expandedKeysValue: Key[]) => {
   //   console.log('onExpand', expandedKeysValue);
@@ -152,7 +153,7 @@ const BaseForm: React.FC<Props> = () => {
             fieldNames: {
               label: 'title',
             },
-            treeData: permissions,
+            treeData: permissiongroups,
           }}
           rules={[
             {
