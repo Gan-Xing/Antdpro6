@@ -24,6 +24,7 @@ const whiteList: string[] = ['/auth/login', '/auth/refresh'];
  * pro 自带的错误处理， 可以在这里做自己的改动
  * @doc https://umijs.org/docs/max/request#配置
  */
+console.log('console.log(base_url', base_url);
 export const errorConfig: RequestConfig = {
   baseURL: base_url, // api 的 base_url
   timeout: request_timeout, // 请求超时时间
