@@ -1,0 +1,18 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build -t antdpro6 .
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - docker stop antdpro6 || true && docker rm antdpro6 || true
+    - docker run -d --name antdpro6 -p 8000:8000 antdpro6
+  only:
+    - main
