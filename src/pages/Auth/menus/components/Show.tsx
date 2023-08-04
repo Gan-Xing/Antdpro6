@@ -3,15 +3,15 @@ import { Drawer } from 'antd';
 interface Props {
   onClose: (e: React.MouseEvent | React.KeyboardEvent) => void;
   open: boolean;
-  currentRow: User.UsersEntity;
-  columns: ProDescriptionsItemProps<User.UsersEntity>[];
+  currentRow: Menus.MenusType;
+  columns: ProDescriptionsItemProps<Menus.MenusType>[];
 }
 const Show: React.FC<Props> = (props) => {
   const { onClose, open, currentRow, columns } = props;
   return (
     <Drawer width="70%" open={open} onClose={onClose} closable={false}>
       {currentRow?.name && (
-        <ProDescriptions<User.UsersEntity>
+        <ProDescriptions<Menus.MenusType>
           column={2}
           title={currentRow?.name}
           request={async () => ({
@@ -20,7 +20,7 @@ const Show: React.FC<Props> = (props) => {
           params={{
             id: currentRow?.name,
           }}
-          columns={columns as ProDescriptionsItemProps<User.UsersEntity>[]}
+          columns={columns as ProDescriptionsItemProps<Menus.MenusType>[]}
         />
       )}
     </Drawer>

@@ -14,7 +14,7 @@ import Update from './components/Update';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: User.UsersEntity) => {
+const handleAdd = async (fields: Menus.MenusType) => {
   const hide = message.loading('正在添加');
   try {
     await addItems('/menus', { ...fields });
@@ -83,8 +83,8 @@ const TableList: React.FC = () => {
    * @zh-CN 分布更新窗口的弹窗
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-  const [currentRow, setCurrentRow] = useState<User.UsersEntity>();
-  const [selectedRowsState, setSelectedRows] = useState<User.UsersEntity[]>([]);
+  const [currentRow, setCurrentRow] = useState<Menus.MenusType>();
+  const [selectedRowsState, setSelectedRows] = useState<Menus.MenusType[]>([]);
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
@@ -124,13 +124,13 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'option',
       valueType: 'option',
-      fixed: 'right',
-      render: (_: any, record: { id: number }) => [
+      fixed: 'right' as const,
+      render: (_: any, record: any) => [
         <a
           key="update"
           onClick={() => {
             handleUpdateModalOpen(true);
-            setCurrentRow(record);
+            setCurrentRow((prevState) => ({ ...prevState, ...record }));
           }}
         >
           <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
@@ -201,6 +201,11 @@ const TableList: React.FC = () => {
         }}
         columns={columns}
         expandable={{}}
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows);
+          },
+        }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
@@ -257,7 +262,7 @@ const TableList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as User.UsersEntity);
+          const success = await handleAdd(value as Menus.MenusType);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -268,8 +273,8 @@ const TableList: React.FC = () => {
       />
       <Show
         open={showDetail}
-        currentRow={currentRow as User.UsersEntity}
-        columns={columns as ProDescriptionsItemProps<User.UsersEntity>[]}
+        currentRow={currentRow as Menus.MenusType}
+        columns={columns as ProDescriptionsItemProps<Menus.MenusType>[]}
         onClose={() => {
           setCurrentRow(undefined);
           setShowDetail(false);

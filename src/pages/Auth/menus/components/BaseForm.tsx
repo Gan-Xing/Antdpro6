@@ -1,11 +1,11 @@
 import useQueryList from '@/hooks/useQueryList';
 import { ProForm, ProFormText, ProFormTreeSelect } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { FormInstance } from 'antd';
+// import { FormInstance } from 'antd';
 import React from 'react';
 
 interface Props {
-  form: FormInstance<any>;
+  // form: FormInstance<any>;
   permissions?: { id: number }[];
 }
 const BaseForm: React.FC<Props> = () => {
