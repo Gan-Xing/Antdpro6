@@ -1,0 +1,28 @@
+name: Sync to GitLab
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GanXing'
+          git config --global user.email '599153574@qq.com'
+          git config pull.rebase false
+
+      - name: Merge and Push to GitLab
+        run: |
+          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.ganxing.fun/root/Antdpro6.git
+          git pull --allow-unrelated-histories gitlab main
+          git push gitlab main
