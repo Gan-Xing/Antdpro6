@@ -7,9 +7,15 @@ stages:
 
 # services:
 #   - docker:dind
+cache:
+  key: antdpro1
+  paths:
+    - node_modules
 
 job_install:
   stage: install
+  tags:
+    - docker
   script:
     - npm install yarn
     - npm install tyarn
@@ -17,5 +23,7 @@ job_install:
 
 job_build:
   stage: build
+  tags:
+    - docker
   script:
     - tyarn run build
