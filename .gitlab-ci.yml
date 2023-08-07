@@ -1,21 +1,16 @@
 stages:
-  - build
-  - deploy
+  - stage1
+  - stage2
 
-services:
-  - docker:dind
+# services:
+#   - docker:dind
 
-build:
-  stage: build
+job1:
+  stage: stage1
   script:
-    - docker build -t antdpro6 .
-  only:
-    - main
+    - echo "my .pre job1"
 
-deploy:
-  stage: deploy
+job2:
+  stage: stage2
   script:
-    - docker stop antdpro6 || true && docker rm antdpro6 || true
-    - docker run -d --name antdpro6 -p 8000:8000 antdpro6
-  only:
-    - main
+    - echo "my build job2"
