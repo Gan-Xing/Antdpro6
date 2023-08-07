@@ -13,7 +13,7 @@ job_install:
   script:
     - npm install yarn
     - npm install tyarn
-    - tyarn install
+    - npx tyarn install
 
 job_build:
   stage: build
