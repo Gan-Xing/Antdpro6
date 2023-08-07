@@ -1,16 +1,21 @@
+image: node:alpine
+
 stages:
-  - stage1
-  - stage2
+  - install
+  - build
+  - deploy
 
 # services:
 #   - docker:dind
 
-job1:
-  stage: stage1
+job_install:
+  stage: install
   script:
-    - echo "my .pre job1"
+    - npm install yarn
+    - npm install tyarn
+    - tyarn install
 
-job2:
-  stage: stage2
+job_build:
+  stage: build
   script:
-    - echo "my build job2"
+    - tyarn run build
