@@ -98,19 +98,18 @@ export const errorConfig: RequestConfig = {
     async (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
       const url = config?.url;
-      let isToken = (config!.headers || {}).isToken === false;
+      let isTokenRequired = (config!.headers || {}).isToken !== false;
       // eslint-disable-next-line array-callback-return
       whiteList.some((v) => {
         if (config.url) {
           if (config.url.indexOf(v) > -1) {
-            isToken = false;
+            isTokenRequired = false;
             return true; // 结束 .some 的遍历
           }
         }
       });
-      const accessToken = authUtil.getAccessToken();
-      let newToken;
-      if (accessToken && !isToken) {
+      let accessToken = authUtil.getAccessToken();
+      if (accessToken && isTokenRequired) {
         const currentDate = new Date();
         const decodedToken = jwt_decode<{ exp: number }>(accessToken);
         // expired
@@ -121,30 +120,17 @@ export const errorConfig: RequestConfig = {
           });
           if (response?.success) {
             authUtil.setToken(response?.data);
-            newToken = response?.data.accessToken;
+            accessToken = response?.data.accessToken;
+          } else {
+            // refreshToken request failed, clear tokens and redirect to login
+            authUtil.removeToken();
+            window.location.href = '/login'; // replace this with your actual login route
           }
         }
       }
-
-      // // refresh token
-      // if (accessToken) {
-      //   const currentDate = new Date();
-      //   const decodedToken = jwt_decode<{ exp: number }>(accessToken);
-      //   // expired
-      //   if (decodedToken.exp * 1000 < currentDate.getTime()) {
-      //     // sent refresh token
-      //     const response = await refreshToken({
-      //       refreshToken: authUtil.getRefreshToken(),
-      //     });
-      //     if (response?.success) {
-      //       authUtil.setToken(response?.data);
-      //       newToken = response?.data.accessToken;
-      //     }
-      //   }
-      // }
       return {
         ...config,
-        headers: { Authorization: `Bearer ${newToken ?? accessToken}` },
+        headers: isTokenRequired ? { Authorization: `Bearer ${accessToken}` } : config.headers,
         url,
       };
     },
