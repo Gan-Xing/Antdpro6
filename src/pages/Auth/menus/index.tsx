@@ -37,7 +37,7 @@ const handleAdd = async (fields: Menus.MenusType) => {
 const handleUpdate = async (fields: any) => {
   const hide = message.loading('正在更新');
   try {
-    await updateItem(`/permissions/${fields.id}`, fields);
+    await updateItem(`/menus/${fields.id}`, fields);
     hide();
 
     message.success('更新成功');

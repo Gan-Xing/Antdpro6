@@ -27,8 +27,8 @@ const BaseForm: React.FC<Props> = () => {
     }));
   }
 
-  const { items: permissiongroupsdata } = useQueryList('/permissiongroups');
-  const permissiongroups = transformData(permissiongroupsdata);
+  const { items: menusdata } = useQueryList('/menus');
+  const menus = transformData(menusdata);
 
   // const { items: permission_groups } = useQueryList('/permission_groups');
   // const onExpand = (expandedKeysValue: Key[]) => {
@@ -99,7 +99,7 @@ const BaseForm: React.FC<Props> = () => {
           name="path"
         />
         <ProFormTreeSelect
-          name="permissionGroupId"
+          name="parentId"
           placeholder={intl.formatMessage({
             id: 'pages.searchTable.select.placeholder',
             defaultMessage: '请选择',
@@ -123,7 +123,7 @@ const BaseForm: React.FC<Props> = () => {
             fieldNames: {
               label: 'title',
             },
-            treeData: permissiongroups,
+            treeData: menus,
           }}
         />
       </ProForm.Group>

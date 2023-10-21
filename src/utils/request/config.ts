@@ -7,7 +7,7 @@ const config: {
   /**
    * api请求基础路径
    */
-  base_url: 'https://api.ganxing.fun/api',
+  base_url: 'http://localhost:3030/api',
   /**
    * 接口成功返回状态码
    */

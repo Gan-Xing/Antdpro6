@@ -102,7 +102,7 @@ const Login: React.FC = () => {
   });
 
   const intl = useIntl();
-
+  console.log('process.env', process.env);
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {

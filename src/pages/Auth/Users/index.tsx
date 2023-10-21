@@ -40,12 +40,11 @@ const handleUpdate = async (fields: User.UpdateUserParams) => {
   try {
     await updateItem(`/users/${fields.id}`, fields);
     hide();
-
     message.success('更新成功');
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? '更新失败,请重试');
+    message.error(error?.message ?? '更新失败,请重试');
     return false;
   }
 };
