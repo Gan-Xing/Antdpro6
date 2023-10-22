@@ -94,6 +94,7 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
       dataIndex: 'name',
       tip: '名称',
+      ellipsis: true,
       render: (dom: any, entity: any) => {
         return (
           <a
@@ -112,6 +113,7 @@ const TableList: React.FC = () => {
       hideInSearch: true,
       dataIndex: 'createdAt',
       valueType: 'dateTime',
+      ellipsis: true, // 添加此属性
     },
     {
       title: <FormattedMessage id="pages.roles.updatedTime" defaultMessage="更新时间" />,
@@ -119,6 +121,7 @@ const TableList: React.FC = () => {
       // hideInTable: true,
       dataIndex: 'updatedAt',
       valueType: 'dateTime',
+      ellipsis: true, // 添加此属性
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
@@ -178,10 +181,14 @@ const TableList: React.FC = () => {
           defaultMessage: '菜单管理',
         })}
         actionRef={actionRef}
-        pagination={{ defaultPageSize: 10 }}
+        pagination={{
+          defaultPageSize: 10,
+          pageSizeOptions: ['10', '20', '30', '50'], // 提供更多的选择项
+          showSizeChanger: true, // 允许用户更改每页的记录数
+        }}
         rowKey="id"
         search={{
-          labelWidth: 120,
+          labelWidth: 80,
         }}
         toolBarRender={() => [
           <Button
@@ -196,8 +203,13 @@ const TableList: React.FC = () => {
         ]}
         request={async (params, sort, filter) => {
           const { data } = await queryList('/menus', params, sort, filter);
-          const processedData = processChildren(data);
-          return { data: processedData };
+          const processedData = processChildren(data.data);
+          return {
+            data: processedData,
+            current: data.pagination.current,
+            pageSize: data.pagination.pageSize,
+            total: data.pagination.total,
+          };
         }}
         columns={columns}
         expandable={{}}
