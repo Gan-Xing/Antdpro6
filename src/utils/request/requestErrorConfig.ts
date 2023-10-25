@@ -47,7 +47,7 @@ export const errorConfig: RequestConfig = {
       }
     },
     // 错误接收及处理
-    errorHandler: (error: any, opts: any) => {
+    errorHandler: async (error: any, opts: any) => {
       if (opts?.skipErrorHandler) throw error;
       // 我们的 errorThrower 抛出的错误。
       if (error.name === 'BizError') {
@@ -78,9 +78,37 @@ export const errorConfig: RequestConfig = {
           }
         }
       } else if (error.response) {
-        // Axios 的错误
-        // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(`Response status:${error.response.status}`);
+        if (error.response.status === 400) {
+          error.response?.data?.message?.message?.map((item: string) => message.error(item));
+        } else if (error.response.status === 401) {
+          // 检查 401 响应
+          let accessToken = authUtil.getAccessToken();
+          if (accessToken) {
+            const currentDate = new Date();
+            const decodedToken = jwt_decode<{ exp: number }>(accessToken);
+
+            // 如果令牌已过期
+            if (decodedToken.exp * 1000 < currentDate.getTime()) {
+              // 尝试使用刷新令牌
+              const response = await refreshToken({
+                refreshToken: authUtil.getRefreshToken(),
+              });
+
+              if (response?.success) {
+                authUtil.setToken(response?.data);
+                // 这里你可能还需要重新发送失败的请求
+              } else {
+                // 如果刷新令牌请求失败，清除令牌并重定向到登录页面
+                authUtil.removeToken();
+                window.location.href = '/login'; // 替换为您的实际登录路由
+              }
+            }
+          }
+        } else if (error.response.status === 500) {
+          message.error('服务器问题，请联系管理员处理');
+        } else {
+          message.error(`Response status:${error.response.status}`);
+        }
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
         // \`error.request\` 在浏览器中是 XMLHttpRequest 的实例，

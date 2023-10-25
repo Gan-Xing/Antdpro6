@@ -24,7 +24,7 @@ const handleAdd = async (fields: User.UsersEntity) => {
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Adding failed, please try again!');
+    console.log('error', error);
     return false;
   }
 };
@@ -101,6 +101,7 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.users.username" defaultMessage="姓名" />,
       dataIndex: 'username',
       tip: '用户姓名',
+      ellipsis: true,
       render: (dom, entity) => {
         return (
           <a
@@ -118,6 +119,7 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.users.email" defaultMessage="邮箱" />,
       dataIndex: 'email',
       copyable: true,
+      ellipsis: true,
       valueType: 'textarea',
     },
     {
@@ -135,7 +137,7 @@ const TableList: React.FC = () => {
         return entity?.isAdmin ? <Tag color="success">是</Tag> : <Tag color="default">否</Tag>;
       },
       valueEnum: {
-        ture: { text: '是' },
+        true: { text: '是' },
         false: { text: '否' },
       },
     },
@@ -186,11 +188,13 @@ const TableList: React.FC = () => {
       hideInSearch: true,
       dataIndex: 'createdAt',
       valueType: 'dateTime',
+      ellipsis: true,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'option',
       valueType: 'option',
+      ellipsis: true,
       fixed: 'right',
       render: (_, record) => [
         access.canUpdateUser && (
@@ -236,7 +240,11 @@ const TableList: React.FC = () => {
           defaultMessage: '用户管理',
         })}
         actionRef={actionRef}
-        pagination={{ defaultPageSize: 10 }}
+        pagination={{
+          defaultPageSize: 10,
+          pageSizeOptions: ['10', '20', '30', '50'], // 提供更多的选择项
+          showSizeChanger: true, // 允许用户更改每页的记录数
+        }}
         rowKey="id"
         search={{
           labelWidth: 120,
@@ -255,7 +263,15 @@ const TableList: React.FC = () => {
             </Button>
           ),
         ]}
-        request={async (params, sort, filter) => queryList('/users', params, sort, filter)}
+        request={async (params, sort, filter) => {
+          const { data } = await queryList('/users/page', params, sort, filter);
+          return {
+            data: data.data,
+            current: data.pagination.current,
+            pageSize: data.pagination.pageSize,
+            total: data.pagination.total,
+          };
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -313,6 +329,9 @@ const TableList: React.FC = () => {
       />
       <Update
         onSubmit={async (value) => {
+          if (value?.password?.trim() === '') {
+            delete value.password;
+          }
           const success = await handleUpdate(value);
           if (success) {
             handleUpdateModalOpen(false);
