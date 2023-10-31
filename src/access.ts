@@ -14,15 +14,36 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
   const { currentUser } = initialState ?? {};
   return {
     canAdmin: currentUser && currentUser?.isAdmin,
-    canUpdateRole:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '修改角色')),
     canCreateRole:
       currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增角色')),
+    canDeleteRole:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除角色')),
+    canUpdateRole:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '修改角色')),
+    canShowRole: currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看角色')),
     canCreateUser:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增员工')),
-    canUpdateUser:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '修改员工')),
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增用户')),
     canDeleteUser:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除员工')),
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除用户')),
+    canUpdateUser:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '修改用户')),
+    canShowUser: currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看用户')),
+
+    canCreateMenu:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增菜单')),
+    canDeleteMenu:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除菜单')),
+    canUpdateMenu:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '修改菜单')),
+    canShowMenu: currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看菜单')),
+
+    canCreatePermission:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增权限')),
+    canDeletePermission:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除权限')),
+    canUpdatePermission:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '修改权限')),
+    canShowPermission:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看权限')),
   };
 }
