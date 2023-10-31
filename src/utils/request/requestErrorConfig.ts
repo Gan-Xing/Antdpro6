@@ -79,7 +79,10 @@ export const errorConfig: RequestConfig = {
         }
       } else if (error.response) {
         if (error.response.status === 400) {
-          error.response?.data?.message?.message?.map((item: string) => message.error(item));
+          if (Array.isArray(error.response?.data?.message?.message)) {
+            error.response?.data?.message?.message?.map((item: string) => message.error(item));
+          }
+          message.error(error.response?.data?.message?.message);
         } else if (error.response.status === 401) {
           // 检查 401 响应
           let accessToken = authUtil.getAccessToken();
