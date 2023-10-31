@@ -102,6 +102,8 @@ const TableList: React.FC = () => {
       dataIndex: 'username',
       tip: '用户姓名',
       ellipsis: true,
+      sorter: (a: User.UsersEntity, b: User.UsersEntity) => a.username.localeCompare(b.username), // 添加这一行
+      sortDirections: ['ascend', 'descend'], // 添加这一行
       render: (dom, entity) => {
         return (
           <a
@@ -249,7 +251,7 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        scroll={{ x: 1200 }}
+        // scroll={{ x: 1200 }}
         toolBarRender={() => [
           access.canCreateUser && (
             <Button

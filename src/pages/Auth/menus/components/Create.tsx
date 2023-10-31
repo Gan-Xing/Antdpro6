@@ -25,7 +25,7 @@ const Create: React.FC<Props> = (props) => {
       onOpenChange={onOpenChange}
       onFinish={onFinish}
     >
-      <BaseForm form={form} />
+      <BaseForm />
     </ModalForm>
   );
 };

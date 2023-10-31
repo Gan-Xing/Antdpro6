@@ -4,27 +4,25 @@ import { Form, Input } from 'antd';
 import React from 'react';
 import BaseForm from './BaseForm';
 
-export type FormValueType = Partial<User.UsersEntity>;
+export type FormValueType = Partial<Permissions.Entity>;
 
 export type UpdateFormProps = {
   onCancel: (visible: boolean) => void;
   onSubmit: (values: FormValueType) => Promise<void>;
   updateModalOpen: boolean;
-  values: Partial<User.UsersEntity>;
+  values: Partial<Permissions.Entity>;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const { updateModalOpen, onCancel, onSubmit, values } = props;
   const intl = useIntl();
-  const [form] = Form.useForm();
   return (
     <ModalForm
-      form={form}
       title={intl.formatMessage({
         id: 'pages.searchTable.createForm.newUser',
         defaultMessage: '新建用户',
       })}
-      width="70%"
+      width="24rem"
       modalProps={{
         destroyOnClose: true,
         maskClosable: false,
@@ -36,7 +34,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         ...values,
       }}
     >
-      <BaseForm permissions={values.permissions} form={form} />
+      <BaseForm />
       <Form.Item name="id" label={false}>
         <Input type="hidden" />
       </Form.Item>

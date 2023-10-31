@@ -87,19 +87,21 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<User.UsersEntity>();
-  const [selectedRowsState, setSelectedRows] = useState<User.UsersEntity[]>([]);
+  const [currentRow, setCurrentRow] = useState<Permissions.Entity>();
+  const [selectedRowsState, setSelectedRows] = useState<Permissions.Entity[]>([]);
 
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const columns: ProColumns<User.UsersEntity>[] = [
+  const columns: ProColumns<Permissions.Entity>[] = [
     {
       title: <FormattedMessage id="pages.permission.name" defaultMessage="权限名称" />,
       dataIndex: 'name',
       tip: '名称',
+      sorter: (a: Permissions.Entity, b: Permissions.Entity) => a.name.localeCompare(b.name), // 添加这一行
+      sortDirections: ['ascend', 'descend'], // 添加这一行
       render: (dom, entity) => {
         return (
           <a
@@ -166,13 +168,17 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<User.UsersEntity, API.PageParams>
+      <ProTable<Permissions.Entity, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'menu.auth.permissions',
           defaultMessage: '权限管理',
         })}
         actionRef={actionRef}
-        pagination={{ defaultPageSize: 10 }}
+        pagination={{
+          defaultPageSize: 10,
+          pageSizeOptions: ['10', '20', '30', '50'], // 提供更多的选择项
+          showSizeChanger: true, // 允许用户更改每页的记录数
+        }}
         rowKey="id"
         search={{
           labelWidth: 120,
@@ -261,8 +267,8 @@ const TableList: React.FC = () => {
       />
       <Show
         open={showDetail}
-        currentRow={currentRow as User.UsersEntity}
-        columns={columns as ProDescriptionsItemProps<User.UsersEntity>[]}
+        currentRow={currentRow as Permissions.Entity}
+        columns={columns as ProDescriptionsItemProps<Permissions.Entity>[]}
         onClose={() => {
           setCurrentRow(undefined);
           setShowDetail(false);
