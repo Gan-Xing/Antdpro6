@@ -87,16 +87,16 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<User.UsersEntity>();
-  const [selectedRowsState, setSelectedRows] = useState<User.UsersEntity[]>([]);
+  const [currentRow, setCurrentRow] = useState<Roles.Entity>();
+  const [selectedRowsState, setSelectedRows] = useState<Roles.Entity[]>([]);
 
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const access = useAccess();
-  const columns: ProColumns<User.UsersEntity>[] = [
+  const { canCreateRole, canEditRole, canDeleteRole } = useAccess();
+  const columns: ProColumns<Roles.Entity>[] = [
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
       dataIndex: 'name',
@@ -145,13 +145,13 @@ const TableList: React.FC = () => {
       dataIndex: 'updatedAt',
       valueType: 'date',
     },
-    {
+    (canEditRole || canDeleteRole) && {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
       render: (_, record) => [
-        access.canUpdateRole && (
+        canEditRole && (
           <a
             key="update"
             onClick={() => {
@@ -162,31 +162,47 @@ const TableList: React.FC = () => {
             <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
           </a>
         ),
-        <a
-          key="delete"
-          onClick={() => {
-            return Modal.confirm({
-              title: '确认删除？',
-              onOk: async () => {
-                await handleRemove([record.id!]);
-                setSelectedRows([]);
-                actionRef.current?.reloadAndRest?.();
-              },
-              content: '确认删除吗？',
-              okText: '确认',
-              cancelText: '取消',
-            });
-          }}
-        >
-          <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-        </a>,
+        canDeleteRole && (
+          <a
+            key="delete"
+            onClick={() => {
+              return Modal.confirm({
+                title: '确认删除？',
+                onOk: async () => {
+                  await handleRemove([record.id!]);
+                  setSelectedRows([]);
+                  actionRef.current?.reloadAndRest?.();
+                },
+                content: '确认删除吗？',
+                okText: '确认',
+                cancelText: '取消',
+              });
+            }}
+          >
+            <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+          </a>
+        ),
       ],
     },
   ];
 
+  const transformPermissions = (permissions: { id: number; name: string }[] | number[]) => {
+    // 如果permissions是undefined或null，返回一个空数组
+    if (!permissions) return [];
+
+    // 检查permissions数组中的第一个元素是否是一个对象
+    if (permissions.length > 0 && typeof permissions[0] === 'object') {
+      // 如果是对象数组，提取id属性并返回一个新数组
+      return (permissions as { id: number; name: string }[]).map((permission) => permission.id);
+    }
+
+    // 如果permissions已经是一个数字数组，直接返回它
+    return permissions;
+  };
+
   return (
     <PageContainer>
-      <ProTable<User.UsersEntity, API.PageParams>
+      <ProTable<Roles.Entity, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'menu.auth.roles',
           defaultMessage: '角色管理',
@@ -198,7 +214,7 @@ const TableList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          access.canCreateRole && (
+          canCreateRole && (
             <Button
               type="primary"
               key="primary"
@@ -268,7 +284,9 @@ const TableList: React.FC = () => {
       />
       <Update
         onSubmit={async (value) => {
-          const success = await handleUpdate(value);
+          const formedPermisssion = transformPermissions(value.permissions);
+          const updateValue = { ...value, permissions: formedPermisssion } as Roles.CreateParams;
+          const success = await handleUpdate(updateValue);
           if (success) {
             handleUpdateModalOpen(false);
             setCurrentRow(undefined);
@@ -279,12 +297,12 @@ const TableList: React.FC = () => {
         }}
         onCancel={handleUpdateModalOpen}
         updateModalOpen={updateModalOpen}
-        values={currentRow || {}}
+        values={currentRow}
       />
       <Show
         open={showDetail}
-        currentRow={currentRow as User.UsersEntity}
-        columns={columns as ProDescriptionsItemProps<User.UsersEntity>[]}
+        currentRow={currentRow as Roles.Entity}
+        columns={columns as ProDescriptionsItemProps<Roles.Entity>[]}
         onClose={() => {
           setCurrentRow(undefined);
           setShowDetail(false);

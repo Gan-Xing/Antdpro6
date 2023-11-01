@@ -95,7 +95,7 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const access = useAccess();
+  const { canEditUser, canDeleteUser, canCreateUser } = useAccess();
   const columns: ProColumns<User.UsersEntity>[] = [
     {
       title: <FormattedMessage id="pages.users.username" defaultMessage="姓名" />,
@@ -192,14 +192,14 @@ const TableList: React.FC = () => {
       valueType: 'dateTime',
       ellipsis: true,
     },
-    {
+    (canDeleteUser || canEditUser) && {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'option',
       valueType: 'option',
       ellipsis: true,
       fixed: 'right',
       render: (_, record) => [
-        access.canUpdateUser && (
+        canEditUser && (
           <a
             key="update"
             onClick={() => {
@@ -210,7 +210,7 @@ const TableList: React.FC = () => {
             <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
           </a>
         ),
-        access.canDeleteUser && (
+        canDeleteUser && (
           <a
             key="delete"
             onClick={() => {
@@ -253,7 +253,7 @@ const TableList: React.FC = () => {
         }}
         // scroll={{ x: 1200 }}
         toolBarRender={() => [
-          access.canCreateUser && (
+          canCreateUser && (
             <Button
               type="primary"
               key="primary"

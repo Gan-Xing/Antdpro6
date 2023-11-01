@@ -6,7 +6,7 @@ import type { Key } from 'react';
 import React, { useState } from 'react';
 
 interface Props {
-  form: FormInstance<any>;
+  form?: FormInstance<any>;
   permissions?: { id: number; name: string }[];
 }
 const BaseForm: React.FC<Props> = (props) => {
@@ -107,7 +107,7 @@ const BaseForm: React.FC<Props> = (props) => {
       checkData = checkedKeysValue.filter((item) => !nonLeafKeysSet.has(item.toString()));
     }
     const permissions = (checkData as Key[]).map((item) => Number(parseInt(item.toString())));
-    form.setFieldsValue({
+    form?.setFieldsValue({
       permissions,
     });
   };

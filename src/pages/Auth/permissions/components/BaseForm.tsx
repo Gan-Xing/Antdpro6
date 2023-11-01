@@ -70,7 +70,7 @@ const BaseForm: React.FC = () => {
             POST: 'POST',
             DELETE: 'DELETE',
             PUT: 'PUT',
-            PATCH: 'PATCH',
+            Patch: 'PATCH',
           }}
           width="md"
           placeholder={intl.formatMessage({

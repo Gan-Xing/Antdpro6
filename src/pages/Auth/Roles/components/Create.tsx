@@ -24,6 +24,7 @@ const Create: React.FC<Props> = (props) => {
       open={open}
       onOpenChange={onOpenChange}
       onFinish={onFinish}
+      initialValues={{}}
     >
       <BaseForm form={form} />
     </ModalForm>

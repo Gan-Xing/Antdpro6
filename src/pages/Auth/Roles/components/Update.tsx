@@ -8,7 +8,7 @@ export type UpdateFormProps = {
   onCancel: (visible: boolean) => void;
   onSubmit: (values: Roles.CreateParams) => Promise<void>;
   updateModalOpen: boolean;
-  values: Partial<User.UsersEntity>;
+  values: Roles.Entity | undefined;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
@@ -41,7 +41,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         ...values,
       }}
     >
-      <BaseForm permissions={values.permissions} form={form} />
+      <BaseForm permissions={values?.permissions} form={form} />
       <Form.Item name="id" label={false}>
         <Input type="hidden" />
       </Form.Item>

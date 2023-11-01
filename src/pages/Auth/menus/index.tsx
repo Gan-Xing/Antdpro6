@@ -2,7 +2,7 @@ import { addItems, queryList, removeItem, updateItem } from '@/services/ant-desi
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
+import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
 import { Button, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
@@ -89,6 +89,7 @@ const TableList: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
+  const { canCreateMenu, canDeleteMenu, canEditMenu } = useAccess();
   const columns = [
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
@@ -123,39 +124,43 @@ const TableList: React.FC = () => {
       valueType: 'dateTime',
       ellipsis: true, // 添加此属性
     },
-    {
+    (canEditMenu || canDeleteMenu) && {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right' as const,
       render: (_: any, record: any) => [
-        <a
-          key="update"
-          onClick={() => {
-            handleUpdateModalOpen(true);
-            setCurrentRow((prevState) => ({ ...prevState, ...record }));
-          }}
-        >
-          <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-        </a>,
-        <a
-          key="delete"
-          onClick={() => {
-            return Modal.confirm({
-              title: '确认删除？',
-              onOk: async () => {
-                await handleRemove([record.id!]);
-                setSelectedRows([]);
-                actionRef.current?.reloadAndRest?.();
-              },
-              content: '确认删除吗？',
-              okText: '确认',
-              cancelText: '取消',
-            });
-          }}
-        >
-          <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-        </a>,
+        canEditMenu && (
+          <a
+            key="update"
+            onClick={() => {
+              handleUpdateModalOpen(true);
+              setCurrentRow((prevState) => ({ ...prevState, ...record }));
+            }}
+          >
+            <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+          </a>
+        ),
+        canDeleteMenu && (
+          <a
+            key="delete"
+            onClick={() => {
+              return Modal.confirm({
+                title: '确认删除？',
+                onOk: async () => {
+                  await handleRemove([record.id!]);
+                  setSelectedRows([]);
+                  actionRef.current?.reloadAndRest?.();
+                },
+                content: '确认删除吗？',
+                okText: '确认',
+                cancelText: '取消',
+              });
+            }}
+          >
+            <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+          </a>
+        ),
       ],
     },
   ];
@@ -191,15 +196,17 @@ const TableList: React.FC = () => {
           labelWidth: 80,
         }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
+          canCreateMenu && (
+            <Button
+              type="primary"
+              key="primary"
+              onClick={() => {
+                handleModalOpen(true);
+              }}
+            >
+              <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+            </Button>
+          ),
         ]}
         request={async (params, sort, filter) => {
           const { data } = await queryList('/menus', params, sort, filter);
