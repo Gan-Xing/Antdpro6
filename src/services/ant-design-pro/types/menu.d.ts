@@ -6,7 +6,7 @@ declare namespace Menus {
     path: string;
     createdAt: string;
     updatedAt: string;
-    permissions: any[]; // TODO: 替换为你实际的类型
+    permissions: Permissions.Entity[];
     parent: MenusType | null;
     children: MenusType[] | null;
   }

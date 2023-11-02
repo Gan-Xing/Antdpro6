@@ -221,7 +221,7 @@ const TableList: React.FC = () => {
         columns={columns}
         expandable={{}}
         rowSelection={{
-          onChange: (_, selectedRows) => {
+          onChange: (_, selectedRows: Menus.MenusType[]) => {
             setSelectedRows(selectedRows);
           },
         }}

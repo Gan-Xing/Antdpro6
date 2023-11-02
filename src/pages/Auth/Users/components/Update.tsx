@@ -31,7 +31,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       initialValues={{
         ...values,
         password: undefined,
-        roles: values.roles?.map((role: { id: any }) => role.id),
+        roles: values.roles?.map((role: Roles.Entity) => role.id),
         gender: values.gender?.toString(), // 将gender值从数字转换为字符串
         status: values.status ? values.status?.toString() : '1', // 将gender值从数字转换为字符串
       }}
