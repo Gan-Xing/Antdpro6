@@ -63,9 +63,9 @@ export async function getNotices(options?: { [key: string]: any }) {
   });
 }
 
-/** 获取当前的目录 GET /menu */
+/** 获取当前用户的目录 GET /menu */
 export async function fetchMenuData() {
-  return request<menuResponse>('/menus/all', {
+  return request<menuResponse>('/menus/user', {
     method: 'GET',
   });
 }

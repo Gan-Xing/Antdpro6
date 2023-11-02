@@ -52,31 +52,6 @@ export async function getInitialState(): Promise<{
   };
 }
 
-// const mockMenuData = [
-//   {
-//     name: 'Dashboard',
-//     path: '/dashboard',
-//   },
-//   {
-//     name: 'Users',
-//     path: '/users',
-//     children: [
-//       {
-//         name: 'User List',
-//         path: '/users/list',
-//       },
-//       {
-//         name: 'User Profile',
-//         path: '/users/profile',
-//       },
-//     ],
-//   },
-//   {
-//     name: 'Settings',
-//     path: '/settings',
-//   },
-// ];
-
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
@@ -97,7 +72,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         // initialState.currentUser 中包含了所有用户信息
         // return mockMenuData;
         const { data, success } = await fetchMenuData();
-        console.log(data);
         if (success) {
           return data;
         } else {
