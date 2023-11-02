@@ -53,21 +53,25 @@ export default [
       {
         path: '/auth/users',
         name: 'users',
+        access: 'canShowUser',
         component: './auth/users',
       },
       {
         path: '/auth/roles',
         name: 'roles',
+        access: 'canShowRole',
         component: './auth/roles',
       },
       {
         path: '/auth/permissions',
         name: 'permissions',
+        access: 'canShowPermission',
         component: './auth/permissions',
       },
       {
         path: '/auth/menus',
         name: 'menus',
+        access: 'canShowMenu',
         component: './auth/menus',
       },
     ],
