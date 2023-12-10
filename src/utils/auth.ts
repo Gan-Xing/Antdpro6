@@ -1,39 +1,46 @@
 import { useCache } from '@/hooks/useCache';
-import { decrypt, encrypt } from '@/utils/jsencrypt';
+import { Decrypt, Encrypt } from './encrypt';
+import { getLocal, removeLocals, setLocals } from 'ganxing';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const { wsCache } = useCache();
 
-const AccessTokenKey = 'ACCESS_TOKEN';
-const RefreshTokenKey = 'REFRESH_TOKEN';
-
+enum TokenKeys {
+  Access = 'ACCESS_TOKEN',
+  Refresh = 'REFRESH_TOKEN',
+}
 // 获取token
 export const getAccessToken = () => {
-  // 此处与TokenKey相同，此写法解决初始化时Cookies中不存在TokenKey报错
-  return wsCache.get(AccessTokenKey) ? wsCache.get(AccessTokenKey) : wsCache.get('ACCESS_TOKEN');
+  return getLocal(TokenKeys.Access) as string;
 };
 
 // 刷新token
 export const getRefreshToken = () => {
-  return wsCache.get(RefreshTokenKey);
+  return getLocal(TokenKeys.Refresh) as string;
 };
 
 // 设置token
 export const setToken = (token: Auth.Token) => {
-  wsCache.set(RefreshTokenKey, token.refreshToken, { exp: token.refreshExpiresIn });
-  wsCache.set(AccessTokenKey, token.accessToken, { exp: token.accessExpiresIn });
+  setLocals([
+    {
+      key: TokenKeys.Refresh,
+      value: token.refreshToken,
+      expiration: token.refreshExpiresIn * 1000,
+    },
+    { key: TokenKeys.Access, value: token.accessToken, expiration: token.accessExpiresIn * 1000 },
+  ]);
 };
 
 // 删除token
 export const removeToken = () => {
-  wsCache.delete(AccessTokenKey);
-  wsCache.delete(RefreshTokenKey);
+  removeLocals([TokenKeys.Access, TokenKeys.Refresh]);
 };
 
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {
   return 'Bearer ' + token;
 };
+
 // ========== 账号相关 ==========
 
 const LoginFormKey = 'LOGINFORM';
@@ -47,13 +54,13 @@ export type LoginFormType = {
 export const getLoginForm = () => {
   const loginForm: LoginFormType = wsCache.get(LoginFormKey);
   if (loginForm) {
-    loginForm.password = decrypt(loginForm.password) as string;
+    loginForm.password = Decrypt(loginForm.password) as string;
   }
   return loginForm;
 };
 
 export const setLoginForm = (loginForm: LoginFormType) => {
-  loginForm.password = encrypt(loginForm.password) as string;
+  loginForm.password = Encrypt(loginForm.password) as string;
   wsCache.set(LoginFormKey, loginForm, { exp: 30 * 24 * 60 * 60 });
 };
 
