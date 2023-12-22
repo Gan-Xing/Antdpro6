@@ -156,4 +156,5 @@ export default defineConfig({
   tabsLayout: {
     hasDropdown: true,
   },
+  esbuildMinifyIIFE: true,
 });
