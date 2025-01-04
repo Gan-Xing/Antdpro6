@@ -209,7 +209,15 @@ const TableList: React.FC = () => {
           ),
         ]}
         request={async (params, sort, filter) => {
-          const { data } = await queryList('/menus', params, sort, filter);
+          const { data } = await queryList(
+            '/menus',
+            {
+              ...params,
+              current: params.current || 1, // 添加默认值
+            },
+            sort,
+            filter,
+          );
           const processedData = processChildren(data.data);
           return {
             data: processedData,

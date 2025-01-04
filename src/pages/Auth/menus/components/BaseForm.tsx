@@ -8,55 +8,40 @@ interface Props {
   // form: FormInstance<any>;
   permissions?: { id: number }[];
 }
-const BaseForm: React.FC<Props> = () => {
-  // const { form, permissions } = props;
-  const intl = useIntl();
-  // const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
-  // const [checkedKeys, setCheckedKeys] = useState<Key[] | { checked: Key[]; halfChecked: Key[] }>(
-  //   permissions?.map((permission) => `permission-${permission.id}`) ?? [],
-  // );
-  // const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
-  // const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
 
-  function transformData(data: any) {
-    return data.map((item: any) => ({
-      title: item.name,
-      value: item.id,
-      key: item.id,
-      children: item.children ? transformData(item.children) : [],
-    }));
+interface MenuItem {
+  id: number;
+  name: string;
+  children?: MenuItem[];
+}
+
+interface TransformedMenuItem {
+  title: string;
+  value: number;
+  key: number;
+  children?: TransformedMenuItem[];
+}
+
+function transformData(data: MenuItem[]): TransformedMenuItem[] {
+  if (!data || !Array.isArray(data)) {
+    return [];
   }
+  return data.map((item: MenuItem) => ({
+    title: item.name,
+    value: item.id,
+    key: item.id,
+    children: item.children ? transformData(item.children) : undefined,
+  }));
+}
 
+const BaseForm: React.FC<Props> = () => {
+  const intl = useIntl();
   const { items: menusdata } = useQueryList('/menus');
-  const menus = transformData(menusdata);
 
-  // const { items: permission_groups } = useQueryList('/permission_groups');
-  // const onExpand = (expandedKeysValue: Key[]) => {
-  //   console.log('onExpand', expandedKeysValue);
-  //   // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-  //   // or, you can remove all expanded children keys.
-  //   setExpandedKeys(expandedKeysValue);
-  //   setAutoExpandParent(false);
-  // };
+  const rawData = menusdata as any;
+  const realData = (rawData?.data || []) as MenuItem[];
+  const menus = transformData(realData);
 
-  // const onCheck = (checkedKeysValue: Key[] | { checked: Key[]; halfChecked: Key[] }) => {
-  //   console.log('onCheck', checkedKeysValue);
-  //   setCheckedKeys(checkedKeysValue);
-  //   const permissions = (checkedKeysValue as Key[]).filter((key: Key) =>
-  //     key.toString().startsWith('permission'),
-  //   );
-  //   const permissionIds = permissions.map((key: Key) =>
-  //     Number(key.toString().replace('permission-', '')),
-  //   );
-  //   form.setFieldsValue({
-  //     permissionIds,
-  //   });
-  // };
-
-  // const onSelect = (selectedKeysValue: Key[], info: any) => {
-  //   console.log('onSelect', info);
-  //   setSelectedKeys(selectedKeysValue);
-  // };
   return (
     <>
       <ProForm.Group>
@@ -111,17 +96,17 @@ const BaseForm: React.FC<Props> = () => {
             id: 'pages.menus.parentid',
             defaultMessage: '上级菜单',
           })}
-          // tree-select args
           fieldProps={{
-            showArrow: false,
+            showArrow: true, // 修改为显示箭头
             filterTreeNode: true,
             showSearch: true,
             treeDefaultExpandAll: true,
             autoClearSearchValue: true,
-            // multiple: true,
             treeNodeFilterProp: 'title',
             fieldNames: {
               label: 'title',
+              value: 'value',
+              children: 'children',
             },
             treeData: menus,
           }}
