@@ -6,19 +6,42 @@ interface menuResponse {
   data: MenuDataItem[];
 }
 
+// 原有的通用响应格式
+export interface CommonResponseStructure<T> {
+  success: boolean;
+  data: T[];
+  total?: number;
+}
+
+// 图文日志的响应格式
+export interface PhotoLogResponseStructure<T> {
+  statusCode: number;
+  timestamp: string;
+  path: string;
+  message: string;
+  data: {
+    data: T[];
+    pagination: {
+      current: number;
+      pageSize: number;
+      total: number;
+    };
+  };
+  success: boolean;
+  showType: number;
+}
+
+// 原有的通用列表查询方法
 export async function queryList(
   url: string,
   params?: {
-    // query
-    /** 当前的页码 */
     current?: number;
-    /** 页面的容量 */
     pageSize?: number;
   },
   sort?: { [key: string]: any },
   filter?: { [key: string]: any },
 ) {
-  return request<Common.ResponseStructure<any>>(url, {
+  return request<CommonResponseStructure<any>>(url, {
     method: 'GET',
     params: {
       ...params,
@@ -27,7 +50,27 @@ export async function queryList(
     },
   });
 }
-/** 新建规则 POST /api/rule */
+
+// 图文日志专用的查询方法
+export async function queryPhotoLogs<T>(
+  url: string,
+  params?: {
+    current?: number;
+    pageSize?: number;
+    [key: string]: any;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<PhotoLogResponseStructure<T>>(url, {
+    method: 'GET',
+    params: {
+      ...params,
+      ...(options || {}),
+    },
+  });
+}
+
+// 原有的创建方法
 export async function addItems(url: string, options?: { [key: string]: any }) {
   return request(url, {
     method: 'POST',
@@ -36,7 +79,16 @@ export async function addItems(url: string, options?: { [key: string]: any }) {
     },
   });
 }
-/** 新建规则 PUT /api/rule */
+
+// 图文日志专用的创建方法
+export async function addPhotoLog<T>(url: string, data: T) {
+  return request<PhotoLogResponseStructure<T>>(`${url}`, {
+    method: 'POST',
+    data,
+  });
+}
+
+// 原有的更新方法
 export async function updateItem(url: string, options?: { [key: string]: any }) {
   return request(url, {
     method: 'PATCH',
@@ -45,7 +97,16 @@ export async function updateItem(url: string, options?: { [key: string]: any }) 
     },
   });
 }
-/** 删除规则 DELETE /api/rule */
+
+// 图文日志专用的更新方法
+export async function updatePhotoLog<T>(url: string, data: T) {
+  return request<PhotoLogResponseStructure<T>>(`${url}`, {
+    method: 'PATCH',
+    data,
+  });
+}
+
+// 原有的删除方法
 export async function removeItem(url: string, options?: { [key: string]: any }) {
   return request(url, {
     method: 'DELETE',
@@ -55,11 +116,11 @@ export async function removeItem(url: string, options?: { [key: string]: any }) 
   });
 }
 
-/** 此处后端没有提供注释 GET /api/notices */
-export async function getNotices(options?: { [key: string]: any }) {
-  return request<API.NoticeIconList>('/api/notices', {
-    method: 'GET',
-    ...(options || {}),
+// 图文日志专用的删除方法
+export async function removePhotoLog(url: string, data: { ids: number[] }) {
+  return request<PhotoLogResponseStructure<any>>(`${url}`, {
+    method: 'DELETE',
+    data,
   });
 }
 

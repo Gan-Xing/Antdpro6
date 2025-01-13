@@ -77,6 +77,20 @@ export default [
     ],
   },
   {
+    path: '/logs',
+    name: 'logs',
+    icon: 'file',
+    routes: [
+      {
+        path: '/logs/photo-logs',
+        name: 'photo-logs',
+        icon: 'camera',
+        access: 'canViewPhotoLog',
+        component: './Logs/PhotoLogs',
+      },
+    ],
+  },
+  {
     name: 'list.table-list',
     icon: 'table',
     path: '/list',

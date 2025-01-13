@@ -5,8 +5,6 @@ import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
 import jwt_decode from 'jwt-decode';
 import { config } from './config';
-// import errorCode from './errorCode';
-// import { useRequest } from 'umi';
 import { refreshToken } from '@/services/ant-design-pro/api';
 
 const { base_url, request_timeout } = config;
@@ -78,12 +76,13 @@ export const errorConfig: RequestConfig = {
           }
         }
       } else if (error.response) {
-        if (error.response.status === 400) {
+        const status = error.response.status;
+        if (status === 400) {
           if (Array.isArray(error.response?.data?.message?.message)) {
             error.response?.data?.message?.message?.map((item: string) => message.error(item));
           }
           message.error(error.response?.data?.message?.message);
-        } else if (error.response.status === 401) {
+        } else if (status === 401) {
           // 检查 401 响应
           let accessToken = authUtil.getAccessToken();
           if (accessToken) {
@@ -107,7 +106,9 @@ export const errorConfig: RequestConfig = {
               }
             }
           }
-        } else if (error.response.status === 500) {
+        } else if (status === 403) {
+          message.error('当前操作没有权限');
+        } else if (status === 500) {
           message.error('服务器问题，请联系管理员处理');
         } else {
           message.error(`Response status:${error.response.status}`);
