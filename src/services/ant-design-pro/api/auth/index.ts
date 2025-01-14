@@ -64,3 +64,10 @@ export async function refreshToken(body: Auth.RefreshTokenDto, options?: { [key:
     ...(options || {}),
   });
 }
+
+/** 获取图形验证码 */
+export async function fetchCaptcha() {
+  return request<{ image: string; token: string }>('/captcha', {
+    method: 'GET',
+  });
+}

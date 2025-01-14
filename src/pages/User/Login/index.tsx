@@ -1,12 +1,12 @@
 import Footer from '@/components/Footer';
-import { login, register } from '@/services/ant-design-pro/api';
+import { login, register, fetchCaptcha } from '@/services/ant-design-pro/api';
 import * as authUtil from '@/utils/auth';
 import { LockOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText, ProFormSelect } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 
@@ -50,6 +50,8 @@ const LoginMessage: React.FC<{
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<Common.ResponseStructure<Auth.Token>>();
   const [loginType, setLoginType] = useState<string>('login');
+  const [captchaSrc, setCaptchaSrc] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
   const { initialState, setInitialState } = useModel('@@initialState');
 
   const containerClassName = useEmotionCss(() => {
@@ -106,7 +108,12 @@ const Login: React.FC = () => {
 
   const handleRegister = async (values: API.RegisterParams) => {
     try {
-      const data = await register(values);
+      const registerData = {
+        ...values,
+        captchaToken,
+      } as API.RegisterParams;
+
+      const data = await register(registerData);
       if (data.data) {
         message.success('注册成功！');
         // 自动登录
@@ -120,6 +127,24 @@ const Login: React.FC = () => {
   };
 
   const success = userLoginState?.success;
+
+  const refreshCaptcha = async () => {
+    try {
+      const data = await fetchCaptcha();
+      if (data) {
+        setCaptchaSrc(data.image);
+        setCaptchaToken(data.token);
+      }
+    } catch (error) {
+      console.error('Error fetching captcha:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (loginType === 'register') {
+      refreshCaptcha();
+    }
+  }, [loginType]);
 
   return (
     <div className={containerClassName}>
@@ -269,6 +294,22 @@ const Login: React.FC = () => {
                   ]}
                 />
               </div>
+              <ProFormSelect
+                name="country"
+                fieldProps={{
+                  size: 'large',
+                }}
+                valueEnum={{
+                  CN: {
+                    text: '中国 +86',
+                  },
+                  CI: {
+                    text: '科特迪瓦 +225',
+                  },
+                }}
+                placeholder="请选择国家"
+                initialValue="CN"
+              />
               <ProFormText
                 name="phoneNumber"
                 fieldProps={{
@@ -287,22 +328,44 @@ const Login: React.FC = () => {
                   },
                 ]}
               />
-              <ProFormSelect
-                name="country"
-                fieldProps={{
-                  size: 'large',
-                }}
-                valueEnum={{
-                  CN: {
-                    text: '中国 +86',
-                  },
-                  CI: {
-                    text: '科特迪瓦 +225',
-                  },
-                }}
-                placeholder="请选择国家"
-                initialValue="CN"
-              />
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div
+                  style={{
+                    cursor: 'pointer',
+                    width: '150px',
+                    height: '40px',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '24px',
+                  }}
+                  onClick={refreshCaptcha}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    dangerouslySetInnerHTML={{
+                      __html: captchaSrc,
+                    }}
+                  />
+                </div>
+                <ProFormText
+                  name="captcha"
+                  fieldProps={{
+                    size: 'large',
+                  }}
+                  placeholder="验证码"
+                  rules={[{ required: true, message: '请输入验证码!' }]}
+                />
+              </div>
             </>
           )}
         </LoginForm>
