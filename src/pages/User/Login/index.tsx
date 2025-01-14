@@ -1,11 +1,11 @@
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
+import { login, register } from '@/services/ant-design-pro/api';
 import * as authUtil from '@/utils/auth';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { LoginForm, ProFormText } from '@ant-design/pro-components';
+import { LockOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
+import { LoginForm, ProFormText, ProFormSelect } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
-import { Alert, message } from 'antd';
+import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
@@ -49,6 +49,7 @@ const LoginMessage: React.FC<{
 
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<Common.ResponseStructure<Auth.Token>>();
+  const [loginType, setLoginType] = useState<string>('login');
   const { initialState, setInitialState } = useModel('@@initialState');
 
   const containerClassName = useEmotionCss(() => {
@@ -102,6 +103,22 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
+
+  const handleRegister = async (values: API.RegisterParams) => {
+    try {
+      const data = await register(values);
+      if (data.data) {
+        message.success('注册成功！');
+        // 自动登录
+        await handleSubmit({ email: values.email, password: values.password });
+      } else {
+        message.error('注册失败，请重试！');
+      }
+    } catch (error) {
+      message.error('注册失败，请重试！');
+    }
+  };
+
   const success = userLoginState?.success;
 
   return (
@@ -131,10 +148,29 @@ const Login: React.FC = () => {
           title="Ant Design"
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           onFinish={async (values) => {
-            await handleSubmit(values as API.LoginParams);
+            if (loginType === 'login') {
+              await handleSubmit(values as API.LoginParams);
+            } else {
+              await handleRegister(values as API.RegisterParams);
+            }
           }}
         >
-          {success && (
+          <Tabs
+            activeKey={loginType}
+            onChange={setLoginType}
+            centered
+            items={[
+              {
+                key: 'login',
+                label: '登录',
+              },
+              {
+                key: 'register',
+                label: '注册',
+              },
+            ]}
+          />
+          {success && loginType === 'login' && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.emailLogin.errorMessage',
@@ -159,6 +195,15 @@ const Login: React.FC = () => {
                   <FormattedMessage id="pages.login.email.required" defaultMessage="请输入邮箱!" />
                 ),
               },
+              {
+                type: 'email',
+                message: (
+                  <FormattedMessage
+                    id="pages.login.email.invalid"
+                    defaultMessage="请输入有效的邮箱地址!"
+                  />
+                ),
+              },
             ]}
           />
           <ProFormText.Password
@@ -181,8 +226,85 @@ const Login: React.FC = () => {
                   />
                 ),
               },
+              {
+                min: 6,
+                message: (
+                  <FormattedMessage
+                    id="pages.login.password.length"
+                    defaultMessage="密码至少6位！"
+                  />
+                ),
+              },
             ]}
           />
+          {loginType === 'register' && (
+            <>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <ProFormText
+                  name="lastName"
+                  fieldProps={{
+                    size: 'large',
+                    prefix: <UserOutlined />,
+                  }}
+                  placeholder="姓"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入姓!',
+                    },
+                  ]}
+                />
+                <ProFormText
+                  name="firstName"
+                  fieldProps={{
+                    size: 'large',
+                    prefix: <UserOutlined />,
+                  }}
+                  placeholder="名"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入名!',
+                    },
+                  ]}
+                />
+              </div>
+              <ProFormText
+                name="phoneNumber"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <PhoneOutlined />,
+                }}
+                placeholder="手机号码"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入手机号码!',
+                  },
+                  {
+                    pattern: /^1[3-9]\d{9}$/,
+                    message: '请输入有效的手机号码!',
+                  },
+                ]}
+              />
+              <ProFormSelect
+                name="country"
+                fieldProps={{
+                  size: 'large',
+                }}
+                valueEnum={{
+                  CN: {
+                    text: '中国 +86',
+                  },
+                  CI: {
+                    text: '科特迪瓦 +225',
+                  },
+                }}
+                placeholder="请选择国家"
+                initialValue="CN"
+              />
+            </>
+          )}
         </LoginForm>
       </div>
       <Footer />

@@ -73,6 +73,21 @@ declare namespace API {
   };
 
   type LoginParams = {
+    email: string;
+    password: string;
+    type?: string;
+  };
+
+  type RegisterParams = {
+    email: string;
+    password: string;
+    lastName: string; // 姓
+    firstName: string; // 名
+    phoneNumber: string;
+    country?: string;
+  };
+
+  type LoginParams = {
     username?: string;
     email?: string;
     password?: string;

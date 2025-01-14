@@ -33,6 +33,27 @@ export async function login(body: API.LoginParams, options?: { [key: string]: an
   });
 }
 
+/** 注册接口 POST /auth/register */
+export async function register(body: API.RegisterParams, options?: { [key: string]: any }) {
+  const { email, password, firstName, lastName, phoneNumber, country } = body;
+  return request<Common.ResponseStructure<Auth.Token>>('/auth/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: {
+      email,
+      password,
+      firstName,
+      lastName,
+      phoneNumber,
+      country,
+      username: lastName + firstName,
+    },
+    ...(options || {}),
+  });
+}
+
 export async function refreshToken(body: Auth.RefreshTokenDto, options?: { [key: string]: any }) {
   return request<Common.ResponseStructure<Auth.Token>>('/auth/refresh', {
     method: 'POST',

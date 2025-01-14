@@ -5,6 +5,7 @@ declare namespace Auth {
     accessExpiresIn: number;
     refreshExpiresIn: number;
   };
+
   type RefreshTokenDto = {
     refreshToken: string;
   };
