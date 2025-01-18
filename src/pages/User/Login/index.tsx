@@ -1,11 +1,16 @@
 import Footer from '@/components/Footer';
-import { login, register, fetchCaptcha } from '@/services/ant-design-pro/api';
+import {
+  login,
+  fetchCaptcha,
+  validateCaptcha,
+  registerByEmail,
+} from '@/services/ant-design-pro/api';
 import * as authUtil from '@/utils/auth';
 import { LockOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText, ProFormSelect } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
-import { Alert, message, Tabs } from 'antd';
+import { Alert, Button, Form, message, Tabs } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
@@ -53,6 +58,7 @@ const Login: React.FC = () => {
   const [captchaSrc, setCaptchaSrc] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
   const { initialState, setInitialState } = useModel('@@initialState');
+  const [form] = Form.useForm(); // 创建表单实例
 
   const containerClassName = useEmotionCss(() => {
     return {
@@ -106,26 +112,6 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleRegister = async (values: API.RegisterParams) => {
-    try {
-      const registerData = {
-        ...values,
-        captchaToken,
-      } as API.RegisterParams;
-
-      const data = await register(registerData);
-      if (data.data) {
-        message.success('注册成功！');
-        // 自动登录
-        await handleSubmit({ email: values.email, password: values.password });
-      } else {
-        message.error('注册失败，请重试！');
-      }
-    } catch (error) {
-      message.error('注册失败，请重试！');
-    }
-  };
-
   const success = userLoginState?.success;
 
   const refreshCaptcha = async () => {
@@ -137,6 +123,96 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching captcha:', error);
+    }
+  };
+
+  // 添加验证图形验证码并发送邮箱验证码的函数
+  const handleValidateCaptchaAndSendEmail = async () => {
+    try {
+      // 验证必要的表单字段
+      const values = await form.validateFields([
+        'email',
+        'firstName',
+        'lastName',
+        'password',
+        'confirmPassword', // 添加确认密码字段
+        'phoneNumber',
+        'country',
+        'captcha',
+      ]);
+
+      // 验证两次密码是否一致
+      if (values.password !== values.confirmPassword) {
+        message.error('两次输入的密码不一致！');
+        return;
+      }
+
+      // 调用验证图形验证码接口
+      const response = await validateCaptcha({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        confirmPassword: values.confirmPassword,
+        country: values.country,
+        phoneNumber: values.phoneNumber,
+        captcha: values.captcha,
+        captchaToken: captchaToken,
+      });
+
+      if (response.success && response.data.isValid) {
+        message.success('验证码已发送到邮箱，请查收！');
+        // 保存邮箱验证的token
+        const token = response.data.token;
+        if (token) {
+          setCaptchaToken(token);
+        }
+      } else {
+        message.error('图形验证码验证失败，请重试！');
+      }
+    } catch (error) {
+      message.error('验证失败，请检查表单内容并重试！');
+    }
+  };
+
+  // 添加新的 handleRegisterByEmail 函数
+  const handleRegisterByEmail = async () => {
+    try {
+      // 验证表单字段
+      const values = await form.validateFields([
+        'email',
+        'firstName',
+        'lastName',
+        'password',
+        'phoneNumber',
+        'country',
+        'emailCode',
+      ]);
+
+      // 调用注册并登录接口
+      const response = await registerByEmail({
+        token: captchaToken, // 使用之前保存的验证token
+        code: values.emailCode,
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phoneNumber: values.phoneNumber,
+        country: values.country,
+      });
+
+      if (response.success) {
+        message.success('注册成功！');
+        // 设置token并登录
+        authUtil.setToken(response.data);
+        await fetchUserInfo();
+        const urlParams = new URL(window.location.href).searchParams;
+        history.push(urlParams.get('redirect') || '/');
+      } else {
+        message.error('注册失败，请重试！');
+      }
+    } catch (error) {
+      message.error('注册失败，请检查表单内容并重试！');
     }
   };
 
@@ -165,6 +241,7 @@ const Login: React.FC = () => {
         }}
       >
         <LoginForm
+          form={form}
           contentStyle={{
             minWidth: 280,
             maxWidth: '75vw',
@@ -176,7 +253,7 @@ const Login: React.FC = () => {
             if (loginType === 'login') {
               await handleSubmit(values as API.LoginParams);
             } else {
-              await handleRegister(values as API.RegisterParams);
+              await handleRegisterByEmail(); // 使用新的注册登录函数
             }
           }}
         >
@@ -264,6 +341,28 @@ const Login: React.FC = () => {
           />
           {loginType === 'register' && (
             <>
+              <ProFormText.Password
+                name="confirmPassword"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined />,
+                }}
+                placeholder="请确认密码"
+                rules={[
+                  {
+                    required: true,
+                    message: '请确认密码！',
+                  },
+                  {
+                    validator: (_, value) => {
+                      if (!value || form.getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('两次输入的密码不一致！'));
+                    },
+                  },
+                ]}
+              />
               <div style={{ display: 'flex', gap: '16px' }}>
                 <ProFormText
                   name="lastName"
@@ -365,6 +464,58 @@ const Login: React.FC = () => {
                   placeholder="验证码"
                   rules={[{ required: true, message: '请输入验证码!' }]}
                 />
+              </div>
+              {/* <div
+                style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}
+              >
+                <ProFormText
+                  name="emailCode"
+                  fieldProps={{
+                    size: 'large',
+                  }}
+                  placeholder="邮箱验证码"
+                  rules={[{ required: true, message: '请输入邮箱验证码!' }]}
+                />
+                <Button
+                  type="primary"
+                  style={{
+                    height: '40px',
+                    marginBottom: '24px',
+                  }}
+                  onClick={async () => {
+                    try {
+                      await sendEmailVerificationCode({ email: 'test@example.com' }); // 调用发送验证码的接口
+                      message.success('验证码已发送到邮箱，请查收！');
+                    } catch (error) {
+                      message.error('发送验证码失败，请重试！');
+                    }
+                  }}
+                >
+                  发送验证码
+                </Button>
+              </div> */}
+              <div
+                style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}
+              >
+                <ProFormText
+                  name="emailCode"
+                  fieldProps={{
+                    size: 'large',
+                  }}
+                  placeholder="请输入邮箱验证码"
+                  rules={[{ required: true, message: '请输入邮箱验证码!' }]}
+                />
+                {/* 发送验证码按钮 */}
+                <Button
+                  type="primary"
+                  style={{
+                    height: '40px',
+                    marginBottom: '24px',
+                  }}
+                  onClick={handleValidateCaptchaAndSendEmail} // 改为调用验证图形验证码的函数
+                >
+                  发送验证码
+                </Button>
               </div>
             </>
           )}

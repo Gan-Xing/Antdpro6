@@ -71,3 +71,41 @@ export async function fetchCaptcha() {
     method: 'GET',
   });
 }
+
+/** 验证图形验证码并发送邮箱验证码 */
+export async function validateCaptcha(params: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  country: string;
+  phoneNumber: string;
+  captcha: string;
+  captchaToken: string;
+}) {
+  return request<Common.ResponseStructure<{ isValid: boolean; token?: string }>>(
+    '/auth/validateCaptcha',
+    {
+      method: 'POST',
+      data: params,
+    },
+  );
+}
+
+/** 注册并登录 */
+export async function registerByEmail(params: {
+  token: string;
+  code: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  country: string;
+}) {
+  return request<Common.ResponseStructure<Auth.Token>>('/auth/registerByEmail', {
+    method: 'POST',
+    data: params,
+  });
+}
