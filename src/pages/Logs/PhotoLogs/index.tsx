@@ -8,6 +8,7 @@ import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
 import Update from './components/Update';
+import ImagePreview from './components/ImagePreview';
 
 const { RangePicker } = DatePicker;
 
@@ -178,19 +179,7 @@ const TableList: React.FC = () => {
       hideInSearch: true,
       render: (_, record) => {
         if (!record.photos?.length) return '-';
-        console.log(record.photos);
-        return (
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {record.photos.map((photo, index) => (
-              <img
-                key={index}
-                src={photo}
-                alt={`照片${index + 1}`}
-                style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 4 }}
-              />
-            ))}
-          </div>
-        );
+        return <ImagePreview photos={record.photos} />;
       },
     },
     {
