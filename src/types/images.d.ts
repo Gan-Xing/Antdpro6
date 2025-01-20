@@ -13,6 +13,12 @@ declare namespace Images {
     area: string;
     /** 图片URL列表 */
     photos: string[];
+    /** 缩略图列表 */
+    thumbnails?: {
+      size: string;
+      path: string;
+      url: string;
+    }[];
     /** 分类 */
     category: '安全' | '质量' | '进度';
     /** 桩号 */
@@ -27,6 +33,8 @@ declare namespace Images {
     createdAt: string;
     /** 更新时间 */
     updatedAt: string;
+    /** 创建者ID */
+    createdById: number;
     /** 创建者信息 */
     createdBy: {
       id: number;

@@ -179,7 +179,7 @@ const TableList: React.FC = () => {
       hideInSearch: true,
       render: (_, record) => {
         if (!record.photos?.length) return '-';
-        return <ImagePreview photos={record.photos} />;
+        return <ImagePreview photos={record.photos} thumbnails={record.thumbnails} />;
       },
     },
     {

@@ -3,47 +3,61 @@ import { Image } from 'antd';
 
 interface ImagePreviewProps {
   photos: string[];
+  thumbnails?: Images.Thumbnail[]; // 就是一个简单的数组
 }
 
-const ImagePreview: React.FC<ImagePreviewProps> = ({ photos }) => {
+const ImagePreview: React.FC<ImagePreviewProps> = ({ photos, thumbnails }) => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // 获取指定尺寸的缩略图 URL
+  const getThumbnailUrl = (size: string): string => {
+    console.log('Looking for thumbnail:', {
+      size,
+      availableThumbnails: thumbnails?.map((t) => ({
+        size: t.size,
+        url: t.url,
+      })),
+    });
+    const thumbnail = thumbnails?.find((t) => t.size === size);
+    console.log('Found thumbnail:', thumbnail);
+    const url = thumbnail?.url || photos[0];
+    console.log('Using URL:', url);
+    return url;
+  };
 
   return (
     <>
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        {photos.map((photo, index) => (
-          <div
-            key={index}
+        <div
+          style={{
+            position: 'relative',
+            cursor: 'pointer',
+            width: 64,
+            height: 64,
+          }}
+        >
+          <Image
+            src={getThumbnailUrl('500x500')}
+            alt="缩略图"
             style={{
-              position: 'relative',
-              cursor: 'pointer',
-              width: 64,
-              height: 64,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: 4,
+              transition: 'transform 0.2s',
             }}
-          >
-            <Image
-              src={photo}
-              alt={`图片${index + 1}`}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                borderRadius: 4,
-                transition: 'transform 0.2s',
-              }}
-              preview={{
-                visible: false,
-                onVisibleChange: (vis) => {
-                  if (vis) {
-                    setCurrentIndex(index);
-                    setVisible(true);
-                  }
-                },
-              }}
-            />
-          </div>
-        ))}
+            preview={{
+              visible: false,
+              onVisibleChange: (vis) => {
+                if (vis) {
+                  setCurrentIndex(0);
+                  setVisible(true);
+                }
+              },
+            }}
+          />
+        </div>
       </div>
       <div style={{ display: 'none' }}>
         <Image.PreviewGroup
@@ -53,9 +67,12 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ photos }) => {
             current: currentIndex,
           }}
         >
-          {photos.map((photo, index) => (
-            <Image key={index} src={photo} />
-          ))}
+          <Image
+            src={getThumbnailUrl('500x500')}
+            preview={{
+              src: photos[0], // 点击放大时使用原图
+            }}
+          />
         </Image.PreviewGroup>
       </div>
     </>

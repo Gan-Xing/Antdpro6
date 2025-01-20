@@ -125,4 +125,50 @@ declare namespace API {
     description?: string;
     type?: NoticeIconItemType;
   };
+  type Response<T = any> = {
+    success: boolean;
+    data: T;
+    message?: string;
+  };
+
+  type PageResult<T> = {
+    data: T[];
+    pagination: {
+      current: number;
+      pageSize: number;
+      total: number;
+    };
+  };
+}
+
+declare namespace Images {
+  type Thumbnail = {
+    size: string;
+    url: string;
+    path: string;
+  };
+
+  type Entity = {
+    id: number;
+    description?: string;
+    area?: string;
+    photos: string[];
+    thumbnails?: Thumbnail[];
+    location?: {
+      latitude: number;
+      longitude: number;
+    };
+    stakeNumber?: string;
+    offset?: string;
+    category?: string;
+    tags?: string[];
+    createdAt: string;
+    updatedAt: string;
+    createdById: number;
+    createdBy: {
+      id: number;
+      username: string;
+      avatar?: string;
+    };
+  };
 }
