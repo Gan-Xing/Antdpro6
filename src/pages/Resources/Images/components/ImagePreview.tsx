@@ -12,17 +12,17 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ photos, thumbnails }) => {
 
   // 获取指定尺寸的缩略图 URL
   const getThumbnailUrl = (size: string): string => {
-    console.log('Looking for thumbnail:', {
-      size,
-      availableThumbnails: thumbnails?.map((t) => ({
-        size: t.size,
-        url: t.url,
-      })),
-    });
+    // console.log('Looking for thumbnail:', {
+    //   size,
+    //   availableThumbnails: thumbnails?.map((t) => ({
+    //     size: t.size,
+    //     url: t.url,
+    //   })),
+    // });
     const thumbnail = thumbnails?.find((t) => t.size === size);
-    console.log('Found thumbnail:', thumbnail);
+    // console.log('Found thumbnail:', thumbnail);
     const url = thumbnail?.url || photos[0];
-    console.log('Using URL:', url);
+    // console.log('Using URL:', url);
     return url;
   };
 

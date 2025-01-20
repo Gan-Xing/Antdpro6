@@ -8,7 +8,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
-import { Style, Icon } from 'ol/style';
+import { Style, Circle as CircleStyle, Fill, Stroke } from 'ol/style';
 import { message } from 'antd';
 import 'ol/ol.css';
 
@@ -23,39 +23,27 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
   const [map, setMap] = useState<Map | null>(null);
   const [markerLayer, setMarkerLayer] = useState<VectorLayer<VectorSource> | null>(null);
 
-  // 更新所有标记的函数
-  const updateMarkers = (
-    vectorSource: VectorSource,
-    points: { latitude: number; longitude: number }[],
-  ) => {
-    vectorSource.clear();
-    points.forEach((point) => {
-      const coordinate = fromLonLat([point.longitude, point.latitude]);
-      vectorSource.addFeature(
-        new Feature({
-          geometry: new Point(coordinate),
-        }),
-      );
-    });
-  };
-
   // 初始化地图
   useEffect(() => {
     if (!mapRef.current || map) return;
 
-    // 创建标记图层
     const vectorSource = new VectorSource();
     const vectorLayer = new VectorLayer({
       source: vectorSource,
       style: new Style({
-        image: new Icon({
-          anchor: [0.5, 1],
-          src: 'https://openlayers.org/en/latest/examples/data/icon.png',
+        image: new CircleStyle({
+          radius: 8,
+          fill: new Fill({
+            color: 'rgba(255, 0, 0, 0.8)',
+          }),
+          stroke: new Stroke({
+            color: '#ffffff',
+            width: 2,
+          }),
         }),
       }),
     });
 
-    // 创建地图实例
     const mapInstance = new Map({
       target: mapRef.current,
       layers: [
@@ -68,7 +56,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
         vectorLayer,
       ],
       view: new View({
-        center: fromLonLat([-2.8, 8.04]), // 默认邦杜库中心
+        center: fromLonLat([-2.8, 8.04]),
         zoom: 12,
       }),
     });
@@ -76,7 +64,6 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
     setMap(mapInstance);
     setMarkerLayer(vectorLayer);
 
-    // 添加点击事件
     mapInstance.on('click', (evt) => {
       const coordinate = transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
       const location = {
@@ -86,49 +73,48 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
       onChange?.(location);
     });
 
-    // 如果有初始值，添加标记
-    if (value) {
-      const coordinate = fromLonLat([value.longitude, value.latitude]);
-      vectorSource.addFeature(
-        new Feature({
-          geometry: new Point(coordinate),
-        }),
-      );
-      mapInstance.getView().setCenter(coordinate);
-    }
-
-    // 如果有位置列表，添加所有标记
-    if (locations.length > 0) {
-      updateMarkers(vectorSource, locations);
-      // 将地图中心设置为第一个位置
-      const firstLocation = locations[0];
-      const coordinate = fromLonLat([firstLocation.longitude, firstLocation.latitude]);
-      mapInstance.getView().setCenter(coordinate);
-    }
-
     return () => {
       mapInstance.setTarget(undefined);
     };
   }, []);
 
-  // 当locations变化时更新标记位置
+  // 处理标记更新
   useEffect(() => {
-    if (!map || !markerLayer) return;
+    if (!markerLayer || !map) return;
 
-    const vectorSource = markerLayer.getSource();
-    if (!vectorSource) return;
+    const source = markerLayer.getSource();
+    if (!source) return;
 
-    updateMarkers(vectorSource, locations);
+    source.clear();
 
-    // 如果有位置，将地图缩放到包含所有标记的范围
-    if (locations.length > 0) {
-      const extent = vectorSource.getExtent();
-      map.getView().fit(extent, {
-        padding: [50, 50, 50, 50],
-        maxZoom: 15,
-      });
+    if (value) {
+      const coordinate = fromLonLat([value.longitude, value.latitude]);
+      source.addFeature(
+        new Feature({
+          geometry: new Point(coordinate),
+        }),
+      );
+      map.getView().setCenter(coordinate);
+      map.getView().setZoom(14);
     }
-  }, [locations]);
+
+    if (locations.length > 0) {
+      locations.forEach((location) => {
+        const coordinate = fromLonLat([location.longitude, location.latitude]);
+        source.addFeature(
+          new Feature({
+            geometry: new Point(coordinate),
+          }),
+        );
+      });
+
+      if (!value && locations.length > 0) {
+        const firstLocation = locations[0];
+        const coordinate = fromLonLat([firstLocation.longitude, firstLocation.latitude]);
+        map.getView().setCenter(coordinate);
+      }
+    }
+  }, [value, locations, map, markerLayer]);
 
   // 获取当前位置
   const handleGetCurrentLocation = () => {
@@ -149,20 +135,6 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
           latitude: position.coords.latitude,
         };
         onChange?.(location);
-
-        const coordinate = fromLonLat([location.longitude, location.latitude]);
-        const vectorSource = markerLayer.getSource();
-        if (!vectorSource) return;
-
-        vectorSource.clear();
-        vectorSource.addFeature(
-          new Feature({
-            geometry: new Point(coordinate),
-          }),
-        );
-        map.getView().setCenter(coordinate);
-        map.getView().setZoom(15);
-
         message.success('位置获取成功');
       },
       (error) => {
@@ -193,10 +165,17 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
   return (
     <div>
       <div ref={mapRef} style={{ width: '100%', height: '400px' }} />
-      <div style={{ marginTop: 8 }}>
+      <div style={{ marginTop: '10px' }}>
         <a onClick={handleGetCurrentLocation} style={{ cursor: 'pointer' }}>
           获取当前位置
         </a>
+        {value && (
+          <div style={{ marginTop: '5px' }}>
+            <small>
+              当前位置: {value.latitude.toFixed(6)}, {value.longitude.toFixed(6)}
+            </small>
+          </div>
+        )}
       </div>
     </div>
   );

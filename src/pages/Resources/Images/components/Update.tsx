@@ -16,21 +16,48 @@ interface UpdateFormProps {
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [mapLocation, setMapLocation] = useState<
+    { latitude: number; longitude: number } | undefined
+  >();
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (props.values.photos?.length) {
-      setFileList(
-        props.values.photos.map((url, index) => ({
-          uid: `-${index}`,
-          name: `图片${index + 1}`,
-          status: 'done',
-          url,
-          response: { data: { data: { path: url } } },
-        })),
-      );
+    if (props.updateModalOpen && props.values) {
+      form.setFieldsValue({
+        ...props.values,
+      });
+
+      // 设置地图位置
+      if (props.values.location) {
+        try {
+          // 如果 location 是字符串，尝试解析它
+          const locationData =
+            typeof props.values.location === 'string'
+              ? JSON.parse(props.values.location)
+              : props.values.location;
+
+          setMapLocation(locationData);
+          form.setFieldsValue({ location: locationData });
+        } catch (error) {
+          console.error('Failed to parse location data:', error);
+        }
+      } else {
+        console.log('No location data provided');
+      }
+      // 如果有照片，初始化文件列表
+      if (props.values.photos) {
+        setFileList(
+          props.values.photos.map((url, index) => ({
+            uid: `-${index}`,
+            name: url.split('/').pop() || `image-${index}`,
+            status: 'done',
+            url,
+            response: { data: { data: { url } } },
+          })),
+        );
+      }
     }
-  }, [props.values.photos]);
+  }, [props.updateModalOpen, props.values, form]);
 
   // 处理文件上传
   const handleUpload: UploadProps['onChange'] = async ({ file, fileList }) => {
@@ -217,7 +244,13 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         label="位置"
         tooltip={'点击地图选择位置，或点击"获取当前位置"按钮'}
       >
-        <MapPicker />
+        <MapPicker
+          value={mapLocation}
+          onChange={(location) => {
+            setMapLocation(location);
+            form.setFieldsValue({ location });
+          }}
+        />
       </Form.Item>
 
       <Form.Item label="照片" required tooltip="支持 jpg、png、gif、webp、heic 格式">
