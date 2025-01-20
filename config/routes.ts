@@ -77,16 +77,15 @@ export default [
     ],
   },
   {
-    path: '/logs',
-    name: 'logs',
-    icon: 'file',
+    path: '/resources',
+    name: 'resources',
+    icon: 'FolderOutlined',
     routes: [
       {
-        path: '/logs/photo-logs',
-        name: 'photo-logs',
-        icon: 'camera',
-        access: 'canViewPhotoLog',
-        component: './Logs/PhotoLogs',
+        path: '/resources/images',
+        name: 'images',
+        icon: 'PictureOutlined',
+        component: './Resources/Images',
       },
     ],
   },

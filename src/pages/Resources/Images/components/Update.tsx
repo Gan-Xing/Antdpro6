@@ -1,40 +1,42 @@
-import { ModalForm, ProFormText, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
-import { Form, Upload, message } from 'antd';
-import PlusOutlined from '@ant-design/icons/PlusOutlined';
-import React, { useState } from 'react';
-import type { RcFile, UploadProps } from 'antd/es/upload';
-import type { UploadFile } from 'antd/es/upload/interface';
-import MapPicker from './MapPicker';
+import { PlusOutlined } from '@ant-design/icons';
+import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { message, Upload } from 'antd';
+import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
+import React, { useEffect, useState } from 'react';
 import { getAccessToken, formatToken } from '@/utils/auth';
+import MapPicker from './MapPicker';
+import { Form } from 'antd';
 
-interface CreateFormProps {
-  createModalOpen: boolean;
+interface UpdateFormProps {
+  updateModalOpen: boolean;
   onCancel: () => void;
-  onSubmit: (values: PhotoLogs.CreateParams) => Promise<boolean>;
+  onSubmit: (values: Images.UpdateParams) => Promise<boolean>;
+  values: Partial<Images.Entity>;
 }
 
-const CreateForm: React.FC<CreateFormProps> = (props) => {
+const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [mapLocation, setMapLocation] = useState<
-    { latitude: number; longitude: number } | undefined
-  >();
-  const [locations, setLocations] = useState<{ latitude: number; longitude: number }[]>([]);
   const [form] = Form.useForm();
 
-  const handleUpload = async ({ file, fileList }: any) => {
-    const updatedFileList = fileList.map((f: any) => {
+  useEffect(() => {
+    if (props.values.photos?.length) {
+      setFileList(
+        props.values.photos.map((url, index) => ({
+          uid: `-${index}`,
+          name: `图片${index + 1}`,
+          status: 'done',
+          url,
+          response: { data: { data: { path: url } } },
+        })),
+      );
+    }
+  }, [props.values.photos]);
+
+  // 处理文件上传
+  const handleUpload: UploadProps['onChange'] = async ({ file, fileList }) => {
+    const updatedFileList = fileList.map((f: UploadFile) => {
       if (f.uid === file.uid) {
         if (file.status === 'done' && file.response?.data?.data?.url) {
-          // 如果返回中有 location，添加到位置列表中
-          const location = file.response?.data?.data?.location;
-          if (location) {
-            setLocations((prev) => [...prev, location]); // 添加新位置到数组
-            // 如果还没有手动选择位置，则设置第一个位置为地图位置
-            if (!mapLocation) {
-              setMapLocation(location);
-              form.setFieldsValue({ location });
-            }
-          }
           return {
             ...f,
             status: file.status,
@@ -48,13 +50,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       return f;
     });
 
-    if (file.status === 'uploading') {
-      console.log('Uploading:', file, fileList);
-    }
-
     setFileList(updatedFileList);
 
-    if (file.status === 'done') {
+    if (file.status === 'uploading') {
+      console.log('Uploading:', file, fileList);
+    } else if (file.status === 'done') {
       const url = file.response?.data?.data?.url;
       if (url) {
         message.success(`${file.name} 上传成功`);
@@ -68,34 +68,22 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     }
   };
 
-  // 处理文件删除，同时删除对应的位置
-  const handleRemove = (file: UploadFile) => {
-    const index = fileList.findIndex((f) => f.uid === file.uid);
-    if (index > -1) {
-      const newLocations = [...locations];
-      newLocations.splice(index, 1);
-      setLocations(newLocations);
-    }
-    return true;
-  };
-
   const uploadProps: UploadProps = {
     name: 'file',
-    action: '/api/photo-logs/upload',
+    action: '/api/images/upload',
     headers: {
       Authorization: formatToken(getAccessToken()),
     },
     onChange: handleUpload,
-    onRemove: handleRemove,
     multiple: true,
     listType: 'picture-card',
-    fileList: fileList,
+    fileList,
     accept: 'image/*,.heic',
     beforeUpload: (file: RcFile) => {
       const isImage = file.type.startsWith('image/') || file.name.toLowerCase().endsWith('.heic');
       if (!isImage) {
         message.error(`${file.name} 不是图片文件`);
-        return false;
+        return Upload.LIST_IGNORE;
       }
       return true;
     },
@@ -110,24 +98,27 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
   return (
     <ModalForm
-      title="新建"
+      title="编辑图片"
       width={800}
       form={form}
-      open={props.createModalOpen}
+      open={props.updateModalOpen}
       onOpenChange={(visible) => {
-        if (!visible) {
+        if (visible) {
+          form.setFieldsValue({
+            ...props.values,
+            location: props.values.location,
+          });
+        } else {
           form.resetFields();
           setFileList([]);
-          setLocations([]); // 重置位置列表
-          setMapLocation(undefined); // 重置地图位置
           props.onCancel();
         }
       }}
       onFinish={async (values) => {
         const photos = fileList
           .filter((file) => file.status === 'done')
-          .map((file) => file.response?.data?.data?.path)
-          .filter(Boolean);
+          .map((file) => file.response?.data?.data?.url)
+          .filter(Boolean) as string[];
 
         if (photos.length === 0) {
           message.error('请至少上传一张图片');
@@ -135,40 +126,39 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         }
 
         const success = await props.onSubmit({
+          id: props.values.id!,
           ...values,
           photos,
-          location: mapLocation, // 提交手动选择的位置或最后一个有效的图片位置
         });
 
         if (success) {
           props.onCancel();
           form.resetFields();
           setFileList([]);
-          setLocations([]); // 重置位置列表
-          setMapLocation(undefined); // 重置地图位置
         }
-
         return success;
       }}
     >
+      {/* 分类 */}
       <ProFormSelect
         name="category"
         label="分类"
         options={[
-          { label: '进度', value: '进度' },
           { label: '安全', value: '安全' },
           { label: '质量', value: '质量' },
+          { label: '进度', value: '进度' },
         ]}
         placeholder="请选择分类"
         rules={[{ required: true, message: '请选择分类' }]}
-        initialValue="进度" // 设置默认值
       />
+
+      {/* 工程类别，与创建页面一致 */}
       <ProFormSelect
         name="area"
         label="工程类别"
         options={[
           { label: '临建', value: '临建' },
-          { label: '挖方弃方', value: '挖方弃方' },
+          { label: '土方弃方', value: '土方弃方' },
           { label: '土方填方', value: '土方填方' },
           { label: '土方换填', value: '土方换填' },
           { label: '底基层', value: '底基层' },
@@ -182,45 +172,54 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         ]}
         placeholder="请选择工程类别"
         rules={[{ required: true, message: '请选择工程类别' }]}
-        initialValue="底基层" // 设置默认值
       />
+
+      {/* 标签 */}
       <ProFormSelect
         name="tags"
         label="标签"
         mode="tags"
         placeholder="请输入标签（支持多个标签）"
         fieldProps={{
-          tokenSeparators: [',', ' '],
+          tokenSeparators: [',', ' '], // 支持用逗号或空格分隔标签
         }}
       />
+
+      {/* 描述 */}
       <ProFormTextArea
         name="description"
         label="描述"
         placeholder="请输入描述"
         rules={[{ required: true, message: '请输入描述' }]}
       />
-      <div style={{ display: 'flex', gap: '24px', marginBottom: '24px' }}>
-        <div style={{ flex: 1 }}>
-          <ProFormText name="stakeNumber" label="桩号" placeholder="请输入桩号" />
-        </div>
-        <div style={{ flex: 1 }}>
-          <ProFormText name="offset" label="偏距" placeholder="请输入偏距" />
-        </div>
+
+      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+        <ProFormText
+          name="stakeNumber"
+          label="桩号"
+          placeholder="请输入桩号"
+          fieldProps={{
+            style: { width: '100%' },
+          }}
+        />
+        <ProFormText
+          name="offset"
+          label="偏距"
+          placeholder="请输入偏距"
+          fieldProps={{
+            style: { width: '100%' },
+          }}
+        />
       </div>
+
       <Form.Item
         name="location"
         label="位置"
         tooltip={'点击地图选择位置，或点击"获取当前位置"按钮'}
       >
-        <MapPicker
-          value={mapLocation}
-          locations={locations}
-          onChange={(location) => {
-            setMapLocation(location);
-            form.setFieldsValue({ location });
-          }}
-        />
+        <MapPicker />
       </Form.Item>
+
       <Form.Item label="照片" required tooltip="支持 jpg、png、gif、webp、heic 格式">
         <Upload {...uploadProps}>{fileList.length >= 8 ? null : uploadButton}</Upload>
       </Form.Item>
@@ -228,4 +227,4 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   );
 };
 
-export default CreateForm;
+export default UpdateForm;

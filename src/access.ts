@@ -21,15 +21,15 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
     canEditRole: currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '编辑角色')),
     canShowRole: currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看角色')),
 
-    // 图文日志相关权限
-    canCreatePhotoLog:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增图文日志')),
-    canUpdatePhotoLog:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '更新图文日志')),
-    canDeletePhotoLog:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除图文日志')),
-    canViewPhotoLog:
-      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看图文日志列表')),
+    // 图片管理相关权限
+    canCreateImage:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增图片')),
+    canUpdateImage:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '更新图片')),
+    canDeleteImage:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除图片')),
+    canViewImage:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看图片列表')),
 
     canCreateUser:
       currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '新增用户')),

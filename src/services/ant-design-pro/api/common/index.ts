@@ -13,7 +13,7 @@ export interface CommonResponseStructure<T> {
   total?: number;
 }
 
-// 图文日志的响应格式
+// 图片管理的响应格式
 export interface PhotoLogResponseStructure<T> {
   statusCode: number;
   timestamp: string;
@@ -51,7 +51,7 @@ export async function queryList(
   });
 }
 
-// 图文日志专用的查询方法
+// 图片管理专用的查询方法
 export async function queryPhotoLogs<T>(
   url: string,
   params?: {
@@ -80,7 +80,7 @@ export async function addItems(url: string, options?: { [key: string]: any }) {
   });
 }
 
-// 图文日志专用的创建方法
+// 图片管理专用的创建方法
 export async function addPhotoLog<T>(url: string, data: T) {
   return request<PhotoLogResponseStructure<T>>(`${url}`, {
     method: 'POST',
@@ -98,7 +98,7 @@ export async function updateItem(url: string, options?: { [key: string]: any }) 
   });
 }
 
-// 图文日志专用的更新方法
+// 图片管理专用的更新方法
 export async function updatePhotoLog<T>(url: string, data: T) {
   return request<PhotoLogResponseStructure<T>>(`${url}`, {
     method: 'PATCH',
@@ -116,7 +116,7 @@ export async function removeItem(url: string, options?: { [key: string]: any }) 
   });
 }
 
-// 图文日志专用的删除方法
+// 图片管理专用的删除方法
 export async function removePhotoLog(url: string, data: { ids: number[] }) {
   return request<PhotoLogResponseStructure<any>>(`${url}`, {
     method: 'DELETE',

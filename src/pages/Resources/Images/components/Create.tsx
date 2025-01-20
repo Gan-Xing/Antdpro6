@@ -1,16 +1,16 @@
-import { ModalForm, ProFormText, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
+import { PlusOutlined } from '@ant-design/icons';
+import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { Form, Upload, message } from 'antd';
-import PlusOutlined from '@ant-design/icons/PlusOutlined';
-import React, { useState } from 'react';
 import type { RcFile, UploadProps } from 'antd/es/upload';
 import type { UploadFile } from 'antd/es/upload/interface';
 import MapPicker from './MapPicker';
 import { getAccessToken, formatToken } from '@/utils/auth';
+import React, { useState } from 'react';
 
 interface CreateFormProps {
   createModalOpen: boolean;
   onCancel: () => void;
-  onSubmit: (values: PhotoLogs.CreateParams) => Promise<boolean>;
+  onSubmit: (values: Images.CreateParams) => Promise<boolean>;
 }
 
 const CreateForm: React.FC<CreateFormProps> = (props) => {
@@ -22,13 +22,13 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   const [form] = Form.useForm();
 
   const handleUpload = async ({ file, fileList }: any) => {
-    const updatedFileList = fileList.map((f: any) => {
+    const updatedFileList = fileList.map((f: UploadFile) => {
       if (f.uid === file.uid) {
         if (file.status === 'done' && file.response?.data?.data?.url) {
           // 如果返回中有 location，添加到位置列表中
           const location = file.response?.data?.data?.location;
           if (location) {
-            setLocations((prev) => [...prev, location]); // 添加新位置到数组
+            setLocations((prev: { latitude: number; longitude: number }[]) => [...prev, location]); // 添加新位置到数组
             // 如果还没有手动选择位置，则设置第一个位置为地图位置
             if (!mapLocation) {
               setMapLocation(location);
@@ -70,7 +70,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
   // 处理文件删除，同时删除对应的位置
   const handleRemove = (file: UploadFile) => {
-    const index = fileList.findIndex((f) => f.uid === file.uid);
+    const index = fileList.findIndex((f: UploadFile) => f.uid === file.uid);
     if (index > -1) {
       const newLocations = [...locations];
       newLocations.splice(index, 1);
@@ -81,7 +81,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
   const uploadProps: UploadProps = {
     name: 'file',
-    action: '/api/photo-logs/upload',
+    action: '/api/images/upload',
     headers: {
       Authorization: formatToken(getAccessToken()),
     },
@@ -110,7 +110,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
   return (
     <ModalForm
-      title="新建"
+      title="新建图片"
       width={800}
       form={form}
       open={props.createModalOpen}
