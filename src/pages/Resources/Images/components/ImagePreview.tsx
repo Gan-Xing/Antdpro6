@@ -38,7 +38,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ photos, thumbnails }) => {
           }}
         >
           <Image
-            src={getThumbnailUrl('500x500')}
+            src={getThumbnailUrl('64x64')}
             alt="缩略图"
             style={{
               width: '100%',
@@ -70,7 +70,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ photos, thumbnails }) => {
           <Image
             src={getThumbnailUrl('500x500')}
             preview={{
-              src: photos[0], // 点击放大时使用原图
+              src: getThumbnailUrl('500x500'), // 点击放大时也先加载 500x500
             }}
           />
         </Image.PreviewGroup>
