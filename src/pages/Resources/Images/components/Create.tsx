@@ -79,6 +79,13 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     return true;
   };
 
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>上传</div>
+    </div>
+  );
+
   const uploadProps: UploadProps = {
     name: 'file',
     action: '/api/images/upload',
@@ -87,7 +94,8 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     },
     onChange: handleUpload,
     onRemove: handleRemove,
-    multiple: true,
+    multiple: false,
+    maxCount: 1,
     listType: 'picture-card',
     fileList: fileList,
     accept: 'image/*,.heic',
@@ -100,13 +108,6 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       return true;
     },
   };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>上传</div>
-    </div>
-  );
 
   return (
     <ModalForm
@@ -222,7 +223,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         />
       </Form.Item>
       <Form.Item label="照片" required tooltip="支持 jpg、png、gif、webp、heic 格式">
-        <Upload {...uploadProps}>{fileList.length >= 8 ? null : uploadButton}</Upload>
+        <Upload {...uploadProps}>{fileList.length >= 1 ? null : uploadButton}</Upload>
       </Form.Item>
     </ModalForm>
   );
