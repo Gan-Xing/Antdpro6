@@ -49,4 +49,6 @@ export default {
   'menu.editor.flow': 'Flow Editor',
   'menu.editor.mind': 'Mind Editor',
   'menu.editor.koni': 'Koni Editor',
+  'menu.resources': 'Resources',
+  'menu.resources.images': 'Image Management',
 };

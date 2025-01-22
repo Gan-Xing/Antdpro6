@@ -14,7 +14,7 @@ export interface CommonResponseStructure<T> {
 }
 
 // 图片管理的响应格式
-export interface PhotoLogResponseStructure<T> {
+export interface ImageResponseStructure<T> {
   statusCode: number;
   timestamp: string;
   path: string;
@@ -52,7 +52,7 @@ export async function queryList(
 }
 
 // 图片管理专用的查询方法
-export async function queryPhotoLogs<T>(
+export async function queryImages<T>(
   url: string,
   params?: {
     current?: number;
@@ -61,7 +61,7 @@ export async function queryPhotoLogs<T>(
   },
   options?: { [key: string]: any },
 ) {
-  return request<PhotoLogResponseStructure<T>>(url, {
+  return request<ImageResponseStructure<T>>(url, {
     method: 'GET',
     params: {
       ...params,
@@ -81,8 +81,8 @@ export async function addItems(url: string, options?: { [key: string]: any }) {
 }
 
 // 图片管理专用的创建方法
-export async function addPhotoLog<T>(url: string, data: T) {
-  return request<PhotoLogResponseStructure<T>>(`${url}`, {
+export async function addImage<T>(url: string, data: T) {
+  return request<ImageResponseStructure<T>>(`${url}`, {
     method: 'POST',
     data,
   });
@@ -99,8 +99,8 @@ export async function updateItem(url: string, options?: { [key: string]: any }) 
 }
 
 // 图片管理专用的更新方法
-export async function updatePhotoLog<T>(url: string, data: T) {
-  return request<PhotoLogResponseStructure<T>>(`${url}`, {
+export async function updateImage<T>(url: string, data: T) {
+  return request<ImageResponseStructure<T>>(`${url}`, {
     method: 'PATCH',
     data,
   });
@@ -117,8 +117,8 @@ export async function removeItem(url: string, options?: { [key: string]: any }) 
 }
 
 // 图片管理专用的删除方法
-export async function removePhotoLog(url: string, data: { ids: number[] }) {
-  return request<PhotoLogResponseStructure<any>>(`${url}`, {
+export async function removeImage(url: string, data: { ids: number[] }) {
+  return request<ImageResponseStructure<any>>(`${url}`, {
     method: 'DELETE',
     data,
   });

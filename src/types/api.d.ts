@@ -140,7 +140,6 @@ declare namespace API {
     };
   };
 }
-
 declare namespace Images {
   type Thumbnail = {
     size: string;
