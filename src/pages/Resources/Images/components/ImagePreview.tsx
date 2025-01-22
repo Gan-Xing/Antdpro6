@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image } from 'antd';
 
 interface ImagePreviewProps {
@@ -9,6 +9,36 @@ interface ImagePreviewProps {
 const ImagePreview: React.FC<ImagePreviewProps> = ({ photos, thumbnails }) => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [containerSize, setContainerSize] = useState({ width: 64, height: 48 });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 576) {
+        // xs: 2列显示
+        setContainerSize({ width: 200, height: 150 });
+      } else if (width < 768) {
+        // sm: 3列显示
+        setContainerSize({ width: 160, height: 120 });
+      } else if (width < 992) {
+        // md: 4列显示
+        setContainerSize({ width: 120, height: 90 });
+      } else {
+        // lg: 全部显示
+        setContainerSize({ width: 100, height: 75 });
+      }
+    };
+
+    // 初始检查
+    handleResize();
+
+    // 监听变化
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // 获取指定尺寸的缩略图 URL
   const getThumbnailUrl = (size: string): string => {
@@ -33,12 +63,12 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ photos, thumbnails }) => {
           style={{
             position: 'relative',
             cursor: 'pointer',
-            width: 64,
-            height: 64,
+            width: containerSize.width,
+            height: containerSize.height,
           }}
         >
           <Image
-            src={getThumbnailUrl('64x64')}
+            src={getThumbnailUrl('500x500')}
             alt="缩略图"
             style={{
               width: '100%',

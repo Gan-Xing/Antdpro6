@@ -91,6 +91,7 @@ const TableList: React.FC = () => {
       dataIndex: 'description',
       tip: '图片描述',
       ellipsis: true,
+      responsive: ['md'],
       render: (dom, entity) => {
         return (
           <a
@@ -108,6 +109,7 @@ const TableList: React.FC = () => {
       title: '工程类别',
       dataIndex: 'area',
       valueType: 'select',
+      responsive: ['lg'],
       valueEnum: {
         临建: { text: '临建' },
         土方弃方: { text: '土方弃方' },
@@ -128,6 +130,7 @@ const TableList: React.FC = () => {
       title: '分类',
       dataIndex: 'category',
       valueType: 'select',
+      responsive: ['sm'],
       valueEnum: {
         安全: { text: '安全' },
         质量: { text: '质量' },
@@ -138,11 +141,13 @@ const TableList: React.FC = () => {
       title: '桩号',
       dataIndex: 'stakeNumber',
       valueType: 'text',
+      responsive: ['lg'],
       hideInTable: true,
     },
     {
       title: '标签',
       dataIndex: 'tags',
+      responsive: ['lg'],
       renderFormItem: (_, { ...rest }, form) => {
         return (
           <Select
@@ -158,7 +163,6 @@ const TableList: React.FC = () => {
       },
       search: {
         transform: (value: string[]) => {
-          // 将标签数组传递给后端
           if (!value || value.length === 0) return {};
           return { tags: value };
         },
@@ -186,6 +190,7 @@ const TableList: React.FC = () => {
       title: '创建者',
       dataIndex: ['createdBy', 'username'],
       ellipsis: true,
+      responsive: ['md'],
       search: {
         transform: (value) => {
           if (!value) return {};
@@ -201,6 +206,7 @@ const TableList: React.FC = () => {
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       hideInSearch: false,
+      responsive: ['lg'],
       ellipsis: true,
       renderFormItem: () => {
         return (
@@ -377,7 +383,7 @@ const TableList: React.FC = () => {
           setCurrentRow(undefined);
           setShowDetail(false);
         }}
-        values={(currentRow as Images.Entity) || {}}
+        currentRow={(currentRow as Images.Entity) || {}}
         columns={columns as ProDescriptionsItemProps<Images.Entity>[]}
       />
     </PageContainer>
