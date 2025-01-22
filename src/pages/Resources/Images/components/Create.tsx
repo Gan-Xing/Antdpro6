@@ -6,6 +6,7 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import MapPicker from './MapPicker';
 import { getAccessToken, formatToken } from '@/utils/auth';
 import React, { useState } from 'react';
+import { useIntl } from '@umijs/max';
 
 interface CreateFormProps {
   createModalOpen: boolean;
@@ -15,11 +16,10 @@ interface CreateFormProps {
 
 const CreateForm: React.FC<CreateFormProps> = (props) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [mapLocation, setMapLocation] = useState<
-    { latitude: number; longitude: number } | undefined
-  >();
-  const [locations, setLocations] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [mapLocation, setMapLocation] = useState<Images.LocationType>();
+  const [locations, setLocations] = useState<Images.LocationType[]>([]);
   const [form] = Form.useForm();
+  const intl = useIntl();
 
   const handleUpload = async ({ file, fileList }: any) => {
     const updatedFileList = fileList.map((f: UploadFile) => {
@@ -28,7 +28,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           // 如果返回中有 location，添加到位置列表中
           const location = file.response?.data?.data?.location;
           if (location) {
-            setLocations((prev: { latitude: number; longitude: number }[]) => [...prev, location]); // 添加新位置到数组
+            setLocations((prev: Images.LocationType[]) => [...prev, location]); // 添加新位置到数组
             // 如果还没有手动选择位置，则设置第一个位置为地图位置
             if (!mapLocation) {
               setMapLocation(location);
@@ -111,7 +111,10 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
   return (
     <ModalForm
-      title="新建图片"
+      title={intl.formatMessage({
+        id: 'pages.resources.images.create',
+        defaultMessage: '新建图片',
+      })}
       width={800}
       form={form}
       open={props.createModalOpen}
@@ -151,39 +154,97 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
         return success;
       }}
+      layout="vertical"
     >
       <ProFormSelect
-        name="category"
-        label="分类"
+        name="area"
+        label={intl.formatMessage({
+          id: 'pages.resources.images.area',
+          defaultMessage: '工程类别',
+        })}
+        placeholder={intl.formatMessage({
+          id: 'pages.resources.images.area.placeholder',
+          defaultMessage: '请选择工程类别',
+        })}
         options={[
-          { label: '进度', value: '进度' },
-          { label: '安全', value: '安全' },
-          { label: '质量', value: '质量' },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.temporary' }),
+            value: 'temporary',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.soil_disposal' }),
+            value: 'soil_disposal',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.soil_filling' }),
+            value: 'soil_filling',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.soil_replacement' }),
+            value: 'soil_replacement',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.subgrade' }),
+            value: 'subgrade',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.gravel_base' }),
+            value: 'gravel_base',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.asphalt_surface' }),
+            value: 'asphalt_surface',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.demolition' }),
+            value: 'demolition',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.structure' }),
+            value: 'structure',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.traffic_sign' }),
+            value: 'traffic_sign',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.environment' }),
+            value: 'environment',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.area.public_facilities' }),
+            value: 'public_facilities',
+          },
         ]}
-        placeholder="请选择分类"
-        rules={[{ required: true, message: '请选择分类' }]}
-        initialValue="进度" // 设置默认值
+        initialValue="subgrade"
+        rules={[{ required: true }]}
       />
       <ProFormSelect
-        name="area"
-        label="工程类别"
+        name="category"
+        label={intl.formatMessage({
+          id: 'pages.resources.images.category',
+          defaultMessage: '分类',
+        })}
+        placeholder={intl.formatMessage({
+          id: 'pages.resources.images.category.placeholder',
+          defaultMessage: '请选择分类',
+        })}
         options={[
-          { label: '临建', value: '临建' },
-          { label: '挖方弃方', value: '挖方弃方' },
-          { label: '土方填方', value: '土方填方' },
-          { label: '土方换填', value: '土方换填' },
-          { label: '底基层', value: '底基层' },
-          { label: '碎石基层', value: '碎石基层' },
-          { label: '沥青面层', value: '沥青面层' },
-          { label: '拆迁', value: '拆迁' },
-          { label: '结构物', value: '结构物' },
-          { label: '交通标志', value: '交通标志' },
-          { label: '环境与绿化', value: '环境与绿化' },
-          { label: '公共设施', value: '公共设施' },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.category.progress' }),
+            value: 'progress',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.category.safety' }),
+            value: 'safety',
+          },
+          {
+            label: intl.formatMessage({ id: 'pages.resources.images.category.quality' }),
+            value: 'quality',
+          },
         ]}
-        placeholder="请选择工程类别"
-        rules={[{ required: true, message: '请选择工程类别' }]}
-        initialValue="底基层" // 设置默认值
+        initialValue="progress"
+        rules={[{ required: true }]}
       />
       <ProFormSelect
         name="tags"
@@ -196,22 +257,59 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       />
       <ProFormTextArea
         name="description"
-        label="描述"
-        placeholder="请输入描述"
-        rules={[{ required: true, message: '请输入描述' }]}
+        label={intl.formatMessage({
+          id: 'pages.resources.images.description',
+          defaultMessage: '描述',
+        })}
+        placeholder={intl.formatMessage({
+          id: 'pages.resources.images.description.required',
+          defaultMessage: '请输入描述',
+        })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({ id: 'pages.resources.images.description.required' }),
+          },
+        ]}
       />
       <div style={{ display: 'flex', gap: '24px', marginBottom: '24px' }}>
         <div style={{ flex: 1 }}>
-          <ProFormText name="stakeNumber" label="桩号" placeholder="请输入桩号" />
+          <ProFormText
+            name="stakeNumber"
+            label={intl.formatMessage({
+              id: 'pages.resources.images.stakeNumber',
+              defaultMessage: '桩号',
+            })}
+            placeholder={intl.formatMessage({
+              id: 'pages.resources.images.stakeNumber.placeholder',
+              defaultMessage: '请输入桩号',
+            })}
+          />
         </div>
         <div style={{ flex: 1 }}>
-          <ProFormText name="offset" label="偏距" placeholder="请输入偏距" />
+          <ProFormText
+            name="offset"
+            label={intl.formatMessage({
+              id: 'pages.resources.images.offset',
+              defaultMessage: '偏距',
+            })}
+            placeholder={intl.formatMessage({
+              id: 'pages.resources.images.offset.placeholder',
+              defaultMessage: '请输入偏距',
+            })}
+          />
         </div>
       </div>
       <Form.Item
         name="location"
-        label="位置"
-        tooltip={'点击地图选择位置，或点击"获取当前位置"按钮'}
+        label={intl.formatMessage({
+          id: 'pages.resources.images.location',
+          defaultMessage: '位置',
+        })}
+        tooltip={intl.formatMessage({
+          id: 'pages.resources.images.location.tooltip',
+          defaultMessage: '点击地图选择位置，或点击"获取当前位置"按钮',
+        })}
       >
         <MapPicker
           value={mapLocation}
@@ -222,7 +320,17 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           }}
         />
       </Form.Item>
-      <Form.Item label="照片" required tooltip="支持 jpg、png、gif、webp、heic 格式">
+      <Form.Item
+        label={intl.formatMessage({
+          id: 'pages.resources.images.photos',
+          defaultMessage: '照片',
+        })}
+        required
+        tooltip={intl.formatMessage({
+          id: 'pages.resources.images.photos.tooltip',
+          defaultMessage: '支持 jpg、png、gif、webp、heic 格式',
+        })}
+      >
         <Upload {...uploadProps}>{fileList.length >= 1 ? null : uploadButton}</Upload>
       </Form.Item>
     </ModalForm>

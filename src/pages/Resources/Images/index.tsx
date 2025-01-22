@@ -87,9 +87,15 @@ const TableList: React.FC = () => {
 
   const columns: ProColumns<Images.Entity>[] = [
     {
-      title: '描述',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.description',
+        defaultMessage: '描述',
+      }),
       dataIndex: 'description',
-      tip: '图片描述',
+      tip: intl.formatMessage({
+        id: 'pages.resources.images.description',
+        defaultMessage: '描述',
+      }),
       ellipsis: true,
       responsive: ['md'],
       render: (dom, entity) => {
@@ -106,46 +112,74 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '工程类别',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.area',
+        defaultMessage: '工程类别',
+      }),
       dataIndex: 'area',
       valueType: 'select',
       responsive: ['lg'],
       valueEnum: {
-        临建: { text: '临建' },
-        土方弃方: { text: '土方弃方' },
-        土方填方: { text: '土方填方' },
-        土方换填: { text: '土方换填' },
-        底基层: { text: '底基层' },
-        碎石基层: { text: '碎石基层' },
-        沥青面层: { text: '沥青面层' },
-        拆迁: { text: '拆迁' },
-        结构物: { text: '结构物' },
-        交通标志: { text: '交通标志' },
-        环境与绿化: { text: '环境与绿化' },
-        公共设施: { text: '公共设施' },
+        temporary: { text: intl.formatMessage({ id: 'pages.resources.images.area.temporary' }) },
+        soil_disposal: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.soil_disposal' }),
+        },
+        soil_filling: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.soil_filling' }),
+        },
+        soil_replacement: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.soil_replacement' }),
+        },
+        subgrade: { text: intl.formatMessage({ id: 'pages.resources.images.area.subgrade' }) },
+        gravel_base: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.gravel_base' }),
+        },
+        asphalt_surface: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.asphalt_surface' }),
+        },
+        demolition: { text: intl.formatMessage({ id: 'pages.resources.images.area.demolition' }) },
+        structure: { text: intl.formatMessage({ id: 'pages.resources.images.area.structure' }) },
+        traffic_sign: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.traffic_sign' }),
+        },
+        environment: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.environment' }),
+        },
+        public_facilities: {
+          text: intl.formatMessage({ id: 'pages.resources.images.area.public_facilities' }),
+        },
       },
       ellipsis: true,
     },
     {
-      title: '分类',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.category',
+        defaultMessage: '分类',
+      }),
       dataIndex: 'category',
       valueType: 'select',
       responsive: ['sm'],
       valueEnum: {
-        安全: { text: '安全' },
-        质量: { text: '质量' },
-        进度: { text: '进度' },
+        progress: { text: intl.formatMessage({ id: 'pages.resources.images.category.progress' }) },
+        safety: { text: intl.formatMessage({ id: 'pages.resources.images.category.safety' }) },
+        quality: { text: intl.formatMessage({ id: 'pages.resources.images.category.quality' }) },
       },
     },
     {
-      title: '桩号',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.stakeNumber',
+        defaultMessage: '桩号',
+      }),
       dataIndex: 'stakeNumber',
       valueType: 'text',
       responsive: ['lg'],
       hideInTable: true,
     },
     {
-      title: '标签',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.tags',
+        defaultMessage: '标签',
+      }),
       dataIndex: 'tags',
       responsive: ['lg'],
       renderFormItem: (_, { ...rest }, form) => {
@@ -153,7 +187,10 @@ const TableList: React.FC = () => {
           <Select
             {...rest}
             mode="tags"
-            placeholder="请输入标签，按 Enter 键添加"
+            placeholder={intl.formatMessage({
+              id: 'pages.resources.images.tags.placeholder',
+              defaultMessage: '请输入标签，按 Enter 键添加',
+            })}
             tokenSeparators={[',', ' ']}
             onChange={(value) => {
               form.setFieldsValue({ tags: value });
@@ -338,7 +375,7 @@ const TableList: React.FC = () => {
               actionRef.current?.reload();
             }}
           >
-            批量删除
+            <FormattedMessage id="pages.resources.images.batch.delete" defaultMessage="批量删除" />
           </Button>
         </FooterToolbar>
       )}
