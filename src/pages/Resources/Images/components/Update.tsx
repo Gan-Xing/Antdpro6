@@ -84,13 +84,53 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     } else if (file.status === 'done') {
       const url = file.response?.data?.data?.url;
       if (url) {
-        message.success(`${file.name} 上传成功`);
+        message.success(
+          intl.formatMessage(
+            {
+              id: 'pages.resources.images.upload.success',
+              defaultMessage: '{name} 上传成功',
+            },
+            {
+              name: file.name,
+            },
+          ),
+        );
       } else {
-        message.warning(`${file.name} 上传成功，但未获取到URL`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'pages.resources.images.upload.error',
+              defaultMessage: '{name} 上传失败: {error}',
+            },
+            {
+              name: file.name,
+              error: intl.formatMessage({
+                id: 'pages.resources.images.upload.error.noUrl',
+                defaultMessage: '未获取到URL',
+              }),
+            },
+          ),
+        );
         console.warn('Upload response without URL:', file.response);
       }
     } else if (file.status === 'error') {
-      message.error(`${file.name} 上传失败: ${file.error?.message || '未知错误'}`);
+      message.error(
+        intl.formatMessage(
+          {
+            id: 'pages.resources.images.upload.error',
+            defaultMessage: '{name} 上传失败: {error}',
+          },
+          {
+            name: file.name,
+            error:
+              file.error?.message ||
+              intl.formatMessage({
+                id: 'pages.resources.images.upload.error.unknown',
+                defaultMessage: '未知错误',
+              }),
+          },
+        ),
+      );
       console.error('Upload error:', file.error);
     }
   };
@@ -98,7 +138,12 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const uploadButton = (
     <div>
       <PlusOutlined />
-      <div style={{ marginTop: 8 }}>上传</div>
+      <div style={{ marginTop: 8 }}>
+        {intl.formatMessage({
+          id: 'pages.resources.images.upload',
+          defaultMessage: '上传',
+        })}
+      </div>
     </div>
   );
 
