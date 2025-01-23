@@ -27,7 +27,7 @@ export default {
   'menu.auth.permissions': '权限管理',
   'menu.auth.menus': '菜单管理',
   'menu.resources': '资源管理',
-  'menu.resources.images': '图片管理',
+  'menu.resources.images': ' 图片管理',
   'menu.list': '列表页',
   'menu.list.table-list': '查询表格',
   'menu.list.basic-list': '标准列表',

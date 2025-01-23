@@ -128,7 +128,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     <ModalForm
       title={intl.formatMessage({
         id: 'pages.resources.images.edit',
-        defaultMessage: '编辑图片管理',
+        defaultMessage: '编辑',
       })}
       width={800}
       form={form}
@@ -336,6 +336,21 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       >
         <Upload {...uploadProps}>{fileList.length >= 1 ? null : uploadButton}</Upload>
       </Form.Item>
+      <ProFormSelect
+        name="tags"
+        label={intl.formatMessage({
+          id: 'pages.resources.images.tags',
+          defaultMessage: '标签',
+        })}
+        mode="tags"
+        placeholder={intl.formatMessage({
+          id: 'pages.resources.images.tags.placeholder',
+          defaultMessage: '请输入标签（支持多个标签）',
+        })}
+        fieldProps={{
+          tokenSeparators: [',', ' '],
+        }}
+      />
     </ModalForm>
   );
 };

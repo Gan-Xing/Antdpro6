@@ -164,6 +164,7 @@ const TableList: React.FC = () => {
         safety: { text: intl.formatMessage({ id: 'pages.resources.images.category.safety' }) },
         quality: { text: intl.formatMessage({ id: 'pages.resources.images.category.quality' }) },
       },
+      ellipsis: true,
     },
     {
       title: intl.formatMessage({
@@ -214,7 +215,10 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '照片',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.photos',
+        defaultMessage: '照片',
+      }),
       dataIndex: 'photos',
       valueType: 'image',
       hideInSearch: true,
@@ -224,7 +228,10 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '创建者',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.creator',
+        defaultMessage: '创建者',
+      }),
       dataIndex: ['createdBy', 'username'],
       ellipsis: true,
       responsive: ['md'],
@@ -239,7 +246,10 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '创建时间',
+      title: intl.formatMessage({
+        id: 'pages.resources.images.createTime',
+        defaultMessage: '创建时间',
+      }),
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       hideInSearch: false,
@@ -248,7 +258,16 @@ const TableList: React.FC = () => {
       renderFormItem: () => {
         return (
           <RangePicker
-            placeholder={['开始日期', '结束日期']}
+            placeholder={[
+              intl.formatMessage({
+                id: 'pages.resources.images.startDate',
+                defaultMessage: '开始日期',
+              }),
+              intl.formatMessage({
+                id: 'pages.resources.images.endDate',
+                defaultMessage: '结束日期',
+              }),
+            ]}
             showTime={false}
             format="YYYY-MM-DD"
           />
@@ -277,7 +296,7 @@ const TableList: React.FC = () => {
               setCurrentRow(record);
             }}
           >
-            <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+            <FormattedMessage id="pages.resources.images.edit" defaultMessage="编辑" />
           </a>
         ),
         canDeleteImage && (
@@ -285,22 +304,35 @@ const TableList: React.FC = () => {
             key="delete"
             onClick={() => {
               Modal.confirm({
-                title: '确认删除？',
+                title: intl.formatMessage({
+                  id: 'pages.resources.images.delete.confirm',
+                  defaultMessage: '确认删除？',
+                }),
                 onOk: async () => {
                   await removeItem(`/images/${record.id}`);
                   setSelectedRows([]);
                   actionRef.current?.reloadAndRest?.();
                 },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
+                content: intl.formatMessage({
+                  id: 'pages.resources.images.delete.confirm',
+                  defaultMessage: '确认删除吗？',
+                }),
+                okText: intl.formatMessage({
+                  id: 'pages.system.ok',
+                  defaultMessage: '确认',
+                }),
+                cancelText: intl.formatMessage({
+                  id: 'pages.system.cancel',
+                  defaultMessage: '取消',
+                }),
               });
             }}
           >
-            <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+            <FormattedMessage id="pages.resources.images.delete" defaultMessage="删除" />
           </a>
         ),
       ],
+      ellipsis: true,
     },
   ];
 
@@ -308,7 +340,7 @@ const TableList: React.FC = () => {
     <PageContainer>
       <ProTable<Images.Entity, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'pages.resources.images.title',
+          id: 'pages.resources.images.list.title',
           defaultMessage: '图片管理列表',
         })}
         actionRef={actionRef}

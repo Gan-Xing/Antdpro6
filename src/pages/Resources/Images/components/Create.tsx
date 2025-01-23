@@ -57,13 +57,45 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     if (file.status === 'done') {
       const url = file.response?.data?.data?.url;
       if (url) {
-        message.success(`${file.name} 上传成功`);
+        message.success(
+          intl.formatMessage(
+            {
+              id: 'pages.resources.images.upload.success',
+              defaultMessage: '{name} 上传成功',
+            },
+            {
+              name: file.name,
+            },
+          ),
+        );
       } else {
-        message.warning(`${file.name} 上传成功，但未获取到URL`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'pages.resources.images.upload.error',
+              defaultMessage: '{name} 上传失败: {error}',
+            },
+            {
+              name: file.name,
+              error: '未获取到URL',
+            },
+          ),
+        );
         console.warn('Upload response without URL:', file.response);
       }
     } else if (file.status === 'error') {
-      message.error(`${file.name} 上传失败: ${file.error?.message || '未知错误'}`);
+      message.error(
+        intl.formatMessage(
+          {
+            id: 'pages.resources.images.upload.error',
+            defaultMessage: '{name} 上传失败: {error}',
+          },
+          {
+            name: file.name,
+            error: file.error?.message || '未知错误',
+          },
+        ),
+      );
       console.error('Upload error:', file.error);
     }
   };
@@ -82,7 +114,12 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   const uploadButton = (
     <div>
       <PlusOutlined />
-      <div style={{ marginTop: 8 }}>上传</div>
+      <div style={{ marginTop: 8 }}>
+        {intl.formatMessage({
+          id: 'pages.resources.images.upload',
+          defaultMessage: '上传',
+        })}
+      </div>
     </div>
   );
 
@@ -102,7 +139,17 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     beforeUpload: (file: RcFile) => {
       const isImage = file.type.startsWith('image/') || file.name.toLowerCase().endsWith('.heic');
       if (!isImage) {
-        message.error(`${file.name} 不是图片文件`);
+        message.error(
+          intl.formatMessage(
+            {
+              id: 'pages.resources.images.upload.error.type',
+              defaultMessage: '{name} 不是图片文件',
+            },
+            {
+              name: file.name,
+            },
+          ),
+        );
         return false;
       }
       return true;
@@ -134,22 +181,27 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           .filter(Boolean);
 
         if (photos.length === 0) {
-          message.error('请至少上传一张图片');
+          message.error(
+            intl.formatMessage({
+              id: 'pages.resources.images.upload.required',
+              defaultMessage: '请至少上传一张图片',
+            }),
+          );
           return false;
         }
 
         const success = await props.onSubmit({
           ...values,
           photos,
-          location: mapLocation, // 提交手动选择的位置或最后一个有效的图片位置
+          location: mapLocation,
         });
 
         if (success) {
           props.onCancel();
           form.resetFields();
           setFileList([]);
-          setLocations([]); // 重置位置列表
-          setMapLocation(undefined); // 重置地图位置
+          setLocations([]);
+          setMapLocation(undefined);
         }
 
         return success;
@@ -248,9 +300,15 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       />
       <ProFormSelect
         name="tags"
-        label="标签"
+        label={intl.formatMessage({
+          id: 'pages.resources.images.tags',
+          defaultMessage: '标签',
+        })}
         mode="tags"
-        placeholder="请输入标签（支持多个标签）"
+        placeholder={intl.formatMessage({
+          id: 'pages.resources.images.tags.placeholder',
+          defaultMessage: '请输入标签（支持多个标签）',
+        })}
         fieldProps={{
           tokenSeparators: [',', ' '],
         }}

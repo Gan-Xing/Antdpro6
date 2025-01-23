@@ -264,11 +264,17 @@ const Login: React.FC = () => {
             items={[
               {
                 key: 'login',
-                label: '登录',
+                label: intl.formatMessage({
+                  id: 'pages.login',
+                  defaultMessage: '登录',
+                }),
               },
               {
                 key: 'register',
-                label: '注册',
+                label: intl.formatMessage({
+                  id: 'pages.register',
+                  defaultMessage: '注册',
+                }),
               },
             ]}
           />
@@ -287,7 +293,7 @@ const Login: React.FC = () => {
               prefix: <UserOutlined />,
             }}
             placeholder={intl.formatMessage({
-              id: 'pages.login.email.placeholder',
+              id: 'pages.login.email',
               defaultMessage: '邮箱',
             })}
             rules={[
@@ -347,18 +353,31 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
-                placeholder="请确认密码"
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.confirm.password.placeholder',
+                  defaultMessage: '请确认密码',
+                })}
                 rules={[
                   {
                     required: true,
-                    message: '请确认密码！',
+                    message: intl.formatMessage({
+                      id: 'pages.login.confirm.password.required',
+                      defaultMessage: '请确认密码！',
+                    }),
                   },
                   {
                     validator: (_, value) => {
                       if (!value || form.getFieldValue('password') === value) {
                         return Promise.resolve();
                       }
-                      return Promise.reject(new Error('两次输入的密码不一致！'));
+                      return Promise.reject(
+                        new Error(
+                          intl.formatMessage({
+                            id: 'pages.login.password.mismatch',
+                            defaultMessage: '两次输入的密码不一致！',
+                          }),
+                        ),
+                      );
                     },
                   },
                 ]}
@@ -370,11 +389,17 @@ const Login: React.FC = () => {
                     size: 'large',
                     prefix: <UserOutlined />,
                   }}
-                  placeholder="姓"
+                  placeholder={intl.formatMessage({
+                    id: 'pages.login.lastname.placeholder',
+                    defaultMessage: '姓',
+                  })}
                   rules={[
                     {
                       required: true,
-                      message: '请输入姓!',
+                      message: intl.formatMessage({
+                        id: 'pages.login.lastname.required',
+                        defaultMessage: '请输入姓!',
+                      }),
                     },
                   ]}
                 />
@@ -384,11 +409,17 @@ const Login: React.FC = () => {
                     size: 'large',
                     prefix: <UserOutlined />,
                   }}
-                  placeholder="名"
+                  placeholder={intl.formatMessage({
+                    id: 'pages.login.firstname.placeholder',
+                    defaultMessage: '名',
+                  })}
                   rules={[
                     {
                       required: true,
-                      message: '请输入名!',
+                      message: intl.formatMessage({
+                        id: 'pages.login.firstname.required',
+                        defaultMessage: '请输入名!',
+                      }),
                     },
                   ]}
                 />
@@ -400,13 +431,22 @@ const Login: React.FC = () => {
                 }}
                 valueEnum={{
                   CN: {
-                    text: '中国 +86',
+                    text: intl.formatMessage({
+                      id: 'pages.login.country.china',
+                      defaultMessage: '中国 +86',
+                    }),
                   },
                   CI: {
-                    text: '科特迪瓦 +225',
+                    text: intl.formatMessage({
+                      id: 'pages.login.country.ivorycoast',
+                      defaultMessage: '科特迪瓦 +225',
+                    }),
                   },
                 }}
-                placeholder="请选择国家"
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.country.placeholder',
+                  defaultMessage: '请选择国家',
+                })}
                 initialValue="CN"
               />
               <ProFormText
@@ -415,15 +455,24 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <PhoneOutlined />,
                 }}
-                placeholder="手机号码"
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.phone.placeholder',
+                  defaultMessage: '手机号码',
+                })}
                 rules={[
                   {
                     required: true,
-                    message: '请输入手机号码!',
+                    message: intl.formatMessage({
+                      id: 'pages.login.phone.required',
+                      defaultMessage: '请输入手机号码!',
+                    }),
                   },
                   {
                     pattern: /^1[3-9]\d{9}$/,
-                    message: '请输入有效的手机号码!',
+                    message: intl.formatMessage({
+                      id: 'pages.login.phone.invalid',
+                      defaultMessage: '请输入有效的手机号码!',
+                    }),
                   },
                 ]}
               />
@@ -461,39 +510,21 @@ const Login: React.FC = () => {
                   fieldProps={{
                     size: 'large',
                   }}
-                  placeholder="验证码"
-                  rules={[{ required: true, message: '请输入验证码!' }]}
+                  placeholder={intl.formatMessage({
+                    id: 'pages.login.captcha.placeholder',
+                    defaultMessage: '验证码',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.formatMessage({
+                        id: 'pages.login.captcha.required',
+                        defaultMessage: '请输入验证码!',
+                      }),
+                    },
+                  ]}
                 />
               </div>
-              {/* <div
-                style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}
-              >
-                <ProFormText
-                  name="emailCode"
-                  fieldProps={{
-                    size: 'large',
-                  }}
-                  placeholder="邮箱验证码"
-                  rules={[{ required: true, message: '请输入邮箱验证码!' }]}
-                />
-                <Button
-                  type="primary"
-                  style={{
-                    height: '40px',
-                    marginBottom: '24px',
-                  }}
-                  onClick={async () => {
-                    try {
-                      await sendEmailVerificationCode({ email: 'test@example.com' }); // 调用发送验证码的接口
-                      message.success('验证码已发送到邮箱，请查收！');
-                    } catch (error) {
-                      message.error('发送验证码失败，请重试！');
-                    }
-                  }}
-                >
-                  发送验证码
-                </Button>
-              </div> */}
               <div
                 style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}
               >
@@ -502,19 +533,32 @@ const Login: React.FC = () => {
                   fieldProps={{
                     size: 'large',
                   }}
-                  placeholder="请输入邮箱验证码"
-                  rules={[{ required: true, message: '请输入邮箱验证码!' }]}
+                  placeholder={intl.formatMessage({
+                    id: 'pages.login.emailCode.placeholder',
+                    defaultMessage: '请输入邮箱验证码',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.formatMessage({
+                        id: 'pages.login.emailCode.required',
+                        defaultMessage: '请输入邮箱验证码!',
+                      }),
+                    },
+                  ]}
                 />
-                {/* 发送验证码按钮 */}
                 <Button
                   type="primary"
                   style={{
                     height: '40px',
                     marginBottom: '24px',
                   }}
-                  onClick={handleValidateCaptchaAndSendEmail} // 改为调用验证图形验证码的函数
+                  onClick={handleValidateCaptchaAndSendEmail}
                 >
-                  发送验证码
+                  {intl.formatMessage({
+                    id: 'pages.login.sendCode',
+                    defaultMessage: '发送验证码',
+                  })}
                 </Button>
               </div>
             </>

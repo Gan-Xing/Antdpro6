@@ -11,6 +11,7 @@ import { Vector as VectorSource } from 'ol/source';
 import { Style, Circle as CircleStyle, Fill, Stroke } from 'ol/style';
 import { message } from 'antd';
 import 'ol/ol.css';
+import { useIntl } from '@umijs/max';
 
 interface MapPickerProps {
   value?: { latitude: number; longitude: number };
@@ -22,6 +23,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<Map | null>(null);
   const [markerLayer, setMarkerLayer] = useState<VectorLayer<VectorSource> | null>(null);
+  const intl = useIntl();
 
   // 初始化地图
   useEffect(() => {
@@ -121,37 +123,73 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
     if (!map || !markerLayer) return;
 
     if (!('geolocation' in navigator)) {
-      message.error('您的浏览器不支持地理位置功能');
+      message.error(
+        intl.formatMessage({
+          id: 'pages.resources.images.location.error',
+          defaultMessage: '您的浏览器不支持地理位置功能',
+        }),
+      );
       return;
     }
 
-    message.loading('正在获取位置...', 0);
+    message.loading({
+      content: intl.formatMessage({
+        id: 'pages.resources.images.location.getting',
+        defaultMessage: '正在获取位置...',
+      }),
+      key: 'getLocation',
+    });
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        message.destroy();
+        message.destroy('getLocation');
         const location = {
           longitude: position.coords.longitude,
           latitude: position.coords.latitude,
         };
         onChange?.(location);
-        message.success('位置获取成功');
+        message.success(
+          intl.formatMessage({
+            id: 'pages.resources.images.location.success',
+            defaultMessage: '位置获取成功',
+          }),
+        );
       },
       (error) => {
-        message.destroy();
+        message.destroy('getLocation');
         console.error('Error getting location:', error);
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message.error('获取位置失败：您拒绝了位置访问权限');
+            message.error(
+              intl.formatMessage({
+                id: 'pages.resources.images.location.error.denied',
+                defaultMessage: '获取位置失败：您拒绝了位置访问权限',
+              }),
+            );
             break;
           case error.POSITION_UNAVAILABLE:
-            message.error('获取位置失败：位置信息不可用');
+            message.error(
+              intl.formatMessage({
+                id: 'pages.resources.images.location.error.unavailable',
+                defaultMessage: '获取位置失败：位置信息不可用',
+              }),
+            );
             break;
           case error.TIMEOUT:
-            message.error('获取位置失败：请求超时');
+            message.error(
+              intl.formatMessage({
+                id: 'pages.resources.images.location.error.timeout',
+                defaultMessage: '获取位置失败：请求超时',
+              }),
+            );
             break;
           default:
-            message.error('获取位置失败：' + error.message);
+            message.error(
+              intl.formatMessage({
+                id: 'pages.resources.images.location.error',
+                defaultMessage: '获取位置失败：',
+              }) + error.message,
+            );
         }
       },
       {
@@ -167,12 +205,24 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
       <div ref={mapRef} style={{ width: '100%', height: '400px' }} />
       <div style={{ marginTop: '10px' }}>
         <a onClick={handleGetCurrentLocation} style={{ cursor: 'pointer' }}>
-          获取当前位置
+          {intl.formatMessage({
+            id: 'pages.resources.images.getCurrentLocation',
+            defaultMessage: '获取当前位置',
+          })}
         </a>
         {value && (
           <div style={{ marginTop: '5px' }}>
             <small>
-              当前位置: {value.latitude.toFixed(6)}, {value.longitude.toFixed(6)}
+              {intl.formatMessage(
+                {
+                  id: 'pages.resources.images.location.current',
+                  defaultMessage: '当前位置: {latitude}, {longitude}',
+                },
+                {
+                  latitude: value.latitude.toFixed(6),
+                  longitude: value.longitude.toFixed(6),
+                },
+              )}
             </small>
           </div>
         )}
