@@ -25,6 +25,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     if (props.updateModalOpen && props.values) {
       form.setFieldsValue({
         ...props.values,
+        tags: props.values.tags || [],
       });
 
       // 设置地图位置
@@ -304,6 +305,21 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         ]}
         rules={[{ required: true }]}
       />
+      <ProFormSelect
+        name="tags"
+        label={intl.formatMessage({
+          id: 'pages.resources.images.tags',
+          defaultMessage: '标签',
+        })}
+        mode="tags"
+        placeholder={intl.formatMessage({
+          id: 'pages.resources.images.tags.placeholder',
+          defaultMessage: '请输入标签（支持多个标签）',
+        })}
+        fieldProps={{
+          tokenSeparators: [',', ' '],
+        }}
+      />
       <ProFormTextArea
         name="description"
         label={intl.formatMessage({
@@ -381,21 +397,6 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       >
         <Upload {...uploadProps}>{fileList.length >= 1 ? null : uploadButton}</Upload>
       </Form.Item>
-      <ProFormSelect
-        name="tags"
-        label={intl.formatMessage({
-          id: 'pages.resources.images.tags',
-          defaultMessage: '标签',
-        })}
-        mode="tags"
-        placeholder={intl.formatMessage({
-          id: 'pages.resources.images.tags.placeholder',
-          defaultMessage: '请输入标签（支持多个标签）',
-        })}
-        fieldProps={{
-          tokenSeparators: [',', ' '],
-        }}
-      />
     </ModalForm>
   );
 };

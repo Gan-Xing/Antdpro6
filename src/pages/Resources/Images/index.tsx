@@ -12,67 +12,6 @@ import ImagePreview from './components/ImagePreview';
 
 const { RangePicker } = DatePicker;
 
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
-const handleAdd = async (fields: Images.Entity) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addItems('/images', { ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error: any) {
-    hide();
-    console.log('error', error);
-    return false;
-  }
-};
-
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: Images.Entity) => {
-  const hide = message.loading('正在更新');
-  try {
-    await updateItem(`/images/${fields.id}`, fields as Images.Entity);
-    hide();
-    message.success('更新成功');
-    return true;
-  } catch (error: any) {
-    hide();
-    message.error(error?.message ?? '更新失败,请重试');
-    return false;
-  }
-};
-
-/**
- * @en-US Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: Images.Entity[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows || selectedRows.length === 0) return true;
-  try {
-    // 批量删除
-    await Promise.all(selectedRows.map((row) => removeItem(`/images/${row.id}`)));
-    hide();
-    message.success('删除成功');
-    return true;
-  } catch (error: any) {
-    hide();
-    message.error(error?.message ?? '删除失败，请重试');
-    return false;
-  }
-};
-
 const TableList: React.FC = () => {
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
@@ -84,6 +23,109 @@ const TableList: React.FC = () => {
 
   const intl = useIntl();
   const { canCreateImage, canUpdateImage, canDeleteImage } = useAccess();
+
+  /**
+   * @en-US Add node
+   * @zh-CN 添加节点
+   * @param fields
+   */
+  const handleAdd = async (fields: Images.Entity) => {
+    const hide = message.loading(
+      intl.formatMessage({
+        id: 'pages.operation.adding',
+        defaultMessage: '正在添加',
+      }),
+    );
+    try {
+      await addItems('/images', { ...fields });
+      hide();
+      message.success(
+        intl.formatMessage({
+          id: 'pages.operation.add.success',
+          defaultMessage: '添加成功',
+        }),
+      );
+      return true;
+    } catch (error: any) {
+      hide();
+      console.log('error', error);
+      return false;
+    }
+  };
+
+  /**
+   * @en-US Update node
+   * @zh-CN 更新节点
+   *
+   * @param fields
+   */
+  const handleUpdate = async (fields: Images.Entity) => {
+    const hide = message.loading(
+      intl.formatMessage({
+        id: 'pages.operation.updating',
+        defaultMessage: '正在更新',
+      }),
+    );
+    try {
+      await updateItem(`/images/${fields.id}`, fields as Images.Entity);
+      hide();
+      message.success(
+        intl.formatMessage({
+          id: 'pages.operation.update.success',
+          defaultMessage: '更新成功',
+        }),
+      );
+      return true;
+    } catch (error: any) {
+      hide();
+      message.error(
+        error?.message ??
+          intl.formatMessage({
+            id: 'pages.operation.update.failed',
+            defaultMessage: '更新失败,请重试',
+          }),
+      );
+      return false;
+    }
+  };
+
+  /**
+   * @en-US Delete node
+   * @zh-CN 删除节点
+   *
+   * @param selectedRows
+   */
+  const handleRemove = async (selectedRows: Images.Entity[]) => {
+    const hide = message.loading(
+      intl.formatMessage({
+        id: 'pages.operation.deleting',
+        defaultMessage: '正在删除',
+      }),
+    );
+    if (!selectedRows || selectedRows.length === 0) return true;
+    try {
+      // 批量删除
+      await Promise.all(selectedRows.map((row) => removeItem(`/images/${row.id}`)));
+      hide();
+      message.success(
+        intl.formatMessage({
+          id: 'pages.operation.delete.success',
+          defaultMessage: '删除成功',
+        }),
+      );
+      return true;
+    } catch (error: any) {
+      hide();
+      message.error(
+        error?.message ??
+          intl.formatMessage({
+            id: 'pages.operation.delete.failed',
+            defaultMessage: '删除失败，请重试',
+          }),
+      );
+      return false;
+    }
+  };
 
   const columns: ProColumns<Images.Entity>[] = [
     {
@@ -402,9 +444,34 @@ const TableList: React.FC = () => {
             type="primary"
             danger
             onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reload();
+              Modal.confirm({
+                title: intl.formatMessage({
+                  id: 'pages.resources.images.batch.delete',
+                  defaultMessage: '批量删除',
+                }),
+                content: intl.formatMessage(
+                  {
+                    id: 'pages.resources.images.batch.delete.confirm.content',
+                    defaultMessage: '是否确认删除选中的 {count} 项？',
+                  },
+                  {
+                    count: selectedRowsState.length,
+                  },
+                ),
+                okText: intl.formatMessage({
+                  id: 'pages.system.ok',
+                  defaultMessage: '确认',
+                }),
+                cancelText: intl.formatMessage({
+                  id: 'pages.system.cancel',
+                  defaultMessage: '取消',
+                }),
+                onOk: async () => {
+                  await handleRemove(selectedRowsState);
+                  setSelectedRows([]);
+                  actionRef.current?.reload();
+                },
+              });
             }}
           >
             <FormattedMessage id="pages.resources.images.batch.delete" defaultMessage="批量删除" />

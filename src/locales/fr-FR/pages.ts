@@ -160,8 +160,8 @@ export default {
   'pages.resources.images.update.success': 'Image mise à jour avec succès',
   'pages.resources.images.update.error': "Erreur lors de la mise à jour de l'image",
   'pages.resources.images.batch.delete': 'Supprimer en lot',
-  'pages.resources.images.batch.delete.confirm':
-    'Êtes-vous sûr de vouloir supprimer les images sélectionnées ?',
+  'pages.resources.images.batch.delete.confirm.content':
+    'Êtes-vous sûr de vouloir supprimer ces {count} images ?',
   'pages.resources.images.batch.delete.success': 'Images supprimées avec succès',
   'pages.resources.images.batch.delete.error': 'Erreur lors de la suppression des images',
   'pages.resources.images.filter.all': 'Tous',
@@ -183,4 +183,12 @@ export default {
   'pages.resources.images.edit': 'Modifier',
   'pages.resources.images.delete': 'Supprimer',
   'pages.resources.images.list.title': 'Liste des images',
+  'pages.operation.adding': "En cours d'ajout",
+  'pages.operation.add.success': 'Ajouté avec succès',
+  'pages.operation.updating': 'Mise à jour en cours',
+  'pages.operation.update.success': 'Mise à jour réussie',
+  'pages.operation.update.failed': 'Échec de la mise à jour, veuillez réessayer',
+  'pages.operation.deleting': 'Suppression en cours',
+  'pages.operation.delete.success': 'Supprimé avec succès',
+  'pages.operation.delete.failed': 'Échec de la suppression, veuillez réessayer',
 };
