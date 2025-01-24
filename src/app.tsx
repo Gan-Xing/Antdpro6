@@ -64,19 +64,29 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       },
     },
     menu: {
-      // 每当 initialState?.currentUser?.userid
       params: {
         userId: initialState?.currentUser?.id,
       },
       request: async () => {
-        // initialState.currentUser 中包含了所有用户信息
-        // return mockMenuData;
         const { data, success } = await fetchMenuData();
         if (success) {
-          return data;
-        } else {
-          return [];
+          // 处理返回的菜单数据，确保每个菜单项都有locale属性
+          const processMenuData = (menuItem: any) => {
+            const newMenuItem = {
+              ...menuItem,
+              locale: menuItem.name, // 将name值作为国际化的key
+            };
+
+            if (newMenuItem.children) {
+              newMenuItem.children = newMenuItem.children.map(processMenuData);
+            }
+
+            return newMenuItem;
+          };
+
+          return data.map(processMenuData);
         }
+        return [];
       },
     },
     waterMarkProps: {
