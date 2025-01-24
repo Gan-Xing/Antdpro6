@@ -14,6 +14,7 @@ import { Alert, Button, Form, message, Tabs } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
+import { validatePhone, getPhoneExample } from '@/utils/phoneValidation';
 
 const Lang = () => {
   const langClassName = useEmotionCss(({ token }) => {
@@ -468,13 +469,26 @@ const Login: React.FC = () => {
                     }),
                   },
                   {
-                    pattern: /^1[3-9]\d{9}$/,
-                    message: intl.formatMessage({
-                      id: 'pages.login.phone.invalid',
-                      defaultMessage: '请输入有效的手机号码!',
-                    }),
+                    validator: async (_, value) => {
+                      const country = form.getFieldValue('country');
+                      if (value && !validatePhone(value, country)) {
+                        throw new Error(
+                          intl.formatMessage(
+                            {
+                              id: 'pages.login.phone.invalid',
+                              defaultMessage: '请输入有效的手机号码，例如：{example}',
+                            },
+                            {
+                              example: getPhoneExample(country),
+                            },
+                          ),
+                        );
+                      }
+                      return Promise.resolve();
+                    },
                   },
                 ]}
+                dependencies={['country']} // 添加依赖，当国家改变时重新验证
               />
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                 <div
