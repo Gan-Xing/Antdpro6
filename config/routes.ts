@@ -84,8 +84,23 @@ export default [
       {
         path: '/resources/images',
         name: 'images',
+        access: 'canViewImage',
         icon: 'PictureOutlined',
         component: './Resources/Images',
+      },
+    ],
+  },
+  {
+    path: '/system',
+    name: 'system',
+    icon: 'SettingOutlined', // 使用更通用的“设置”图标
+    routes: [
+      {
+        path: '/system/logs',
+        name: 'images',
+        access: 'canViewSystemLogs',
+        icon: 'FileTextOutlined', // 更适合日志的文本文件图标
+        component: './System/SystemLogs',
       },
     ],
   },

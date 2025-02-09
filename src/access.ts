@@ -53,5 +53,15 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
       currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '编辑权限')),
     canShowPermission:
       currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看权限')),
+
+    // 系统日志管理
+    canViewSystemLogs:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '查看系统日志')),
+    canExportSystemLogs:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '导出系统日志')),
+    canDeleteSystemLogs:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '删除系统日志')),
+    canAuditSystemLogs:
+      currentUser && (currentUser?.isAdmin || checkPermission(currentUser, '审计系统日志')),
   };
 }
