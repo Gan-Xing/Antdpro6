@@ -68,6 +68,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         userId: initialState?.currentUser?.id,
       },
       request: async () => {
+        // 添加判断，如果没有用户信息则不请求
+        if (!initialState?.currentUser) {
+          return [];
+        }
         const { data, success } = await fetchMenuData();
         if (success) {
           // 处理返回的菜单数据，确保每个菜单项都有locale属性
