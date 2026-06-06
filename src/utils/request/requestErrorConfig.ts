@@ -3,7 +3,7 @@
 import * as authUtil from '@/utils/auth';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { config } from './config';
 import { refreshToken } from '@/services/ant-design-pro/api';
 
@@ -87,7 +87,7 @@ export const errorConfig: RequestConfig = {
           let accessToken = authUtil.getAccessToken();
           if (accessToken) {
             const currentDate = new Date();
-            const decodedToken = jwt_decode<{ exp: number }>(accessToken);
+            const decodedToken = jwtDecode<{ exp: number }>(accessToken);
 
             // 如果令牌已过期
             if (decodedToken.exp * 1000 < currentDate.getTime()) {
@@ -143,7 +143,7 @@ export const errorConfig: RequestConfig = {
       let accessToken = authUtil.getAccessToken();
       if (accessToken && isTokenRequired) {
         const currentDate = new Date();
-        const decodedToken = jwt_decode<{ exp: number }>(accessToken);
+        const decodedToken = jwtDecode<{ exp: number }>(accessToken);
         // expired
         if (decodedToken.exp * 1000 < currentDate.getTime()) {
           // sent refresh token
