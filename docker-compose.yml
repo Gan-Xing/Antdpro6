@@ -1,9 +1,15 @@
-version: '3.8'
-
 services:
-  app:
-    container_name: frontend
+  frontend:
+    container_name: antdpro6-frontend
     build:
       context: .
     ports:
       - '8000:8000'
+    restart: unless-stopped
+    networks:
+      - nestweb
+
+networks:
+  nestweb:
+    external: true
+    name: nestweb_default

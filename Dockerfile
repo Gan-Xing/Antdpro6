@@ -1,23 +1,19 @@
-# 使用Node 18作为基础镜像
-FROM node:18
+FROM node:18 AS builder
 
-# 创建app目录
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# 先复制package*.json，这样如果没有任何依赖变更，Docker可以使用缓存来加快构建速度
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm@9.15.4
+RUN pnpm install --frozen-lockfile
 
-# 安装pnpm
-RUN npm install -g pnpm
-
-# 使用pnpm安装依赖
-RUN pnpm install
-
-# 之后复制其他文件，这样我们可以最大化Docker层的缓存
 COPY . .
+RUN pnpm run build
 
-# 暴露的端口
+FROM nginx:1.27-alpine
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
+
 EXPOSE 8000
 
-# 启动命令
-CMD [ "pnpm", "run", "preview" ]
+CMD ["nginx", "-g", "daemon off;"]
