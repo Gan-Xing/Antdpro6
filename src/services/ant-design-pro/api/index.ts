@@ -1,5 +1,4 @@
 import { request } from '@umijs/max';
-import type { API } from './typings';
 
 export * from './common';
 export * from './auth';

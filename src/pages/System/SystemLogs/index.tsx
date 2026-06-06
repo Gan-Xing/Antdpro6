@@ -89,7 +89,7 @@ const SystemLogs: React.FC = () => {
       onOk: async () => {
         try {
           const result = await clearLogs(30);
-          message.success(`清理成功：${result.message}`);
+          message.success(`清理成功：${result.data.message}`);
           actionRef.current?.reload();
         } catch (error) {
           message.error('清理失败');
@@ -102,7 +102,7 @@ const SystemLogs: React.FC = () => {
     try {
       const data = await exportLogs();
       // 这里需要处理导出逻辑，可以是下载CSV文件
-      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(data.data)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

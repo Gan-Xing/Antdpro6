@@ -9,7 +9,7 @@ interface menuResponse {
 // 原有的通用响应格式
 export interface CommonResponseStructure<T> {
   success: boolean;
-  data: T[];
+  data: T;
   total?: number;
 }
 

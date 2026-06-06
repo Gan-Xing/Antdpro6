@@ -2,7 +2,7 @@ import { request } from '@umijs/max';
 
 /** 查询日志列表 */
 export async function queryLogs(params: API.QueryLogParams) {
-  return request<API.SystemLogList>('/system-log', {
+  return request<API.Response<API.SystemLogList>>('/system-log', {
     method: 'GET',
     params,
   });
@@ -10,7 +10,7 @@ export async function queryLogs(params: API.QueryLogParams) {
 
 /** 清理日志 */
 export async function clearLogs(days: number) {
-  return request<API.ClearLogsResult>('/system-log/clear', {
+  return request<API.Response<API.ClearLogsResult>>('/system-log/clear', {
     method: 'DELETE',
     params: { days },
   });
@@ -18,7 +18,7 @@ export async function clearLogs(days: number) {
 
 /** 导出日志 */
 export async function exportLogs(params?: API.QueryLogParams) {
-  return request<API.SystemLog[]>('/system-log/export', {
+  return request<API.Response<API.SystemLog[]>>('/system-log/export', {
     method: 'GET',
     params,
   });
@@ -26,7 +26,7 @@ export async function exportLogs(params?: API.QueryLogParams) {
 
 /** 获取日志详情 */
 export async function getLogDetail(id: number) {
-  return request<API.SystemLog>(`/system-log/${id}`, {
+  return request<API.Response<API.SystemLog>>(`/system-log/${id}`, {
     method: 'GET',
   });
 }
