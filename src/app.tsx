@@ -1,6 +1,16 @@
 import Footer from '@/components/Footer';
 import { Question, SelectLang } from '@/components/RightContent';
-import { LinkOutlined } from '@ant-design/icons';
+import {
+  CrownOutlined,
+  DashboardOutlined,
+  FileTextOutlined,
+  FolderOutlined,
+  LinkOutlined,
+  PictureOutlined,
+  SettingOutlined,
+  SmileOutlined,
+  TableOutlined,
+} from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
@@ -14,6 +24,43 @@ import { unwrapResponse } from './utils/apiResponse';
 import { errorConfig } from './utils/request/requestErrorConfig';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+
+const menuIconMap: Record<string, React.ReactNode> = {
+  crown: <CrownOutlined />,
+  CrownOutlined: <CrownOutlined />,
+  dashboard: <DashboardOutlined />,
+  DashboardOutlined: <DashboardOutlined />,
+  FileTextOutlined: <FileTextOutlined />,
+  FolderOutlined: <FolderOutlined />,
+  PictureOutlined: <PictureOutlined />,
+  SettingOutlined: <SettingOutlined />,
+  smile: <SmileOutlined />,
+  SmileOutlined: <SmileOutlined />,
+  table: <TableOutlined />,
+  TableOutlined: <TableOutlined />,
+};
+
+const resolveMenuIcon = (icon: unknown): React.ReactNode | undefined => {
+  if (typeof icon !== 'string') {
+    return icon as React.ReactNode;
+  }
+
+  return menuIconMap[icon] ?? undefined;
+};
+
+const processRemoteMenuData = (menuItem: any): any => {
+  const newMenuItem = {
+    ...menuItem,
+    icon: resolveMenuIcon(menuItem.icon),
+    locale: menuItem.name,
+  };
+
+  if (newMenuItem.children) {
+    newMenuItem.children = newMenuItem.children.map(processRemoteMenuData);
+  }
+
+  return newMenuItem;
+};
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -72,21 +119,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
           return [];
         }
         const data = unwrapResponse<any[]>(await menusControllerFindUserMenus());
-        // 处理返回的菜单数据，确保每个菜单项都有locale属性
-        const processMenuData = (menuItem: any) => {
-          const newMenuItem = {
-            ...menuItem,
-            locale: menuItem.name, // 将name值作为国际化的key
-          };
-
-          if (newMenuItem.children) {
-            newMenuItem.children = newMenuItem.children.map(processMenuData);
-          }
-
-          return newMenuItem;
-        };
-
-        return (data || []).map(processMenuData);
+        return (data || []).map(processRemoteMenuData);
       },
     },
     waterMarkProps: {
