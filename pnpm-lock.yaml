@@ -71,6 +71,9 @@ importers:
       '@ant-design/pro-cli':
         specifier: ^3.4.0
         version: 3.4.0(@types/node@20.10.4)(encoding@0.1.13)(mem-fs@2.3.0)
+      '@playwright/test':
+        specifier: ^1.60.0
+        version: 1.60.0
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -94,13 +97,13 @@ importers:
         version: 18.3.7(@types/react@18.3.31)
       '@umijs/fabric':
         specifier: ^4.0.1
-        version: 4.0.1(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(postcss@7.0.39)
+        version: 4.0.1(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(postcss@8.4.32)
       '@umijs/lint':
         specifier: ^4.6.61
-        version: 4.6.61(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@13.13.1)(typescript@5.9.3)
+        version: 4.6.61(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@15.11.0(typescript@5.9.3))(typescript@5.9.3)
       '@umijs/max':
         specifier: ^4.6.61
-        version: 4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+        version: 4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
@@ -142,7 +145,7 @@ importers:
         version: 5.9.3
       umi-presets-pro:
         specifier: ^2.0.3
-        version: 2.0.3(sm5mferzlgx4sir67ojsebjbfa)
+        version: 2.0.3(df7enazxre4ft7psfr372yj3by)
 
 packages:
 
@@ -2774,6 +2777,11 @@ packages:
   '@pkgr/utils@2.4.2':
     resolution: {integrity: sha512-POgTXhjrTfbTV63DiFXav4lBHiICLKKwDeaKn9Nphwj7WH6m0hMMCaJkMyRWjgtPFyRKRVoMXXjczsTQRDEhYw==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
+
+  '@playwright/test@1.60.0':
+    resolution: {integrity: sha512-O71yZIbAh/PxDMNGns37GHBIfrVkEVyn+AXyIa5dOTfb4/xNvRWV+Vv/NMbNCtODB/pO7vLlF2OTmMVLhmr7Ag==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@radix-ui/popper@0.0.10':
     resolution: {integrity: sha512-YFKuPqQPKscreQid7NuB4it3PMzSwGg03vgrud6sVliHkI43QNAOHyrHyMNo015jg6QK5GVDn+7J2W5uygqSGA==}
@@ -5968,6 +5976,11 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -8256,6 +8269,16 @@ packages:
   pkg-dir@4.2.0:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
+
+  playwright-core@1.60.0:
+    resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.60.0:
+    resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   plur@4.0.0:
     resolution: {integrity: sha512-4UGewrYgqDFw9vV6zNV+ADmPAUAfJPKtGvb/VdpQAx25X5f3xXdGdyOEVFwkl8Hl/tl7+xbeHqSEM+D5/TirUg==}
@@ -12104,14 +12127,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/eslint-parser@7.23.3(@babel/core@7.23.5)(eslint@8.57.1)':
-    dependencies:
-      '@babel/core': 7.23.5
-      '@nicolo-ribaudo/eslint-scope-5-internals': 5.1.1-v1
-      eslint: 8.57.1
-      eslint-visitor-keys: 2.1.0
-      semver: 6.3.1
-
   '@babel/eslint-parser@7.23.3(@babel/core@7.23.6)(eslint@8.35.0)':
     dependencies:
       '@babel/core': 7.23.6
@@ -12136,9 +12151,17 @@ snapshots:
       eslint-visitor-keys: 2.1.0
       semver: 6.3.1
 
+  '@babel/eslint-parser@7.23.3(@babel/core@7.29.7)(eslint@8.57.1)':
+    dependencies:
+      '@babel/core': 7.29.7
+      '@nicolo-ribaudo/eslint-scope-5-internals': 5.1.1-v1
+      eslint: 8.57.1
+      eslint-visitor-keys: 2.1.0
+      semver: 6.3.1
+
   '@babel/eslint-plugin@7.29.7(@babel/eslint-parser@7.23.3(@babel/core@7.29.7)(eslint@8.57.1))(eslint@8.57.1)':
     dependencies:
-      '@babel/eslint-parser': 7.23.3(@babel/core@7.23.5)(eslint@8.57.1)
+      '@babel/eslint-parser': 7.23.3(@babel/core@7.29.7)(eslint@8.57.1)
       eslint: 8.57.1
       eslint-rule-composer: 0.3.0
 
@@ -15109,6 +15132,10 @@ snapshots:
       picocolors: 1.1.1
       tslib: 2.6.2
 
+  '@playwright/test@1.60.0':
+    dependencies:
+      playwright: 1.60.0
+
   '@radix-ui/popper@0.0.10':
     dependencies:
       '@babel/runtime': 7.29.7
@@ -15220,26 +15247,26 @@ snapshots:
 
   '@stagewise/toolbar@0.6.2': {}
 
-  '@stylelint/postcss-css-in-js@0.37.3(postcss-syntax@0.36.2)(postcss@7.0.39)':
+  '@stylelint/postcss-css-in-js@0.37.3(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@7.0.39)':
     dependencies:
       '@babel/core': 7.29.7
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss@8.4.32)
     transitivePeerDependencies:
       - supports-color
 
-  '@stylelint/postcss-css-in-js@0.38.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@8.4.32)':
+  '@stylelint/postcss-css-in-js@0.38.0(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@8.4.32)':
     dependencies:
       '@babel/core': 7.23.6
       postcss: 8.4.32
-      postcss-syntax: 0.36.2(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss@8.4.32)
     transitivePeerDependencies:
       - supports-color
 
-  '@stylelint/postcss-markdown@0.36.2(postcss-syntax@0.36.2)(postcss@7.0.39)':
+  '@stylelint/postcss-markdown@0.36.2(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@7.0.39)':
     dependencies:
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss@8.4.32)
       remark: 13.0.0
       unist-util-find-all-after: 3.0.2
     transitivePeerDependencies:
@@ -15642,10 +15669,29 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
+  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5)':
+    dependencies:
+      '@eslint-community/regexpp': 4.10.0
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/scope-manager': 5.62.0
+      '@typescript-eslint/type-utils': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
+      '@typescript-eslint/utils': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
+      debug: 4.3.4
+      eslint: 7.32.0
+      graphemer: 1.4.0
+      ignore: 5.3.0
+      natural-compare-lite: 1.4.0
+      semver: 7.5.4
+      tsutils: 3.21.0(typescript@4.9.5)
+    optionalDependencies:
+      typescript: 4.9.5
+    transitivePeerDependencies:
+      - supports-color
+
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.35.0)(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.10.0
-      '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@8.35.0)(typescript@5.9.3)
       '@typescript-eslint/utils': 5.62.0(eslint@8.35.0)(typescript@5.9.3)
@@ -15664,17 +15710,17 @@ snapshots:
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.10.0
-      '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 5.62.0
-      '@typescript-eslint/type-utils': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
-      '@typescript-eslint/utils': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
+      '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       debug: 4.3.4
       eslint: 8.57.1
       graphemer: 1.4.0
       ignore: 5.3.0
       natural-compare-lite: 1.4.0
       semver: 7.5.4
-      tsutils: 3.21.0(typescript@4.9.5)
+      tsutils: 3.21.0(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -15721,7 +15767,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@4.9.5)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.3)
       debug: 4.3.4
       eslint: 8.57.1
     optionalDependencies:
@@ -15757,6 +15803,18 @@ snapshots:
       '@typescript-eslint/utils': 5.62.0(eslint@8.35.0)(typescript@5.9.3)
       debug: 4.3.4
       eslint: 8.35.0
+      tsutils: 3.21.0(typescript@5.9.3)
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/type-utils@5.62.0(eslint@8.57.1)(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.3)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
+      debug: 4.3.4
+      eslint: 8.57.1
       tsutils: 3.21.0(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
@@ -15841,12 +15899,12 @@ snapshots:
 
   '@typescript-eslint/utils@5.62.0(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.4.0(eslint@7.32.0)
+      '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.1)
       '@types/json-schema': 7.0.15
       '@types/semver': 7.5.6
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@4.9.5)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.9.3)
       eslint: 8.57.1
       eslint-scope: 5.1.1
       semver: 7.5.4
@@ -15891,10 +15949,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@umijs/bundler-mako@0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))':
+  '@umijs/bundler-mako@0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))':
     dependencies:
       '@umijs/bundler-utils': 4.6.61
-      '@umijs/mako': 0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/mako': 0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       chalk: 4.1.2
       compression: 1.8.1
       connect-history-api-fallback: 2.0.0
@@ -15945,22 +16003,22 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@umijs/bundler-utoopack@4.6.61(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))':
+  '@umijs/bundler-utoopack@4.6.61(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))':
     dependencies:
       '@umijs/bundler-utils': 4.6.61
-      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
-      '@utoo/pack': 1.4.12(less-loader@11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)))(less@4.1.3)(postcss@8.4.32)(resolve-url-loader@5.0.0)(sass-loader@13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)))(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))
+      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
+      '@utoo/pack': 1.4.12(less-loader@11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)))(less@4.1.3)(postcss@8.4.32)(resolve-url-loader@5.0.0)(sass-loader@13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)))(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))
       compression: 1.8.1
       connect-history-api-fallback: 2.0.0
       cors: 2.8.5
       express: 4.22.2
       express-http-proxy: 2.1.2
       less: 4.1.3
-      less-loader: 11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      less-loader: 11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       postcss: 8.4.32
       resolve-url-loader: 5.0.0
       sass: 1.54.0
-      sass-loader: 13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      sass-loader: 13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
     transitivePeerDependencies:
       - '@types/webpack'
       - bufferutil
@@ -16001,7 +16059,7 @@ snapshots:
       - supports-color
       - terser
 
-  '@umijs/bundler-webpack@4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))':
+  '@umijs/bundler-webpack@4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))':
     dependencies:
       '@svgr/core': 6.5.1
       '@svgr/plugin-jsx': 6.5.1(@svgr/core@6.5.1)
@@ -16011,12 +16069,12 @@ snapshots:
       '@umijs/bundler-utils': 4.6.61
       '@umijs/case-sensitive-paths-webpack-plugin': 1.0.1
       '@umijs/mfsu': 4.6.61
-      '@umijs/react-refresh-webpack-plugin': 0.5.11(react-refresh@0.14.0)(type-fest@1.4.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/react-refresh-webpack-plugin': 0.5.11(react-refresh@0.14.0)(type-fest@1.4.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/utils': 4.6.61
       cors: 2.8.5
-      css-loader: 6.7.1(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      css-loader: 6.7.1(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       es5-imcompatible-versions: 0.1.88
-      fork-ts-checker-webpack-plugin: 8.0.0(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      fork-ts-checker-webpack-plugin: 8.0.0(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       jest-worker: 29.4.3
       lightningcss: 1.22.1
       node-libs-browser: 2.2.1
@@ -16094,14 +16152,14 @@ snapshots:
       '@babel/preset-env': 7.29.7(@babel/core@7.29.7)
       '@babel/preset-react': 7.23.3(@babel/core@7.29.7)
       '@babel/preset-typescript': 7.23.3(@babel/core@7.29.7)
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5)
       '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@4.9.5)
       chalk: 4.1.2
       eslint: 7.32.0
       eslint-config-prettier: 8.10.0(eslint@7.32.0)
       eslint-formatter-pretty: 4.1.0
       eslint-plugin-babel: 5.3.1(eslint@7.32.0)
-      eslint-plugin-jest: 24.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5))(eslint@7.32.0)(typescript@4.9.5)
+      eslint-plugin-jest: 24.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5)
       eslint-plugin-promise: 6.1.1(eslint@7.32.0)
       eslint-plugin-react: 7.33.2(eslint@7.32.0)
       eslint-plugin-react-hooks: 4.6.0(eslint@7.32.0)
@@ -16122,10 +16180,10 @@ snapshots:
       - postcss-markdown
       - supports-color
 
-  '@umijs/fabric@4.0.1(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(postcss@7.0.39)':
+  '@umijs/fabric@4.0.1(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(postcss@8.4.32)':
     dependencies:
       '@babel/core': 7.29.7
-      '@babel/eslint-parser': 7.23.3(@babel/core@7.23.5)(eslint@8.57.1)
+      '@babel/eslint-parser': 7.23.3(@babel/core@7.29.7)(eslint@8.57.1)
       '@babel/eslint-plugin': 7.29.7(@babel/eslint-parser@7.23.3(@babel/core@7.29.7)(eslint@8.57.1))(eslint@8.57.1)
       '@babel/plugin-proposal-class-properties': 7.18.6(@babel/core@7.29.7)
       '@babel/plugin-proposal-decorators': 7.29.7(@babel/core@7.29.7)
@@ -16138,13 +16196,13 @@ snapshots:
       eslint: 8.57.1
       eslint-config-prettier: 8.10.0(eslint@8.57.1)
       eslint-formatter-pretty: 4.1.0
-      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5))(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3)
+      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3)
       eslint-plugin-react: 7.33.2(eslint@8.57.1)
       eslint-plugin-react-hooks: 4.6.0(eslint@8.57.1)
       eslint-plugin-unicorn: 47.0.0(eslint@8.57.1)
       fast-glob: 3.3.2
       os-locale: 5.0.0
-      postcss-less: 6.0.0(postcss@7.0.39)
+      postcss-less: 6.0.0(postcss@8.4.32)
       prettier: 2.8.8
       prettier-plugin-organize-imports: 3.2.4(prettier@2.8.8)(typescript@5.9.3)
       prettier-plugin-two-style-order: 1.0.1(prettier@2.8.8)
@@ -16170,11 +16228,11 @@ snapshots:
     dependencies:
       '@babel/core': 7.23.6
       '@babel/eslint-parser': 7.23.3(@babel/core@7.23.6)(eslint@8.35.0)
-      '@stylelint/postcss-css-in-js': 0.38.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@8.4.32)
+      '@stylelint/postcss-css-in-js': 0.38.0(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@8.4.32)
       '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.35.0)(typescript@5.9.3)
       '@typescript-eslint/parser': 5.62.0(eslint@8.35.0)(typescript@5.9.3)
       '@umijs/babel-preset-umi': 4.6.61
-      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5))(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3)
+      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3)
       eslint-plugin-react: 7.33.2(eslint@8.35.0)
       eslint-plugin-react-hooks: 4.6.0(eslint@8.35.0)
       postcss: 8.4.32
@@ -16192,20 +16250,20 @@ snapshots:
       - supports-color
       - typescript
 
-  '@umijs/lint@4.6.61(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@13.13.1)(typescript@5.9.3)':
+  '@umijs/lint@4.6.61(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@15.11.0(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
       '@babel/core': 7.23.6
       '@babel/eslint-parser': 7.23.3(@babel/core@7.23.6)(eslint@8.57.1)
-      '@stylelint/postcss-css-in-js': 0.38.0(postcss-syntax@0.36.2(postcss@7.0.39))(postcss@8.4.32)
+      '@stylelint/postcss-css-in-js': 0.38.0(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@8.4.32)
       '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       '@umijs/babel-preset-umi': 4.6.61
-      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5))(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3)
+      eslint-plugin-jest: 27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3)
       eslint-plugin-react: 7.33.2(eslint@8.57.1)
       eslint-plugin-react-hooks: 4.6.0(eslint@8.57.1)
       postcss: 8.4.32
       postcss-syntax: 0.36.2(postcss@8.4.32)
-      stylelint-config-standard: 25.0.0(stylelint@13.13.1)
+      stylelint-config-standard: 25.0.0(stylelint@15.11.0(typescript@5.9.3))
     transitivePeerDependencies:
       - eslint
       - jest
@@ -16242,7 +16300,7 @@ snapshots:
   '@umijs/mako-win32-x64-msvc@0.11.10':
     optional: true
 
-  '@umijs/mako@0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))':
+  '@umijs/mako@0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))':
     dependencies:
       '@module-federation/webpack-bundler-runtime': 0.8.12
       '@swc/helpers': 0.5.1
@@ -16250,17 +16308,17 @@ snapshots:
       chalk: 4.1.2
       enhanced-resolve: 5.23.0
       less: 4.6.4
-      less-loader: 12.3.3(less@4.6.4)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      less-loader: 12.3.3(less@4.6.4)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       loader-runner: 4.3.0
       loader-utils: 3.3.1
       lodash: 4.18.1
       node-libs-browser-okam: 2.2.5
       piscina: 4.9.2
-      postcss-loader: 8.2.1(postcss@8.4.32)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      postcss-loader: 8.2.1(postcss@8.4.32)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       react-error-overlay: 6.0.9
       react-refresh: 0.14.0
       resolve: 1.22.8
-      sass-loader: 16.0.8(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      sass-loader: 16.0.8(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       semver: 7.8.2
       yargs-parser: 21.1.1
     optionalDependencies:
@@ -16294,14 +16352,14 @@ snapshots:
       - postcss-markdown
       - supports-color
 
-  '@umijs/max@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))':
+  '@umijs/max@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))':
     dependencies:
       '@umijs/lint': 4.6.61(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@14.8.2)(typescript@5.9.3)
       '@umijs/plugins': 4.6.61(@babel/core@7.23.5)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(antd@4.24.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       antd: 4.24.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       eslint: 8.35.0
       stylelint: 14.8.2
-      umi: 4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@14.8.2)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      umi: 4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@14.8.2)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
     transitivePeerDependencies:
       - '@babel/core'
       - '@rspack/core'
@@ -16518,7 +16576,7 @@ snapshots:
       - react-native
       - supports-color
 
-  '@umijs/preset-umi@4.6.61(@types/node@20.10.4)(@types/react@18.3.31)(lightningcss@1.22.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))':
+  '@umijs/preset-umi@4.6.61(@types/node@20.10.4)(@types/react@18.3.31)(lightningcss@1.22.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))':
     dependencies:
       '@iconify/utils': 2.1.1
       '@stagewise/toolbar': 0.6.2
@@ -16526,11 +16584,11 @@ snapshots:
       '@umijs/ast': 4.6.61
       '@umijs/babel-preset-umi': 4.6.61
       '@umijs/bundler-esbuild': 4.6.61
-      '@umijs/bundler-mako': 0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/bundler-mako': 0.11.10(postcss@8.4.32)(sass@1.54.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/bundler-utils': 4.6.61
-      '@umijs/bundler-utoopack': 4.6.61(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/bundler-utoopack': 4.6.61(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/bundler-vite': 4.6.61(@types/node@20.10.4)(lightningcss@1.22.1)(postcss@8.4.32)(rollup@3.29.4)(sass@1.54.0)(sugarss@2.0.0)(terser@5.48.0)
-      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/core': 4.6.61
       '@umijs/did-you-know': 1.0.4
       '@umijs/es-module-parser': 0.0.7
@@ -16549,7 +16607,7 @@ snapshots:
       current-script-polyfill: 1.0.0
       enhanced-resolve: 5.9.3
       fast-glob: 3.2.12
-      html-webpack-plugin: 5.5.0(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      html-webpack-plugin: 5.5.0(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       less-plugin-resolve: 1.0.2
       path-to-regexp: 1.7.0
       postcss: 8.4.32
@@ -16585,7 +16643,7 @@ snapshots:
       - webpack-hot-middleware
       - webpack-plugin-serve
 
-  '@umijs/react-refresh-webpack-plugin@0.5.11(react-refresh@0.14.0)(type-fest@1.4.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))':
+  '@umijs/react-refresh-webpack-plugin@0.5.11(react-refresh@0.14.0)(type-fest@1.4.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))':
     dependencies:
       ansi-html-community: 0.0.8
       common-path-prefix: 3.0.0
@@ -16597,7 +16655,7 @@ snapshots:
       react-refresh: 0.14.0
       schema-utils: 3.3.0
       source-map: 0.7.4
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
     optionalDependencies:
       type-fest: 1.4.0
 
@@ -16611,13 +16669,13 @@ snapshots:
       react-helmet-async: 1.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-router-dom: 6.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-  '@umijs/request-record@1.1.4(umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@13.13.1)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)))':
+  '@umijs/request-record@1.1.4(umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@15.11.0(typescript@5.9.3))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)))':
     dependencies:
       chokidar: 3.5.3
       express: 4.22.2
       lodash: 4.18.1
       prettier: 2.8.8
-      umi: 4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@13.13.1)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      umi: 4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@15.11.0(typescript@5.9.3))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
     transitivePeerDependencies:
       - supports-color
 
@@ -16783,7 +16841,7 @@ snapshots:
   '@utoo/pack-win32-x64-msvc@1.4.12':
     optional: true
 
-  '@utoo/pack@1.4.12(less-loader@11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)))(less@4.1.3)(postcss@8.4.32)(resolve-url-loader@5.0.0)(sass-loader@13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)))(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))':
+  '@utoo/pack@1.4.12(less-loader@11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)))(less@4.1.3)(postcss@8.4.32)(resolve-url-loader@5.0.0)(sass-loader@13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)))(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))':
     dependencies:
       '@babel/code-frame': 7.22.5
       '@hono/node-server': 1.19.14(hono@4.12.23)
@@ -16795,13 +16853,13 @@ snapshots:
       get-port: 5.1.1
       hono: 4.12.23
       less: 4.1.3
-      less-loader: 11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      less-loader: 11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       nanoid: 3.3.12
       picocolors: 1.1.1
       postcss: 8.4.32
       resolve-url-loader: 5.0.0
       sass: 1.54.0
-      sass-loader: 13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      sass-loader: 13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       semver: 7.8.2
       send: 0.17.1
       styled-jsx: 5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1)
@@ -18254,7 +18312,7 @@ snapshots:
       postcss: 8.4.32
       postcss-selector-parser: 6.0.13
 
-  css-loader@6.7.1(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  css-loader@6.7.1(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       icss-utils: 5.1.0(postcss@8.4.32)
       postcss: 8.4.32
@@ -18264,7 +18322,7 @@ snapshots:
       postcss-modules-values: 4.0.0(postcss@8.4.32)
       postcss-value-parser: 4.2.0
       semver: 7.5.4
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
 
   css-prefers-color-scheme@6.0.3(postcss@8.4.32):
     dependencies:
@@ -18992,7 +19050,7 @@ snapshots:
       eslint: 7.32.0
       eslint-rule-composer: 0.3.0
 
-  eslint-plugin-jest@24.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5))(eslint@7.32.0)(typescript@4.9.5):
+  eslint-plugin-jest@24.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5):
     dependencies:
       '@typescript-eslint/experimental-utils': 4.33.0(eslint@7.32.0)(typescript@4.9.5)
       eslint: 7.32.0
@@ -19002,7 +19060,7 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-jest@27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5))(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3):
+  eslint-plugin-jest@27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 5.62.0(eslint@8.35.0)(typescript@5.9.3)
       eslint: 8.35.0
@@ -19013,7 +19071,7 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-jest@27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@7.32.0)(typescript@4.9.5))(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3):
+  eslint-plugin-jest@27.2.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.1)(typescript@5.9.3)
       eslint: 8.57.1
@@ -19639,7 +19697,7 @@ snapshots:
 
   forever-agent@0.6.1: {}
 
-  fork-ts-checker-webpack-plugin@8.0.0(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  fork-ts-checker-webpack-plugin@8.0.0(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       '@babel/code-frame': 7.23.5
       chalk: 4.1.2
@@ -19654,7 +19712,7 @@ snapshots:
       semver: 7.5.4
       tapable: 2.2.1
       typescript: 5.9.3
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
 
   form-data@2.3.3:
     dependencies:
@@ -19703,6 +19761,9 @@ snapshots:
   fs-readdir-recursive@1.1.0: {}
 
   fs.realpath@1.0.0: {}
+
+  fsevents@2.3.2:
+    optional: true
 
   fsevents@2.3.3:
     optional: true
@@ -20079,14 +20140,14 @@ snapshots:
 
   html-tags@3.3.1: {}
 
-  html-webpack-plugin@5.5.0(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  html-webpack-plugin@5.5.0(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       '@types/html-minifier-terser': 6.1.0
       html-minifier-terser: 6.1.0
       lodash: 4.18.1
       pretty-error: 4.0.0
       tapable: 2.2.1
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
 
   htmlparser2@3.10.1:
     dependencies:
@@ -21155,17 +21216,17 @@ snapshots:
 
   lerc@3.0.0: {}
 
-  less-loader@11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  less-loader@11.1.0(less@4.1.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       klona: 2.0.6
       less: 4.1.3
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
 
-  less-loader@12.3.3(less@4.6.4)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  less-loader@12.3.3(less@4.6.4)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       less: 4.6.4
     optionalDependencies:
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
 
   less-plugin-resolve@1.0.2:
     dependencies:
@@ -22491,6 +22552,14 @@ snapshots:
     dependencies:
       find-up: 4.1.0
 
+  playwright-core@1.60.0: {}
+
+  playwright@1.60.0:
+    dependencies:
+      playwright-core: 1.60.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
   plur@4.0.0:
     dependencies:
       irregular-plurals: 3.5.0
@@ -22588,11 +22657,11 @@ snapshots:
     dependencies:
       postcss: 8.4.32
 
-  postcss-html@0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39):
+  postcss-html@0.36.0(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@7.0.39):
     dependencies:
       htmlparser2: 3.10.1
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss@8.4.32)
 
   postcss-image-set-function@4.0.7(postcss@8.4.32):
     dependencies:
@@ -22617,18 +22686,18 @@ snapshots:
     dependencies:
       postcss: 8.4.32
 
-  postcss-less@6.0.0(postcss@7.0.39):
+  postcss-less@6.0.0(postcss@8.4.32):
     dependencies:
-      postcss: 7.0.39
+      postcss: 8.4.32
 
-  postcss-loader@8.2.1(postcss@8.4.32)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  postcss-loader@8.2.1(postcss@8.4.32)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       cosmiconfig: 9.0.1(typescript@5.9.3)
       jiti: 2.7.0
       postcss: 8.4.32
       semver: 7.8.2
     optionalDependencies:
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
     transitivePeerDependencies:
       - typescript
 
@@ -22792,9 +22861,13 @@ snapshots:
       lodash: 4.18.1
       postcss: 8.4.32
 
-  postcss-syntax@0.36.2(postcss@7.0.39):
+  postcss-syntax@0.36.2(postcss-html@0.36.0)(postcss-less@3.1.4)(postcss-scss@2.1.1)(postcss@7.0.39):
     dependencies:
       postcss: 7.0.39
+    optionalDependencies:
+      postcss-html: 0.36.0(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@7.0.39)
+      postcss-less: 3.1.4
+      postcss-scss: 2.1.1
 
   postcss-syntax@0.36.2(postcss@8.4.32):
     dependencies:
@@ -24488,20 +24561,20 @@ snapshots:
 
   safer-buffer@2.1.2: {}
 
-  sass-loader@13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  sass-loader@13.2.0(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       klona: 2.0.6
       neo-async: 2.6.2
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
     optionalDependencies:
       sass: 1.54.0
 
-  sass-loader@16.0.8(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  sass-loader@16.0.8(sass@1.54.0)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
       sass: 1.54.0
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
 
   sass@1.54.0:
     dependencies:
@@ -25151,28 +25224,28 @@ snapshots:
     dependencies:
       stylelint: 13.13.1
 
-  stylelint-config-recommended@7.0.0(stylelint@13.13.1):
-    dependencies:
-      stylelint: 13.13.1
-
   stylelint-config-recommended@7.0.0(stylelint@14.8.2):
     dependencies:
       stylelint: 14.8.2
+
+  stylelint-config-recommended@7.0.0(stylelint@15.11.0(typescript@5.9.3)):
+    dependencies:
+      stylelint: 15.11.0(typescript@5.9.3)
 
   stylelint-config-standard@20.0.0(stylelint@13.13.1):
     dependencies:
       stylelint: 13.13.1
       stylelint-config-recommended: 3.0.0(stylelint@13.13.1)
 
-  stylelint-config-standard@25.0.0(stylelint@13.13.1):
-    dependencies:
-      stylelint: 13.13.1
-      stylelint-config-recommended: 7.0.0(stylelint@13.13.1)
-
   stylelint-config-standard@25.0.0(stylelint@14.8.2):
     dependencies:
       stylelint: 14.8.2
       stylelint-config-recommended: 7.0.0(stylelint@14.8.2)
+
+  stylelint-config-standard@25.0.0(stylelint@15.11.0(typescript@5.9.3)):
+    dependencies:
+      stylelint: 15.11.0(typescript@5.9.3)
+      stylelint-config-recommended: 7.0.0(stylelint@15.11.0(typescript@5.9.3))
 
   stylelint-config-standard@33.0.0(stylelint@15.11.0(typescript@5.9.3)):
     dependencies:
@@ -25205,8 +25278,8 @@ snapshots:
 
   stylelint@13.13.1:
     dependencies:
-      '@stylelint/postcss-css-in-js': 0.37.3(postcss-syntax@0.36.2)(postcss@7.0.39)
-      '@stylelint/postcss-markdown': 0.36.2(postcss-syntax@0.36.2)(postcss@7.0.39)
+      '@stylelint/postcss-css-in-js': 0.37.3(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@7.0.39)
+      '@stylelint/postcss-markdown': 0.36.2(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@7.0.39)
       autoprefixer: 9.8.8
       balanced-match: 2.0.0
       chalk: 4.1.2
@@ -25232,7 +25305,7 @@ snapshots:
       micromatch: 4.0.5
       normalize-selector: 0.2.0
       postcss: 7.0.39
-      postcss-html: 0.36.0(postcss-syntax@0.36.2)(postcss@7.0.39)
+      postcss-html: 0.36.0(postcss-syntax@0.36.2(postcss@8.4.32))(postcss@7.0.39)
       postcss-less: 3.1.4
       postcss-media-query-parser: 0.2.3
       postcss-resolve-nested-selector: 0.1.1
@@ -25240,7 +25313,7 @@ snapshots:
       postcss-sass: 0.4.4
       postcss-scss: 2.1.1
       postcss-selector-parser: 6.0.13
-      postcss-syntax: 0.36.2(postcss@7.0.39)
+      postcss-syntax: 0.36.2(postcss-html@0.36.0)(postcss-less@3.1.4)(postcss-scss@2.1.1)(postcss@7.0.39)
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
       slash: 3.0.0
@@ -25466,16 +25539,16 @@ snapshots:
       mkdirp: 1.0.4
       yallist: 4.0.0
 
-  terser-webpack-plugin@5.6.1(lightningcss@1.22.1)(postcss@7.0.39)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  terser-webpack-plugin@5.6.1(lightningcss@1.22.1)(postcss@8.4.32)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.48.0
-      webpack: 5.89.0(lightningcss@1.22.1)(postcss@7.0.39)
+      webpack: 5.89.0(lightningcss@1.22.1)(postcss@8.4.32)
     optionalDependencies:
       lightningcss: 1.22.1
-      postcss: 7.0.39
+      postcss: 8.4.32
 
   terser@5.26.0:
     dependencies:
@@ -25713,12 +25786,12 @@ snapshots:
 
   ua-parser-js@0.7.37: {}
 
-  umi-presets-pro@2.0.3(sm5mferzlgx4sir67ojsebjbfa):
+  umi-presets-pro@2.0.3(df7enazxre4ft7psfr372yj3by):
     dependencies:
       '@alita/plugins': 3.3.7(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(antd@5.29.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(babel-plugin-styled-components@2.1.4(@babel/core@7.23.5)(styled-components@6.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)))(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@umijs/max-plugin-openapi': 2.0.3(chokidar@3.5.3)(encoding@0.1.13)
       '@umijs/plugins': 4.0.89(@babel/core@7.23.5)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(antd@5.29.3(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(dva@2.5.0-beta.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(rc-field-form@2.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@umijs/request-record': 1.1.4(umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@13.13.1)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)))
+      '@umijs/request-record': 1.1.4(umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@15.11.0(typescript@5.9.3))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)))
       swagger-ui-dist: 4.19.1
     transitivePeerDependencies:
       - '@babel/core'
@@ -25753,14 +25826,14 @@ snapshots:
       prettier: 1.15.3
       slash2: 2.0.0
 
-  umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@14.8.2)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@14.8.2)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       '@babel/runtime': 7.29.7
       '@umijs/bundler-utils': 4.6.61
-      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/core': 4.6.61
       '@umijs/lint': 4.6.61(eslint@8.35.0)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@14.8.2)(typescript@5.9.3)
-      '@umijs/preset-umi': 4.6.61(@types/node@20.10.4)(@types/react@18.3.31)(lightningcss@1.22.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/preset-umi': 4.6.61(@types/node@20.10.4)(@types/react@18.3.31)(lightningcss@1.22.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/renderer-react': 4.6.61(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@umijs/server': 4.6.61
       '@umijs/test': 4.6.61(@babel/core@7.23.5)
@@ -25807,14 +25880,14 @@ snapshots:
       - webpack-hot-middleware
       - webpack-plugin-serve
 
-  umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@13.13.1)(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39)):
+  umi@4.6.61(@babel/core@7.23.5)(@types/node@20.10.4)(@types/react@18.3.31)(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(lightningcss@1.22.1)(prettier@3.8.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(stylelint@15.11.0(typescript@5.9.3))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32)):
     dependencies:
       '@babel/runtime': 7.29.7
       '@umijs/bundler-utils': 4.6.61
-      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/bundler-webpack': 4.6.61(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/core': 4.6.61
-      '@umijs/lint': 4.6.61(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@13.13.1)(typescript@5.9.3)
-      '@umijs/preset-umi': 4.6.61(@types/node@20.10.4)(@types/react@18.3.31)(lightningcss@1.22.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      '@umijs/lint': 4.6.61(eslint@8.57.1)(jest@30.4.2(@types/node@20.10.4)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.10.4)(typescript@5.9.3)))(stylelint@15.11.0(typescript@5.9.3))(typescript@5.9.3)
+      '@umijs/preset-umi': 4.6.61(@types/node@20.10.4)(@types/react@18.3.31)(lightningcss@1.22.1)(rollup@3.29.4)(sass@1.54.0)(styled-jsx@5.1.7(@babel/core@7.23.5)(babel-plugin-macros@3.1.0)(react@18.3.1))(sugarss@2.0.0)(terser@5.48.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       '@umijs/renderer-react': 4.6.61(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@umijs/server': 4.6.61
       '@umijs/test': 4.6.61(@babel/core@7.23.5)
@@ -26167,7 +26240,7 @@ snapshots:
 
   webpack-sources@3.5.0: {}
 
-  webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39):
+  webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.9
@@ -26190,7 +26263,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(lightningcss@1.22.1)(postcss@7.0.39)(webpack@5.89.0(lightningcss@1.22.1)(postcss@7.0.39))
+      terser-webpack-plugin: 5.6.1(lightningcss@1.22.1)(postcss@8.4.32)(webpack@5.89.0(lightningcss@1.22.1)(postcss@8.4.32))
       watchpack: 2.5.1
       webpack-sources: 3.5.0
     transitivePeerDependencies:
