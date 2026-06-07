@@ -9,11 +9,44 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
-import { Button, message, Modal } from 'antd';
+import { Alert, Button, message, Modal, Space, Tag, Tooltip, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
 import Update, { FormValueType } from './components/Update';
+
+const systemManagedPermissionCodes = new Set([
+  'dashboard.view',
+  'auth.users.view',
+  'auth.users.create',
+  'auth.users.update',
+  'auth.users.delete',
+  'auth.roles.view',
+  'auth.roles.create',
+  'auth.roles.update',
+  'auth.roles.delete',
+  'auth.permissions.view',
+  'auth.permissions.create',
+  'auth.permissions.update',
+  'auth.permissions.delete',
+  'auth.menus.view',
+  'auth.menus.create',
+  'auth.menus.update',
+  'auth.menus.delete',
+  'resources.images.view',
+  'resources.images.detail',
+  'resources.images.create',
+  'resources.images.upload',
+  'resources.images.update',
+  'resources.images.delete',
+  'system.logs.view',
+  'system.logs.detail',
+  'system.logs.export',
+  'system.logs.delete',
+]);
+
+const isSystemManagedPermission = (permission?: Partial<Permissions.Entity>) =>
+  Boolean(permission?.code && systemManagedPermissionCodes.has(permission.code));
 
 /**
  * @en-US Add node
@@ -118,16 +151,45 @@ const TableList: React.FC = () => {
               setShowDetail(true);
             }}
           >
-            {dom}
+            <Space size={8}>
+              {dom}
+              {isSystemManagedPermission(entity) ? <Tag color="blue">系统内置</Tag> : null}
+            </Space>
           </a>
         );
       },
     },
     {
+      title: '权限编码',
+      dataIndex: 'code',
+      copyable: true,
+      ellipsis: true,
+      hideInSearch: true,
+      render: (dom) => (
+        <Typography.Text code style={{ fontSize: 12 }}>
+          {dom}
+        </Typography.Text>
+      ),
+    },
+    {
+      title: '请求方法',
+      dataIndex: 'action',
+      width: 96,
+      hideInSearch: true,
+      render: (_, record) => <Tag>{record.action}</Tag>,
+    },
+    {
+      title: '请求路径',
+      dataIndex: 'path',
+      copyable: true,
+      ellipsis: true,
+      hideInSearch: true,
+    },
+    {
       title: <FormattedMessage id="pages.permissions.group" defaultMessage="所属权限组" />,
       dataIndex: 'permissionGroup',
       renderText: (val) => {
-        return `${val.parent.name}-${val.name}`;
+        return `${val?.parent?.name ? `${val.parent.name}-` : ''}${val?.name ?? ''}`;
       },
       hideInSearch: true,
     },
@@ -142,46 +204,67 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
-      render: (_, record) =>
-        [
-          canEditPermission && (
-            <a
-              key="update"
-              onClick={() => {
-                handleUpdateModalOpen(true);
-                setCurrentRow(record);
-              }}
-            >
-              <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-            </a>
-          ),
-          canDeletePermission && (
-            <a
-              key="delete"
-              onClick={() => {
-                return Modal.confirm({
-                  title: '确认删除？',
-                  onOk: async () => {
-                    await handleRemove([record.id!]);
-                    setSelectedRows([]);
-                    actionRef.current?.reloadAndRest?.();
-                  },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
-                });
-              }}
-            >
-              <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-            </a>
-          ),
-        ].filter(Boolean),
+      render: (_, record) => {
+        const systemManaged = isSystemManagedPermission(record);
+
+        return [
+          canEditPermission &&
+            (systemManaged ? (
+              <Tooltip key="update-disabled" title="系统内置权限由代码种子维护，不能在后台编辑">
+                <Typography.Text type="secondary">编辑</Typography.Text>
+              </Tooltip>
+            ) : (
+              <a
+                key="update"
+                onClick={() => {
+                  handleUpdateModalOpen(true);
+                  setCurrentRow(record);
+                }}
+              >
+                <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+              </a>
+            )),
+          canDeletePermission &&
+            (systemManaged ? (
+              <Tooltip key="delete-disabled" title="系统内置权限由代码种子维护，不能在后台删除">
+                <Typography.Text type="secondary">删除</Typography.Text>
+              </Tooltip>
+            ) : (
+              <a
+                key="delete"
+                onClick={() => {
+                  return Modal.confirm({
+                    title: '确认删除？',
+                    onOk: async () => {
+                      await handleRemove([record.id!]);
+                      setSelectedRows([]);
+                      actionRef.current?.reloadAndRest?.();
+                    },
+                    content: '确认删除吗？',
+                    okText: '确认',
+                    cancelText: '取消',
+                  });
+                }}
+              >
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+              </a>
+            )),
+        ].filter(Boolean);
+      },
     },
   ];
   const columns = rawColumns.filter(Boolean) as ProColumns<Permissions.Entity>[];
+  const selectedContainsSystemManagedPermission = selectedRowsState.some(isSystemManagedPermission);
 
   return (
     <PageContainer>
+      <Alert
+        showIcon
+        type="warning"
+        message="内部维护入口"
+        description="系统内置权限由后端代码种子维护，后台只允许查看和分配给角色，不能编辑或删除。新增权限仅用于临时扩展，正式权限建议通过代码种子管理。"
+        style={{ marginBottom: 16 }}
+      />
       <ProTable<Permissions.Entity, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'menu.auth.permissions',
@@ -221,6 +304,9 @@ const TableList: React.FC = () => {
         }}
         columns={columns}
         rowSelection={{
+          getCheckboxProps: (record) => ({
+            disabled: isSystemManagedPermission(record),
+          }),
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);
           },
@@ -237,28 +323,37 @@ const TableList: React.FC = () => {
             </div>
           }
         >
-          <Button
-            type="primary"
-            danger
-            onClick={() => {
-              return Modal.confirm({
-                title: '确认删除？',
-                onOk: async () => {
-                  await handleRemove(selectedRowsState?.map((item) => item.id!));
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
-              });
-            }}
+          <Tooltip
+            title={
+              selectedContainsSystemManagedPermission
+                ? '已选择系统内置权限，不能批量删除'
+                : undefined
+            }
           >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
+            <Button
+              type="primary"
+              danger
+              disabled={selectedContainsSystemManagedPermission}
+              onClick={() => {
+                return Modal.confirm({
+                  title: '确认删除？',
+                  onOk: async () => {
+                    await handleRemove(selectedRowsState?.map((item) => item.id!));
+                    setSelectedRows([]);
+                    actionRef.current?.reloadAndRest?.();
+                  },
+                  content: '确认删除吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                });
+              }}
+            >
+              <FormattedMessage
+                id="pages.searchTable.batchDeletion"
+                defaultMessage="Batch deletion"
+              />
+            </Button>
+          </Tooltip>
         </FooterToolbar>
       )}
       <Create
