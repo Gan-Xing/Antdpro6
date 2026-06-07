@@ -4,9 +4,10 @@ import { FormattedMessage, useIntl } from '@umijs/max';
 import React from 'react';
 interface Props {
   newRecord?: boolean;
+  protectAdminRole?: boolean;
 }
 const BaseForm: React.FC<Props> = (props) => {
-  const { newRecord } = props;
+  const { newRecord, protectAdminRole } = props;
   const { items: roles } = useQueryList('/roles');
   const intl = useIntl();
   return (
@@ -136,7 +137,11 @@ const BaseForm: React.FC<Props> = (props) => {
           defaultMessage: '请选择角色',
         })}
         options={roles?.map((role: { name: string; id: number }) => ({
-          label: role.name,
+          disabled: protectAdminRole && role.name === 'admin',
+          label:
+            protectAdminRole && role.name === 'admin'
+              ? `${role.name}（当前管理员角色）`
+              : role.name,
           value: role.id,
         }))}
       />

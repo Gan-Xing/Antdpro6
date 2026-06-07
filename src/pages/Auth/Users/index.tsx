@@ -9,8 +9,8 @@ import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
-import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
-import { Button, message, Modal, Select, Tag } from 'antd';
+import { FormattedMessage, useAccess, useIntl, useModel } from '@umijs/max';
+import { Button, message, Modal, Select, Space, Tag, Tooltip, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
@@ -94,12 +94,15 @@ const TableList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<User.UsersEntity>();
   const [selectedRowsState, setSelectedRows] = useState<User.UsersEntity[]>([]);
   const { items: roles } = useQueryList('/roles');
+  const { initialState } = useModel('@@initialState');
+  const currentUserId = initialState?.currentUser?.id;
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
   const { canEditUser, canDeleteUser, canCreateUser } = useAccess();
+  const isCurrentUser = (user?: Partial<User.UsersEntity>) => user?.id === currentUserId;
   const rawColumns: Array<ProColumns<User.UsersEntity> | false> = [
     {
       title: <FormattedMessage id="pages.users.username" defaultMessage="姓名" />,
@@ -116,7 +119,10 @@ const TableList: React.FC = () => {
               setShowDetail(true);
             }}
           >
-            {dom}
+            <Space size={8}>
+              {dom}
+              {isCurrentUser(entity) ? <Tag color="blue">当前用户</Tag> : null}
+            </Space>
           </a>
         );
       },
@@ -204,8 +210,10 @@ const TableList: React.FC = () => {
       valueType: 'option',
       ellipsis: true,
       fixed: 'right',
-      render: (_, record) =>
-        [
+      render: (_, record) => {
+        const currentUserRecord = isCurrentUser(record);
+
+        return [
           canEditUser && (
             <a
               key="update"
@@ -217,30 +225,37 @@ const TableList: React.FC = () => {
               <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
             </a>
           ),
-          canDeleteUser && (
-            <a
-              key="delete"
-              onClick={() => {
-                return Modal.confirm({
-                  title: '确认删除？',
-                  onOk: async () => {
-                    await handleRemove([record.id!]);
-                    setSelectedRows([]);
-                    actionRef.current?.reloadAndRest?.();
-                  },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
-                });
-              }}
-            >
-              <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-            </a>
-          ),
-        ].filter(Boolean),
+          canDeleteUser &&
+            (currentUserRecord ? (
+              <Tooltip key="delete-disabled" title="不能删除当前登录用户">
+                <Typography.Text type="secondary">删除</Typography.Text>
+              </Tooltip>
+            ) : (
+              <a
+                key="delete"
+                onClick={() => {
+                  return Modal.confirm({
+                    title: '确认删除？',
+                    onOk: async () => {
+                      await handleRemove([record.id!]);
+                      setSelectedRows([]);
+                      actionRef.current?.reloadAndRest?.();
+                    },
+                    content: '确认删除吗？',
+                    okText: '确认',
+                    cancelText: '取消',
+                  });
+                }}
+              >
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+              </a>
+            )),
+        ].filter(Boolean);
+      },
     },
   ];
   const columns = rawColumns.filter(Boolean) as ProColumns<User.UsersEntity>[];
+  const selectedContainsCurrentUser = selectedRowsState.some(isCurrentUser);
 
   return (
     <PageContainer>
@@ -290,6 +305,9 @@ const TableList: React.FC = () => {
         }}
         columns={columns}
         rowSelection={{
+          getCheckboxProps: (record) => ({
+            disabled: isCurrentUser(record),
+          }),
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);
           },
@@ -306,28 +324,33 @@ const TableList: React.FC = () => {
             </div>
           }
         >
-          <Button
-            type="primary"
-            danger
-            onClick={() => {
-              return Modal.confirm({
-                title: '确认删除？',
-                onOk: async () => {
-                  await handleRemove(selectedRowsState?.map((item) => item.id!));
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
-              });
-            }}
+          <Tooltip
+            title={selectedContainsCurrentUser ? '已选择当前登录用户，不能批量删除' : undefined}
           >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
+            <Button
+              type="primary"
+              danger
+              disabled={selectedContainsCurrentUser}
+              onClick={() => {
+                return Modal.confirm({
+                  title: '确认删除？',
+                  onOk: async () => {
+                    await handleRemove(selectedRowsState?.map((item) => item.id!));
+                    setSelectedRows([]);
+                    actionRef.current?.reloadAndRest?.();
+                  },
+                  content: '确认删除吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                });
+              }}
+            >
+              <FormattedMessage
+                id="pages.searchTable.batchDeletion"
+                defaultMessage="Batch deletion"
+              />
+            </Button>
+          </Tooltip>
         </FooterToolbar>
       )}
       <Create

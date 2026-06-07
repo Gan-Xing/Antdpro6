@@ -9,11 +9,13 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
-import { Button, message, Modal } from 'antd';
+import { Button, message, Modal, Space, Tag, Tooltip, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
 import Update from './components/Update';
+
+const isSystemAdminRole = (role?: Partial<Roles.Entity>) => role?.name === 'admin';
 
 /**
  * @en-US Add node
@@ -124,7 +126,10 @@ const TableList: React.FC = () => {
               setShowDetail(true);
             }}
           >
-            {dom}
+            <Space size={8}>
+              {dom}
+              {isSystemAdminRole(entity) ? <Tag color="blue">系统内置</Tag> : null}
+            </Space>
           </a>
         );
       },
@@ -164,43 +169,57 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
-      render: (_, record) =>
-        [
-          canEditRole && (
-            <a
-              key="update"
-              onClick={() => {
-                handleUpdateModalOpen(true);
-                setCurrentRow(record);
-              }}
-            >
-              <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-            </a>
-          ),
-          canDeleteRole && (
-            <a
-              key="delete"
-              onClick={() => {
-                return Modal.confirm({
-                  title: '确认删除？',
-                  onOk: async () => {
-                    await handleRemove([record.id!]);
-                    setSelectedRows([]);
-                    actionRef.current?.reloadAndRest?.();
-                  },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
-                });
-              }}
-            >
-              <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-            </a>
-          ),
-        ].filter(Boolean),
+      render: (_, record) => {
+        const systemAdminRole = isSystemAdminRole(record);
+
+        return [
+          canEditRole &&
+            (systemAdminRole ? (
+              <Tooltip key="update-disabled" title="admin 是系统管理员角色，不能在后台编辑">
+                <Typography.Text type="secondary">编辑</Typography.Text>
+              </Tooltip>
+            ) : (
+              <a
+                key="update"
+                onClick={() => {
+                  handleUpdateModalOpen(true);
+                  setCurrentRow(record);
+                }}
+              >
+                <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+              </a>
+            )),
+          canDeleteRole &&
+            (systemAdminRole ? (
+              <Tooltip key="delete-disabled" title="admin 是系统管理员角色，不能在后台删除">
+                <Typography.Text type="secondary">删除</Typography.Text>
+              </Tooltip>
+            ) : (
+              <a
+                key="delete"
+                onClick={() => {
+                  return Modal.confirm({
+                    title: '确认删除？',
+                    onOk: async () => {
+                      await handleRemove([record.id!]);
+                      setSelectedRows([]);
+                      actionRef.current?.reloadAndRest?.();
+                    },
+                    content: '确认删除吗？',
+                    okText: '确认',
+                    cancelText: '取消',
+                  });
+                }}
+              >
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+              </a>
+            )),
+        ].filter(Boolean);
+      },
     },
   ];
   const columns = rawColumns.filter(Boolean) as ProColumns<Roles.Entity>[];
+  const selectedContainsAdminRole = selectedRowsState.some(isSystemAdminRole);
 
   return (
     <PageContainer>
@@ -237,6 +256,9 @@ const TableList: React.FC = () => {
         }}
         columns={columns}
         rowSelection={{
+          getCheckboxProps: (record) => ({
+            disabled: isSystemAdminRole(record),
+          }),
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);
           },
@@ -253,28 +275,33 @@ const TableList: React.FC = () => {
             </div>
           }
         >
-          <Button
-            type="primary"
-            danger
-            onClick={() => {
-              return Modal.confirm({
-                title: '确认删除？',
-                onOk: async () => {
-                  await handleRemove(selectedRowsState?.map((item) => item.id!));
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
-              });
-            }}
+          <Tooltip
+            title={selectedContainsAdminRole ? '已选择 admin 角色，不能批量删除' : undefined}
           >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
+            <Button
+              type="primary"
+              danger
+              disabled={selectedContainsAdminRole}
+              onClick={() => {
+                return Modal.confirm({
+                  title: '确认删除？',
+                  onOk: async () => {
+                    await handleRemove(selectedRowsState?.map((item) => item.id!));
+                    setSelectedRows([]);
+                    actionRef.current?.reloadAndRest?.();
+                  },
+                  content: '确认删除吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                });
+              }}
+            >
+              <FormattedMessage
+                id="pages.searchTable.batchDeletion"
+                defaultMessage="Batch deletion"
+              />
+            </Button>
+          </Tooltip>
         </FooterToolbar>
       )}
       <Create

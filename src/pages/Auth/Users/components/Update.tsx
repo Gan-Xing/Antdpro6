@@ -1,5 +1,5 @@
 import { ModalForm } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
+import { useIntl, useModel } from '@umijs/max';
 import { Form, Input } from 'antd';
 import React from 'react';
 import BaseForm from './BaseForm';
@@ -14,6 +14,12 @@ export type UpdateFormProps = {
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const { updateModalOpen, onCancel, onSubmit, values } = props;
   const intl = useIntl();
+  const { initialState } = useModel('@@initialState');
+  const currentUserId = initialState?.currentUser?.id;
+  const protectAdminRole =
+    values.id === currentUserId &&
+    values.roles?.some((role: Roles.Entity) => role.name === 'admin');
+
   return (
     <ModalForm
       title={intl.formatMessage({
@@ -36,7 +42,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         status: values.status ? values.status?.toString() : '1', // 将gender值从数字转换为字符串
       }}
     >
-      <BaseForm />
+      <BaseForm protectAdminRole={protectAdminRole} />
       <Form.Item name="id" label={false}>
         <Input type="hidden" />
       </Form.Item>
