@@ -1,6 +1,7 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { SelectLang as UmiSelectLang } from '@umijs/max';
 import React from 'react';
+import { brand } from '@/config/brand';
 
 export type SiderTheme = 'light' | 'dark';
 
@@ -22,7 +23,9 @@ export const Question = () => {
         height: 26,
       }}
       onClick={() => {
-        window.open('https://pro.ant.design/docs/getting-started');
+        if (brand.docsUrl) {
+          window.open(brand.docsUrl);
+        }
       }}
     >
       <QuestionCircleOutlined />

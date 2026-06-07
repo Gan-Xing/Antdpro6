@@ -85,14 +85,14 @@ describe('Login Page', () => {
   it('should show login form', async () => {
     const { historyRef, rootContainer } = renderLoginPage();
 
-    await rootContainer.findAllByText('Ant Design');
+    await rootContainer.findAllByText('企业管理平台');
 
     act(() => {
       historyRef.current?.push('/user/login');
     });
 
     expect(rootContainer.baseElement?.querySelector('.ant-pro-form-login-desc')?.textContent).toBe(
-      'Ant Design is the most influential web design specification in Xihu district',
+      'Enterprise-ready user, permission, resource and audit management.',
     );
 
     expect(rootContainer.getByPlaceholderText(/邮箱|email/i)).toBeTruthy();
@@ -107,7 +107,7 @@ describe('Login Page', () => {
     window.history.pushState({}, '', '/user/login?redirect=/user/login');
     const { historyRef, rootContainer } = renderLoginPage();
 
-    await rootContainer.findAllByText('Ant Design');
+    await rootContainer.findAllByText('企业管理平台');
 
     const emailInput = await rootContainer.findByPlaceholderText(/邮箱|email/i);
 

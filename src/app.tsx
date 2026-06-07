@@ -1,14 +1,12 @@
 import Footer from '@/components/Footer';
-import { Question, SelectLang } from '@/components/RightContent';
+import { SelectLang } from '@/components/RightContent';
 import {
-  CrownOutlined,
   DashboardOutlined,
   FileTextOutlined,
   FolderOutlined,
   LinkOutlined,
   PictureOutlined,
   SettingOutlined,
-  SmileOutlined,
   TableOutlined,
 } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
@@ -26,16 +24,12 @@ const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
 const menuIconMap: Record<string, React.ReactNode> = {
-  crown: <CrownOutlined />,
-  CrownOutlined: <CrownOutlined />,
   dashboard: <DashboardOutlined />,
   DashboardOutlined: <DashboardOutlined />,
   FileTextOutlined: <FileTextOutlined />,
   FolderOutlined: <FolderOutlined />,
   PictureOutlined: <PictureOutlined />,
   SettingOutlined: <SettingOutlined />,
-  smile: <SmileOutlined />,
-  SmileOutlined: <SmileOutlined />,
   table: <TableOutlined />,
   TableOutlined: <TableOutlined />,
 };
@@ -101,7 +95,7 @@ export async function getInitialState(): Promise<{
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
+    actionsRender: () => (isDev ? [<SelectLang key="SelectLang" />] : []),
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -133,26 +127,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         history.push(loginPath);
       }
     },
-    layoutBgImgList: [
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/D2LWSqNny4sAAAAAAAAAAAAAFl94AQBr',
-        left: 85,
-        bottom: 100,
-        height: '303px',
-      },
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/C2TWRpJpiC0AAAAAAAAAAAAAFl94AQBr',
-        bottom: -68,
-        right: -45,
-        height: '303px',
-      },
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/F6vSTbj8KpYAAAAAAAAAAAAAFl94AQBr',
-        bottom: 0,
-        left: 0,
-        width: '331px',
-      },
-    ],
+    layoutBgImgList: [],
     links: isDev
       ? [
           <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
@@ -170,17 +145,19 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       return (
         <>
           {children}
-          <SettingDrawer
-            disableUrlParams
-            enableDarkTheme
-            settings={initialState?.settings}
-            onSettingChange={(settings) => {
-              setInitialState((preInitialState) => ({
-                ...preInitialState,
-                settings,
-              }));
-            }}
-          />
+          {isDev ? (
+            <SettingDrawer
+              disableUrlParams
+              enableDarkTheme
+              settings={initialState?.settings}
+              onSettingChange={(settings) => {
+                setInitialState((preInitialState) => ({
+                  ...preInitialState,
+                  settings,
+                }));
+              }}
+            />
+          ) : null}
         </>
       );
     },

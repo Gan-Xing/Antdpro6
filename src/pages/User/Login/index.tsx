@@ -1,4 +1,5 @@
 import Footer from '@/components/Footer';
+import { brand } from '@/config/brand';
 import {
   authControllerLogin,
   authControllerRegisterByEmail,
@@ -68,9 +69,8 @@ const Login: React.FC = () => {
       flexDirection: 'column',
       height: '100vh',
       overflow: 'auto',
-      backgroundImage:
-        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
-      backgroundSize: '100% 100%',
+      background:
+        'radial-gradient(circle at 15% 20%, rgba(22, 119, 255, 0.14), transparent 28%), linear-gradient(135deg, #f7faff 0%, #eef4ff 45%, #f8fafc 100%)',
     };
   });
 
@@ -258,7 +258,7 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
+          title={brand.zhName}
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           onFinish={async (values) => {
             if (loginType === 'login') {

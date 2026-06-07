@@ -1,4 +1,5 @@
 import { ProLayoutProps } from '@ant-design/pro-components';
+import { brand } from '../src/config/brand';
 
 /**
  * @name
@@ -15,7 +16,7 @@ const Settings: ProLayoutProps & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: '管理系统',
+  title: brand.zhName,
   pwa: true,
   logo: '/logo.svg',
   iconfontUrl: '',

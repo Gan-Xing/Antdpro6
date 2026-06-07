@@ -3,6 +3,7 @@ import { defineConfig } from '@umijs/max';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
+import { brand } from '../src/config/brand';
 
 const { REACT_APP_ENV = 'dev' } = process.env;
 const nestWebOpenApiSchema = process.env.OPENAPI_SCHEMA_URL || 'http://localhost:3030/openapi.json';
@@ -76,7 +77,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: 'Ant Design Pro',
+  title: brand.zhName,
   layout: {
     locale: true,
     ...defaultSettings,
@@ -133,7 +134,7 @@ export default defineConfig({
   /**
    * @name openAPI 插件的配置
    * @description 基于 openapi 的规范生成serve 和mock，能减少很多样板代码
-   * @doc https://pro.ant.design/zh-cn/docs/openapi/
+   * @doc https://umijs.org/docs/max/openapi
    */
   openAPI: [
     {

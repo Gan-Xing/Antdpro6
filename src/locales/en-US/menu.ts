@@ -1,9 +1,9 @@
 export default {
-  'menu.welcome': 'Welcome',
+  'menu.welcome': 'Dashboard',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',
   'menu.admin': 'Administration',
-  'menu.admin.sub-page': 'Sub-page',
+  'menu.admin.sub-page': 'Admin Sub-page',
   'menu.login': 'Login',
   'menu.register': 'Register',
   'menu.register-result': 'Registration Result',
