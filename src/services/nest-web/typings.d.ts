@@ -202,6 +202,9 @@ declare namespace NestWebAPI {
     key: string;
     title: string;
     permissionId?: number;
+    code?: string;
+    action?: string;
+    path?: string;
     selectable: boolean;
     checkable?: boolean;
     children?: PermissionTreeNodeEntity[];

@@ -19,8 +19,8 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   return (
     <ModalForm
       title={intl.formatMessage({
-        id: 'pages.searchTable.createForm.newUser',
-        defaultMessage: '新建用户',
+        id: 'pages.searchTable.updateForm.editPermission',
+        defaultMessage: '编辑权限',
       })}
       width="24rem"
       modalProps={{

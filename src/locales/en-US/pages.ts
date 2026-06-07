@@ -90,4 +90,12 @@ export default {
   'pages.searchTable.tenThousand': '0000',
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
+  'pages.searchTable.createForm.newUser': 'New User',
+  'pages.searchTable.updateForm.editUser': 'Edit User',
+  'pages.searchTable.createForm.newRole': 'New Role',
+  'pages.searchTable.updateForm.editRole': 'Edit Role',
+  'pages.searchTable.createForm.newPermission': 'New Permission',
+  'pages.searchTable.updateForm.editPermission': 'Edit Permission',
+  'pages.searchTable.createForm.newMenus': 'New Menu',
+  'pages.searchTable.updateForm.editMenus': 'Edit Menu',
 };
