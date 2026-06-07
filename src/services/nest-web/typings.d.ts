@@ -198,6 +198,15 @@ declare namespace NestWebAPI {
     id: number;
   };
 
+  type PermissionTreeNodeEntity = {
+    key: string;
+    title: string;
+    permissionId?: number;
+    selectable: boolean;
+    checkable?: boolean;
+    children?: PermissionTreeNodeEntity[];
+  };
+
   type RefreshTokenDto = {
     refreshToken: string;
   };

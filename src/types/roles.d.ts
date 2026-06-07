@@ -1,8 +1,8 @@
 declare namespace Roles {
   interface CreateParams {
-    id: string;
+    id?: string | number;
     name: string;
-    permissions: number[];
+    permissions?: number[];
   }
   interface Entity {
     id: number;

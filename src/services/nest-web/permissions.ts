@@ -86,3 +86,11 @@ export async function permissionsControllerUpdate(
     ...(options || {}),
   });
 }
+
+/** 此处后端没有提供注释 GET /api/permissions/tree */
+export async function permissionsControllerFindTree(options?: { [key: string]: any }) {
+  return request<NestWebAPI.PermissionTreeNodeEntity[]>('/api/permissions/tree', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}

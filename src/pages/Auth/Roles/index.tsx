@@ -20,10 +20,20 @@ import Update from './components/Update';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: any) => {
+const toCreateRoleDto = (fields: Roles.CreateParams): NestWebAPI.CreateRoleDto => ({
+  name: fields.name,
+  permissions: fields.permissions ?? [],
+});
+
+const toUpdateRoleDto = (fields: Roles.CreateParams): NestWebAPI.UpdateRoleDto => ({
+  name: fields.name,
+  permissions: fields.permissions ?? [],
+});
+
+const handleAdd = async (fields: Roles.CreateParams) => {
   const hide = message.loading('正在添加');
   try {
-    await rolesControllerCreate(fields as NestWebAPI.CreateRoleDto);
+    await rolesControllerCreate(toCreateRoleDto(fields));
     hide();
     message.success('Added successfully');
     return true;
@@ -43,10 +53,7 @@ const handleAdd = async (fields: any) => {
 const handleUpdate = async (fields: Roles.CreateParams) => {
   const hide = message.loading('正在更新');
   try {
-    await rolesControllerUpdate(
-      { id: Number(fields.id) },
-      fields as unknown as NestWebAPI.UpdateRoleDto,
-    );
+    await rolesControllerUpdate({ id: Number(fields.id) }, toUpdateRoleDto(fields));
     hide();
 
     message.success('更新成功');
@@ -195,20 +202,6 @@ const TableList: React.FC = () => {
   ];
   const columns = rawColumns.filter(Boolean) as ProColumns<Roles.Entity>[];
 
-  const transformPermissions = (permissions: { id: number; name: string }[] | number[]) => {
-    // 如果permissions是undefined或null，返回一个空数组
-    if (!permissions) return [];
-
-    // 检查permissions数组中的第一个元素是否是一个对象
-    if (permissions.length > 0 && typeof permissions[0] === 'object') {
-      // 如果是对象数组，提取id属性并返回一个新数组
-      return (permissions as { id: number; name: string }[]).map((permission) => permission.id);
-    }
-
-    // 如果permissions已经是一个数字数组，直接返回它
-    return permissions;
-  };
-
   return (
     <PageContainer>
       <ProTable<Roles.Entity, API.PageParams>
@@ -288,7 +281,7 @@ const TableList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as Roles.CreateParams);
+          const success = await handleAdd(value);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -299,9 +292,7 @@ const TableList: React.FC = () => {
       />
       <Update
         onSubmit={async (value) => {
-          const formedPermisssion = transformPermissions(value.permissions);
-          const updateValue = { ...value, permissions: formedPermisssion } as Roles.CreateParams;
-          const success = await handleUpdate(updateValue);
+          const success = await handleUpdate(value);
           if (success) {
             handleUpdateModalOpen(false);
             setCurrentRow(undefined);
