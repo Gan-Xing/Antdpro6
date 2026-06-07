@@ -109,16 +109,16 @@ declare namespace NestWebAPI {
   };
 
   type ImagesControllerFindAllParams = {
-    current: string;
-    pageSize: string;
-    description: string;
-    area: string;
-    category: string;
-    stakeNumber: string;
-    tags: string[];
-    createdBy: string;
-    startDate: string;
-    endDate: string;
+    current?: number;
+    pageSize?: number;
+    description?: string;
+    area?: string;
+    category?: 'progress' | 'safety' | 'quality';
+    stakeNumber?: string;
+    tags?: string[];
+    createdBy?: string;
+    startDate?: string;
+    endDate?: string;
   };
 
   type ImagesControllerFindOneParams = {

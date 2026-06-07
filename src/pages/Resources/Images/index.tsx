@@ -1,4 +1,10 @@
-import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
+import {
+  imagesControllerCreate,
+  imagesControllerFindAll,
+  imagesControllerRemove,
+  imagesControllerUpdate,
+} from '@/services/nest-web/images';
+import { unwrapResponse } from '@/utils/apiResponse';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -11,6 +17,26 @@ import Update from './components/Update';
 import ImagePreview from './components/ImagePreview';
 
 const { RangePicker } = DatePicker;
+
+const serializeDateParam = (value: any) => {
+  if (!value) return undefined;
+  if (typeof value?.format === 'function') return value.format('YYYY-MM-DD');
+  return String(value);
+};
+
+const serializeCreatedByParam = (value: unknown) => {
+  if (!value) return undefined;
+  if (typeof value === 'string') return value;
+  return JSON.stringify(value);
+};
+
+const toImageQueryParams = (params: API.PageParams & Record<string, any>) =>
+  ({
+    ...params,
+    createdBy: serializeCreatedByParam(params.createdBy),
+    startDate: serializeDateParam(params.startDate),
+    endDate: serializeDateParam(params.endDate),
+  }) as NestWebAPI.ImagesControllerFindAllParams;
 
 const TableList: React.FC = () => {
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
@@ -37,7 +63,7 @@ const TableList: React.FC = () => {
       }),
     );
     try {
-      await addItems('/images', { ...fields });
+      await imagesControllerCreate(fields as unknown as NestWebAPI.CreateImageDto);
       hide();
       message.success(
         intl.formatMessage({
@@ -67,7 +93,10 @@ const TableList: React.FC = () => {
       }),
     );
     try {
-      await updateItem(`/images/${fields.id}`, fields as Images.Entity);
+      await imagesControllerUpdate(
+        { id: fields.id },
+        fields as unknown as NestWebAPI.UpdateImageDto,
+      );
       hide();
       message.success(
         intl.formatMessage({
@@ -105,7 +134,7 @@ const TableList: React.FC = () => {
     if (!selectedRows || selectedRows.length === 0) return true;
     try {
       // 批量删除
-      await Promise.all(selectedRows.map((row) => removeItem(`/images/${row.id}`)));
+      await Promise.all(selectedRows.map((row) => imagesControllerRemove({ id: row.id })));
       hide();
       message.success(
         intl.formatMessage({
@@ -351,7 +380,7 @@ const TableList: React.FC = () => {
                   defaultMessage: '确认删除？',
                 }),
                 onOk: async () => {
-                  await removeItem(`/images/${record.id}`);
+                  await imagesControllerRemove({ id: record.id });
                   setSelectedRows([]);
                   actionRef.current?.reloadAndRest?.();
                 },
@@ -409,12 +438,15 @@ const TableList: React.FC = () => {
           ),
         ]}
         request={async (params) => {
-          const msg = await queryList('/images', params);
-          const result = msg as any;
+          const result = unwrapResponse<any>(
+            await imagesControllerFindAll(
+              toImageQueryParams(params as API.PageParams & Record<string, any>),
+            ),
+          );
           return {
-            data: result.data?.data || [],
+            data: result.data || [],
             success: true,
-            total: result.data?.pagination?.total || 0,
+            total: result.total || 0,
           };
         }}
         columns={columns}
