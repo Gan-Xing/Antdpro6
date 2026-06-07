@@ -1,7 +1,9 @@
 ﻿import * as React from 'react';
 import { render, fireEvent, act, waitFor } from '@testing-library/react';
 import { TestBrowser } from '@@/testBrowser';
-import { currentUser, fetchMenuData, login } from '@/services/ant-design-pro/api';
+import { authControllerLogin } from '@/services/nest-web/auth';
+import { menusControllerFindUserMenus } from '@/services/nest-web/menus';
+import { usersControllerFindCurrent } from '@/services/nest-web/users';
 import * as authUtil from '@/utils/auth';
 
 jest.mock('antd', () => {
@@ -16,10 +18,22 @@ jest.mock('antd', () => {
   };
 });
 
-jest.mock('@/services/ant-design-pro/api', () => ({
-  currentUser: jest.fn(),
-  fetchMenuData: jest.fn(),
-  login: jest.fn(),
+jest.mock('@/services/nest-web/auth', () => ({
+  authControllerLogin: jest.fn(),
+  authControllerRegisterByEmail: jest.fn(),
+  authControllerValidateCaptchaAndInitiateEmailVerification: jest.fn(),
+}));
+
+jest.mock('@/services/nest-web/captcha', () => ({
+  captchaControllerGetCaptcha: jest.fn(),
+}));
+
+jest.mock('@/services/nest-web/menus', () => ({
+  menusControllerFindUserMenus: jest.fn(),
+}));
+
+jest.mock('@/services/nest-web/users', () => ({
+  usersControllerFindCurrent: jest.fn(),
 }));
 
 jest.mock('@/utils/auth', () => ({
@@ -58,16 +72,14 @@ describe('Login Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.history.pushState({}, '', '/user/login');
-    (login as jest.Mock).mockResolvedValue({ success: true, data: token });
-    (currentUser as jest.Mock).mockResolvedValue({
-      data: {
-        id: 1,
-        username: 'admin',
-        email: 'admin@example.com',
-        access: 'admin',
-      },
+    (authControllerLogin as jest.Mock).mockResolvedValue(token);
+    (usersControllerFindCurrent as jest.Mock).mockResolvedValue({
+      id: 1,
+      username: 'admin',
+      email: 'admin@example.com',
+      access: 'admin',
     });
-    (fetchMenuData as jest.Mock).mockResolvedValue({ success: true, data: [] });
+    (menusControllerFindUserMenus as jest.Mock).mockResolvedValue([]);
   });
 
   it('should show login form', async () => {
@@ -112,18 +124,17 @@ describe('Login Page', () => {
     fireEvent.click(rootContainer.getByRole('button', { name: /login|登录/i }));
 
     await waitFor(() => {
-      expect(login).toHaveBeenCalledWith(
+      expect(authControllerLogin).toHaveBeenCalledWith(
         expect.objectContaining({
           email: 'admin@example.com',
           password: 'ant.design',
-          type: 'email',
         }),
       );
     });
 
     await waitFor(() => {
       expect(authUtil.setToken).toHaveBeenCalledWith(token);
-      expect(currentUser).toHaveBeenCalled();
+      expect(usersControllerFindCurrent).toHaveBeenCalled();
       expect(historyRef.current?.location.pathname).toBe('/user/login');
     });
 

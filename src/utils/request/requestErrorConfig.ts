@@ -5,7 +5,8 @@ import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
 import { jwtDecode } from 'jwt-decode';
 import { config } from './config';
-import { refreshToken } from '@/services/ant-design-pro/api';
+import { authControllerRefresh } from '@/services/nest-web/auth';
+import { unwrapResponse } from '@/utils/apiResponse';
 
 const { base_url, request_timeout } = config;
 // const ignoreMsgs = [
@@ -16,7 +17,21 @@ const { base_url, request_timeout } = config;
 // 是否正在刷新中
 // let isRefreshToken = false;
 // 请求白名单，无须token的接口
-const whiteList: string[] = ['/auth/login', '/auth/refresh'];
+const whiteList: string[] = [
+  '/api/auth/login',
+  '/api/auth/refresh',
+  '/api/auth/register',
+  '/api/auth/registerByEmail',
+  '/api/auth/validateCaptcha',
+  '/api/captcha',
+];
+
+const refreshSessionToken = async () => {
+  const response = await authControllerRefresh({
+    refreshToken: authUtil.getRefreshToken(),
+  });
+  return unwrapResponse<Auth.Token>(response as any);
+};
 /**
  * @name 错误处理
  * pro 自带的错误处理， 可以在这里做自己的改动
@@ -92,12 +107,10 @@ export const errorConfig: RequestConfig = {
             // 如果令牌已过期
             if (decodedToken.exp * 1000 < currentDate.getTime()) {
               // 尝试使用刷新令牌
-              const response = await refreshToken({
-                refreshToken: authUtil.getRefreshToken(),
-              });
+              const refreshedToken = await refreshSessionToken();
 
-              if (response?.success) {
-                authUtil.setToken(response?.data);
+              if (refreshedToken?.accessToken) {
+                authUtil.setToken(refreshedToken);
                 // 这里你可能还需要重新发送失败的请求
               } else {
                 // 如果刷新令牌请求失败，清除令牌并重定向到登录页面
@@ -147,12 +160,10 @@ export const errorConfig: RequestConfig = {
         // expired
         if (decodedToken.exp * 1000 < currentDate.getTime()) {
           // sent refresh token
-          const response = await refreshToken({
-            refreshToken: authUtil.getRefreshToken(),
-          });
-          if (response?.success) {
-            authUtil.setToken(response?.data);
-            accessToken = response?.data.accessToken;
+          const refreshedToken = await refreshSessionToken();
+          if (refreshedToken?.accessToken) {
+            authUtil.setToken(refreshedToken);
+            accessToken = refreshedToken.accessToken;
           } else {
             // refreshToken request failed, clear tokens and redirect to login
             authUtil.removeToken();

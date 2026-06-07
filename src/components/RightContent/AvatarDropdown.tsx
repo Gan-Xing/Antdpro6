@@ -1,4 +1,4 @@
-import { logout } from '@/services/ant-design-pro/api';
+import { authControllerLogout } from '@/services/nest-web/auth';
 import { removeToken } from '@/utils/auth';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
@@ -27,7 +27,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
-    await logout();
+    await authControllerLogout();
     removeToken();
     const { search, pathname } = window.location;
     const urlParams = new URL(window.location.href).searchParams;

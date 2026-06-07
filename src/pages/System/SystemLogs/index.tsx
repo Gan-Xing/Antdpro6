@@ -4,7 +4,12 @@ import { ProTable } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { Button, message, Modal, Tag } from 'antd';
 import { useRef } from 'react';
-import { clearLogs, exportLogs, queryLogs } from '@/services/system/log';
+import {
+  systemLogControllerClear,
+  systemLogControllerExport,
+  systemLogControllerFindAll,
+} from '@/services/nest-web/systemLog';
+import { unwrapResponse } from '@/utils/apiResponse';
 import moment from 'moment';
 
 const SystemLogs: React.FC = () => {
@@ -88,8 +93,8 @@ const SystemLogs: React.FC = () => {
       content: '是否确认清理30天前的日志？此操作不可恢复！',
       onOk: async () => {
         try {
-          const result = await clearLogs(30);
-          message.success(`清理成功：${result.data.message}`);
+          const result = unwrapResponse<any>(await systemLogControllerClear({ days: 30 }));
+          message.success(`清理成功：${result.message}`);
           actionRef.current?.reload();
         } catch (error) {
           message.error('清理失败');
@@ -100,9 +105,9 @@ const SystemLogs: React.FC = () => {
 
   const handleExport = async () => {
     try {
-      const data = await exportLogs();
+      const data = unwrapResponse<API.SystemLog[]>(await systemLogControllerExport({}));
       // 这里需要处理导出逻辑，可以是下载CSV文件
-      const blob = new Blob([JSON.stringify(data.data)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -140,17 +145,19 @@ const SystemLogs: React.FC = () => {
         ) => {
           const { current, pageSize, createdAt, ...rest } = params;
           const [startTime, endTime] = createdAt || [];
-          const result = await queryLogs({
-            page: current,
-            pageSize,
-            startTime,
-            endTime,
-            ...rest,
-          });
+          const result = unwrapResponse<any>(
+            await systemLogControllerFindAll({
+              page: current,
+              pageSize,
+              startTime,
+              endTime,
+              ...rest,
+            }),
+          );
           return {
-            data: result.data.data,
+            data: result.data,
             success: true,
-            total: result.data.total,
+            total: result.total,
           };
         }}
         columns={columns}

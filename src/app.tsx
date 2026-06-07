@@ -8,7 +8,9 @@ import { history, Link } from '@umijs/max';
 import * as React from 'react';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
-import { fetchMenuData, currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import { menusControllerFindUserMenus } from './services/nest-web/menus';
+import { usersControllerFindCurrent } from './services/nest-web/users';
+import { unwrapResponse } from './utils/apiResponse';
 import { errorConfig } from './utils/request/requestErrorConfig';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -24,14 +26,10 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const msg = await queryCurrentUser({
+      const msg = await usersControllerFindCurrent({
         skipErrorHandler: true,
       });
-      if ('data' in msg) {
-        return msg.data;
-      } else {
-        return msg;
-      }
+      return unwrapResponse<User.UsersEntity>(msg as any);
     } catch (error) {
       history.push(loginPath);
     }
@@ -73,25 +71,22 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         if (!initialState?.currentUser) {
           return [];
         }
-        const { data, success } = await fetchMenuData();
-        if (success) {
-          // 处理返回的菜单数据，确保每个菜单项都有locale属性
-          const processMenuData = (menuItem: any) => {
-            const newMenuItem = {
-              ...menuItem,
-              locale: menuItem.name, // 将name值作为国际化的key
-            };
-
-            if (newMenuItem.children) {
-              newMenuItem.children = newMenuItem.children.map(processMenuData);
-            }
-
-            return newMenuItem;
+        const data = unwrapResponse<any[]>(await menusControllerFindUserMenus());
+        // 处理返回的菜单数据，确保每个菜单项都有locale属性
+        const processMenuData = (menuItem: any) => {
+          const newMenuItem = {
+            ...menuItem,
+            locale: menuItem.name, // 将name值作为国际化的key
           };
 
-          return data.map(processMenuData);
-        }
-        return [];
+          if (newMenuItem.children) {
+            newMenuItem.children = newMenuItem.children.map(processMenuData);
+          }
+
+          return newMenuItem;
+        };
+
+        return (data || []).map(processMenuData);
       },
     },
     waterMarkProps: {

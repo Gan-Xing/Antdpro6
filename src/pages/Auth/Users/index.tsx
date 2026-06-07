@@ -164,7 +164,9 @@ const TableList: React.FC = () => {
             allowClear
             optionFilterProp="children"
             filterOption={(input, option) =>
-              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              String(option?.label ?? '')
+                .toLowerCase()
+                .includes(input.toLowerCase())
             }
             options={roles?.map((role: { name: string; id: number }) => ({
               label: role.name,

@@ -1,4 +1,3 @@
-import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -15,6 +14,60 @@ import { Button, Drawer, Input, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+let demoRules: API.RuleListItem[] = Array.from({ length: 18 }).map((_, index) => ({
+  key: index + 1,
+  name: `Demo rule ${index + 1}`,
+  desc: 'Local demo data, not connected to NestWeb.',
+  callNo: (index + 1) * 37,
+  status: index % 4,
+  updatedAt: new Date(Date.now() - index * 3600 * 1000).toISOString(),
+  createdAt: new Date(Date.now() - index * 7200 * 1000).toISOString(),
+  progress: ((index + 1) * 13) % 100,
+}));
+
+const rule = async (params: API.PageParams): Promise<API.RuleList> => {
+  const current = params.current || 1;
+  const pageSize = params.pageSize || 10;
+  const start = (current - 1) * pageSize;
+
+  return {
+    data: demoRules.slice(start, start + pageSize),
+    total: demoRules.length,
+    success: true,
+  };
+};
+
+const addRule = async (fields: API.RuleListItem) => {
+  demoRules = [
+    {
+      ...fields,
+      key: Date.now(),
+      callNo: 0,
+      status: 0,
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    },
+    ...demoRules,
+  ];
+};
+
+const updateRule = async (fields: API.RuleListItem) => {
+  demoRules = demoRules.map((item) =>
+    item.key === fields.key
+      ? {
+          ...item,
+          ...fields,
+          updatedAt: new Date().toISOString(),
+        }
+      : item,
+  );
+};
+
+const removeRule = async (fields: { key?: API.RuleListItem['key'][] }) => {
+  const keys = new Set(fields.key || []);
+  demoRules = demoRules.filter((item) => !keys.has(item.key));
+};
 
 /**
  * @en-US Add node

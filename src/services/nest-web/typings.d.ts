@@ -264,6 +264,28 @@ declare namespace NestWebAPI {
     days: number;
   };
 
+  type SystemLogControllerExportParams = {
+    endTime?: string;
+    startTime?: string;
+    status?: number;
+    method?: string;
+    requestUrl?: string;
+    username?: string;
+    userId?: number;
+  };
+
+  type SystemLogControllerFindAllParams = {
+    pageSize?: number;
+    page?: number;
+    endTime?: string;
+    startTime?: string;
+    status?: number;
+    method?: string;
+    requestUrl?: string;
+    username?: string;
+    userId?: number;
+  };
+
   type SystemLogControllerFindOneParams = {
     id: number;
   };

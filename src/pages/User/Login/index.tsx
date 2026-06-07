@@ -1,10 +1,11 @@
 import Footer from '@/components/Footer';
 import {
-  login,
-  fetchCaptcha,
-  validateCaptcha,
-  registerByEmail,
-} from '@/services/ant-design-pro/api';
+  authControllerLogin,
+  authControllerRegisterByEmail,
+  authControllerValidateCaptchaAndInitiateEmailVerification,
+} from '@/services/nest-web/auth';
+import { captchaControllerGetCaptcha } from '@/services/nest-web/captcha';
+import { unwrapResponse } from '@/utils/apiResponse';
 import * as authUtil from '@/utils/auth';
 import { LockOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText, ProFormSelect } from '@ant-design/pro-components';
@@ -89,21 +90,25 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
-      const data = await login({ ...values, type: 'email' });
+      const data = await authControllerLogin({
+        email: values.email,
+        password: values.password,
+      });
+      const token = unwrapResponse<Auth.Token>(data as any);
 
-      if (data.data) {
+      if (token?.accessToken) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
-        authUtil.setToken(data.data);
+        authUtil.setToken(token);
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
         return;
       }
-      setUserLoginState(data);
+      setUserLoginState(data as any);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -117,7 +122,9 @@ const Login: React.FC = () => {
 
   const refreshCaptcha = async () => {
     try {
-      const data = await fetchCaptcha();
+      const data = unwrapResponse<{ image: string; token: string }>(
+        await captchaControllerGetCaptcha(),
+      );
       if (data) {
         setCaptchaSrc(data.image);
         setCaptchaToken(data.token);
@@ -149,22 +156,24 @@ const Login: React.FC = () => {
       }
 
       // 调用验证图形验证码接口
-      const response = await validateCaptcha({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-        country: values.country,
-        phoneNumber: values.phoneNumber,
-        captcha: values.captcha,
-        captchaToken: captchaToken,
-      });
+      const response = unwrapResponse<{ isValid: boolean; token?: string }>(
+        await authControllerValidateCaptchaAndInitiateEmailVerification({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          password: values.password,
+          confirmPassword: values.confirmPassword,
+          country: values.country,
+          phoneNumber: values.phoneNumber,
+          captcha: values.captcha,
+          captchaToken: captchaToken,
+        }),
+      );
 
-      if (response.success && response.data.isValid) {
+      if (response.isValid) {
         message.success('验证码已发送到邮箱，请查收！');
         // 保存邮箱验证的token
-        const token = response.data.token;
+        const token = response.token;
         if (token) {
           setCaptchaToken(token);
         }
@@ -191,7 +200,7 @@ const Login: React.FC = () => {
       ]);
 
       // 调用注册并登录接口
-      const response = await registerByEmail({
+      const response = await authControllerRegisterByEmail({
         token: captchaToken, // 使用之前保存的验证token
         code: values.emailCode,
         email: values.email,
@@ -201,11 +210,12 @@ const Login: React.FC = () => {
         phoneNumber: values.phoneNumber,
         country: values.country,
       });
+      const token = unwrapResponse<Auth.Token>(response as any);
 
-      if (response.success) {
+      if (token?.accessToken) {
         message.success('注册成功！');
         // 设置token并登录
-        authUtil.setToken(response.data);
+        authUtil.setToken(token);
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
