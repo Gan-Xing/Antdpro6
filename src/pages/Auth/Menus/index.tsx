@@ -9,11 +9,27 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
-import { Button, message, Modal } from 'antd';
+import { Alert, Button, message, Modal, Space, Tag, Tooltip, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
 import Update from './components/Update';
+
+const systemManagedMenuCodes = new Set([
+  'dashboard',
+  'auth',
+  'auth.users',
+  'auth.roles',
+  'auth.permissions',
+  'auth.menus',
+  'resources',
+  'resources.images',
+  'system',
+  'system.logs',
+]);
+
+const isSystemManagedMenu = (menu?: Partial<Menus.MenusType>) =>
+  Boolean(menu?.code && systemManagedMenuCodes.has(menu.code));
 
 /**
  * @en-US Add node
@@ -108,10 +124,27 @@ const TableList: React.FC = () => {
               setShowDetail(true);
             }}
           >
-            {dom}
+            <Space size={8}>
+              {dom}
+              {isSystemManagedMenu(entity) ? <Tag color="blue">系统内置</Tag> : null}
+            </Space>
           </a>
         );
       },
+    },
+    {
+      title: '菜单编码',
+      dataIndex: 'code',
+      copyable: true,
+      ellipsis: true,
+      hideInSearch: true,
+    },
+    {
+      title: '路由路径',
+      dataIndex: 'path',
+      copyable: true,
+      ellipsis: true,
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
@@ -133,40 +166,53 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right' as const,
-      render: (_: any, record: any) =>
-        [
-          canEditMenu && (
-            <a
-              key="update"
-              onClick={() => {
-                handleUpdateModalOpen(true);
-                setCurrentRow((prevState) => ({ ...prevState, ...record }));
-              }}
-            >
-              <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-            </a>
-          ),
-          canDeleteMenu && (
-            <a
-              key="delete"
-              onClick={() => {
-                return Modal.confirm({
-                  title: '确认删除？',
-                  onOk: async () => {
-                    await handleRemove([record.id!]);
-                    setSelectedRows([]);
-                    actionRef.current?.reloadAndRest?.();
-                  },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
-                });
-              }}
-            >
-              <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-            </a>
-          ),
-        ].filter(Boolean),
+      render: (_: any, record: any) => {
+        const systemManaged = isSystemManagedMenu(record);
+
+        return [
+          canEditMenu &&
+            (systemManaged ? (
+              <Tooltip key="update-disabled" title="系统内置菜单由代码种子维护，不能在后台编辑">
+                <Typography.Text type="secondary">编辑</Typography.Text>
+              </Tooltip>
+            ) : (
+              <a
+                key="update"
+                onClick={() => {
+                  handleUpdateModalOpen(true);
+                  setCurrentRow((prevState) => ({ ...prevState, ...record }));
+                }}
+              >
+                <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+              </a>
+            )),
+          canDeleteMenu &&
+            (systemManaged ? (
+              <Tooltip key="delete-disabled" title="系统内置菜单由代码种子维护，不能在后台删除">
+                <Typography.Text type="secondary">删除</Typography.Text>
+              </Tooltip>
+            ) : (
+              <a
+                key="delete"
+                onClick={() => {
+                  return Modal.confirm({
+                    title: '确认删除？',
+                    onOk: async () => {
+                      await handleRemove([record.id!]);
+                      setSelectedRows([]);
+                      actionRef.current?.reloadAndRest?.();
+                    },
+                    content: '确认删除吗？',
+                    okText: '确认',
+                    cancelText: '取消',
+                  });
+                }}
+              >
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+              </a>
+            )),
+        ].filter(Boolean);
+      },
     },
   ];
   const columns = rawColumns.filter(Boolean) as ProColumns<Menus.MenusType>[];
@@ -184,8 +230,17 @@ const TableList: React.FC = () => {
     });
   };
 
+  const selectedContainsSystemManagedMenu = selectedRowsState.some(isSystemManagedMenu);
+
   return (
     <PageContainer>
+      <Alert
+        showIcon
+        type="warning"
+        message="内部维护入口"
+        description="系统内置菜单由后端种子配置维护，后台只允许查看，不能编辑或删除。新增菜单仅用于临时扩展，正式菜单建议通过代码种子管理。"
+        style={{ marginBottom: 16 }}
+      />
       <ProTable
         headerTitle={intl.formatMessage({
           id: 'menu.auth.menus',
@@ -233,6 +288,9 @@ const TableList: React.FC = () => {
         columns={columns}
         expandable={{}}
         rowSelection={{
+          getCheckboxProps: (record) => ({
+            disabled: isSystemManagedMenu(record),
+          }),
           onChange: (_, selectedRows: Menus.MenusType[]) => {
             setSelectedRows(selectedRows);
           },
@@ -249,28 +307,35 @@ const TableList: React.FC = () => {
             </div>
           }
         >
-          <Button
-            type="primary"
-            danger
-            onClick={() => {
-              return Modal.confirm({
-                title: '确认删除？',
-                onOk: async () => {
-                  await handleRemove(selectedRowsState?.map((item) => item.id!));
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
-              });
-            }}
+          <Tooltip
+            title={
+              selectedContainsSystemManagedMenu ? '已选择系统内置菜单，不能批量删除' : undefined
+            }
           >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
+            <Button
+              type="primary"
+              danger
+              disabled={selectedContainsSystemManagedMenu}
+              onClick={() => {
+                return Modal.confirm({
+                  title: '确认删除？',
+                  onOk: async () => {
+                    await handleRemove(selectedRowsState?.map((item) => item.id!));
+                    setSelectedRows([]);
+                    actionRef.current?.reloadAndRest?.();
+                  },
+                  content: '确认删除吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                });
+              }}
+            >
+              <FormattedMessage
+                id="pages.searchTable.batchDeletion"
+                defaultMessage="Batch deletion"
+              />
+            </Button>
+          </Tooltip>
         </FooterToolbar>
       )}
       <Update
