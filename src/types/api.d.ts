@@ -118,34 +118,3 @@ declare namespace API {
     };
   };
 }
-declare namespace Images {
-  type Thumbnail = {
-    size: string;
-    url: string;
-    path: string;
-  };
-
-  type Entity = {
-    id: number;
-    description?: string;
-    area?: string;
-    photos: string[];
-    thumbnails?: Thumbnail[];
-    location?: {
-      latitude: number;
-      longitude: number;
-    };
-    stakeNumber?: string;
-    offset?: string;
-    category?: string;
-    tags?: string[];
-    createdAt: string;
-    updatedAt: string;
-    createdById: number;
-    createdBy: {
-      id: number;
-      username: string;
-      avatar?: string;
-    };
-  };
-}

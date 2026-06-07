@@ -38,6 +38,40 @@ const toImageQueryParams = (params: API.PageParams & Record<string, any>) =>
     endDate: serializeDateParam(params.endDate),
   }) as NestWebAPI.ImagesControllerFindAllParams;
 
+const toOptionalNumber = (value: number | string | undefined) => {
+  if (value === undefined || value === null || value === '') return undefined;
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : undefined;
+};
+
+const toLocationDto = (value: Images.LocationType | string | undefined) => {
+  if (!value) return undefined;
+  if (typeof value !== 'string') return value;
+
+  try {
+    return JSON.parse(value) as NestWebAPI.LocationDto;
+  } catch {
+    return undefined;
+  }
+};
+
+const toCreateImageDto = (fields: Images.CreateParams): NestWebAPI.CreateImageDto => ({
+  ...fields,
+  location: toLocationDto(fields.location),
+  offset: toOptionalNumber(fields.offset),
+});
+
+const toUpdateImageDto = (fields: Images.UpdateParams): NestWebAPI.UpdateImageDto => {
+  const payload: Partial<Images.UpdateParams> = { ...fields };
+  delete payload.id;
+
+  return {
+    ...payload,
+    location: toLocationDto(payload.location),
+    offset: toOptionalNumber(payload.offset),
+  };
+};
+
 const TableList: React.FC = () => {
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
@@ -55,7 +89,7 @@ const TableList: React.FC = () => {
    * @zh-CN 添加节点
    * @param fields
    */
-  const handleAdd = async (fields: Images.Entity) => {
+  const handleAdd = async (fields: Images.CreateParams) => {
     const hide = message.loading(
       intl.formatMessage({
         id: 'pages.operation.adding',
@@ -63,7 +97,7 @@ const TableList: React.FC = () => {
       }),
     );
     try {
-      await imagesControllerCreate(fields as unknown as NestWebAPI.CreateImageDto);
+      await imagesControllerCreate(toCreateImageDto(fields));
       hide();
       message.success(
         intl.formatMessage({
@@ -85,7 +119,7 @@ const TableList: React.FC = () => {
    *
    * @param fields
    */
-  const handleUpdate = async (fields: Images.Entity) => {
+  const handleUpdate = async (fields: Images.UpdateParams) => {
     const hide = message.loading(
       intl.formatMessage({
         id: 'pages.operation.updating',
@@ -93,10 +127,7 @@ const TableList: React.FC = () => {
       }),
     );
     try {
-      await imagesControllerUpdate(
-        { id: fields.id },
-        fields as unknown as NestWebAPI.UpdateImageDto,
-      );
+      await imagesControllerUpdate({ id: fields.id }, toUpdateImageDto(fields));
       hide();
       message.success(
         intl.formatMessage({
@@ -516,7 +547,7 @@ const TableList: React.FC = () => {
           handleModalOpen(false);
         }}
         onSubmit={async (value) => {
-          const success = await handleAdd(value as Images.Entity);
+          const success = await handleAdd(value);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -533,7 +564,7 @@ const TableList: React.FC = () => {
           setCurrentRow(undefined);
         }}
         onSubmit={async (value) => {
-          const success = await handleUpdate(value as Images.Entity);
+          const success = await handleUpdate(value);
           if (success) {
             handleUpdateModalOpen(false);
             setCurrentRow(undefined);

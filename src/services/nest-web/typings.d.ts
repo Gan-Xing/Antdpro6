@@ -46,8 +46,6 @@ declare namespace NestWebAPI {
     area: string;
     /** 图片URL数组 */
     photos: string[];
-    /** 缩略图信息 */
-    thumbnails?: string[];
     /** GPS位置信息 */
     location?: LocationDto;
     /** 桩号 */
@@ -55,7 +53,7 @@ declare namespace NestWebAPI {
     /** 偏距 */
     offset?: number;
     /** 分类 */
-    category: 'progress' | 'safety' | 'quality';
+    category?: 'progress' | 'safety' | 'quality';
     /** 标签数组 */
     tags?: string[];
   };
@@ -311,8 +309,6 @@ declare namespace NestWebAPI {
     area?: string;
     /** 图片URL数组 */
     photos?: string[];
-    /** 缩略图信息 */
-    thumbnails?: string[];
     /** GPS位置信息 */
     location?: LocationDto;
     /** 桩号 */

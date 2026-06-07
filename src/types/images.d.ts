@@ -1,34 +1,38 @@
 declare namespace Images {
+  type Category = 'progress' | 'safety' | 'quality';
+
   type LocationType = {
     latitude: number;
     longitude: number;
+  };
+
+  type Thumbnail = {
+    size: string;
+    path: string;
+    url?: string;
   };
 
   type Entity = {
     /** ID */
     id: number;
     /** 描述信息 */
-    description: string;
+    description?: string;
     /** 区域 */
-    area: string;
+    area?: string;
     /** 图片URL列表 */
     photos: string[];
     /** 缩略图列表 */
-    thumbnails?: {
-      size: string;
-      path: string;
-      url: string;
-    }[];
+    thumbnails?: Thumbnail[];
     /** 分类 */
-    category: '安全' | '质量' | '进度';
+    category?: Category;
     /** 桩号 */
     stakeNumber?: string;
     /** 偏距（米） */
-    offset?: number;
+    offset?: number | string;
     /** 标签列表 */
-    tags: string[];
+    tags?: string[];
     /** 位置信息 */
-    location?: LocationType;
+    location?: LocationType | string;
     /** 创建时间 */
     createdAt: string;
     /** 更新时间 */
@@ -39,47 +43,18 @@ declare namespace Images {
     createdBy: {
       id: number;
       username: string;
-      avatar: string;
+      avatar?: string;
     };
   };
 
-  type CreateParams = {
-    /** 描述信息 */
-    description: string;
-    /** 区域 */
-    area: string;
-    /** 图片URL列表 */
-    photos: string[];
-    /** 分类 */
-    category?: '安全' | '质量' | '进度';
-    /** 桩号 */
-    stakeNumber?: string;
-    /** 偏距（米） */
-    offset?: number;
-    /** 标签列表 */
-    tags?: string[];
-    /** 位置信息 */
+  type CreateParams = Omit<NestWebAPI.CreateImageDto, 'location' | 'offset'> & {
     location?: LocationType;
+    offset?: number | string;
   };
 
-  type UpdateParams = {
-    /** ID */
+  type UpdateParams = Omit<NestWebAPI.UpdateImageDto, 'location' | 'offset'> & {
     id: number;
-    /** 描述信息 */
-    description?: string;
-    /** 区域 */
-    area?: string;
-    /** 图片URL列表 */
-    photos?: string[];
-    /** 分类 */
-    category?: '安全' | '质量' | '进度';
-    /** 桩号 */
-    stakeNumber?: string;
-    /** 偏距（米） */
-    offset?: number;
-    /** 标签列表 */
-    tags?: string[];
-    /** 位置信息 */
-    location?: LocationType;
+    location?: LocationType | string;
+    offset?: number | string;
   };
 }
