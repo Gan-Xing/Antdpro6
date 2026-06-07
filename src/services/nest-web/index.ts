@@ -13,6 +13,7 @@ import * as images from './images';
 import * as diagnostics from './diagnostics';
 import * as captcha from './captcha';
 import * as systemLog from './systemLog';
+import * as dashboard from './dashboard';
 import * as app from './app';
 import * as prometheus from './prometheus';
 export default {
@@ -27,6 +28,7 @@ export default {
   diagnostics,
   captcha,
   systemLog,
+  dashboard,
   app,
   prometheus,
 };

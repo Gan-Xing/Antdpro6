@@ -10,11 +10,7 @@ import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { history, useAccess, useModel } from '@umijs/max';
 import { Alert, Button, Col, List, Row, Space, Statistic, Tag, Typography } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import { appControllerGetHealth } from '@/services/nest-web/app';
-import { imagesControllerFindAll } from '@/services/nest-web/images';
-import { rolesControllerFindAll } from '@/services/nest-web/roles';
-import { systemLogControllerFindAll } from '@/services/nest-web/systemLog';
-import { usersControllerFindAllPaged } from '@/services/nest-web/users';
+import { dashboardControllerSummary } from '@/services/nest-web/dashboard';
 import { unwrapResponse } from '@/utils/apiResponse';
 
 type DashboardMetric = {
@@ -35,24 +31,12 @@ type RecentLog = {
 
 const emptyValue = '-';
 
-const resolveTotal = (payload: any) => {
-  const data = unwrapResponse<any>(payload);
-
-  return (
-    data?.pagination?.total ??
-    data?.total ??
-    (Array.isArray(data?.data) ? data.data.length : undefined) ??
-    (Array.isArray(data) ? data.length : undefined) ??
-    0
-  );
-};
-
 const Dashboard: React.FC = () => {
   const access = useAccess();
   const { initialState } = useModel('@@initialState');
   const [loading, setLoading] = useState(true);
   const [health, setHealth] = useState<{ status?: string; service?: string }>({});
-  const [metrics, setMetrics] = useState<Record<string, number | string>>({});
+  const [metrics, setMetrics] = useState<Record<string, number | string | null>>({});
   const [recentLogs, setRecentLogs] = useState<RecentLog[]>([]);
 
   useEffect(() => {
@@ -60,53 +44,15 @@ const Dashboard: React.FC = () => {
 
     const loadDashboard = async () => {
       setLoading(true);
-      const nextMetrics: Record<string, number | string> = {};
-
-      const healthResult = await appControllerGetHealth({ skipErrorHandler: true }).catch(
+      const summaryResult = await dashboardControllerSummary({ skipErrorHandler: true }).catch(
         () => undefined,
       );
+      const summary = unwrapResponse<NestWebAPI.DashboardSummaryEntity | undefined>(summaryResult);
 
       if (mounted) {
-        setHealth(unwrapResponse<any>(healthResult ?? {}));
-      }
-
-      if (access.canShowUser) {
-        const users = await usersControllerFindAllPaged(
-          { current: 1, pageSize: 1 },
-          { skipErrorHandler: true },
-        ).catch(() => undefined);
-        nextMetrics.users = users ? resolveTotal(users) : emptyValue;
-      }
-
-      if (access.canShowRole) {
-        const roles = await rolesControllerFindAll({ skipErrorHandler: true }).catch(
-          () => undefined,
-        );
-        nextMetrics.roles = roles ? resolveTotal(roles) : emptyValue;
-      }
-
-      if (access.canViewImage) {
-        const images = await imagesControllerFindAll(
-          { current: 1, pageSize: 1 },
-          { skipErrorHandler: true },
-        ).catch(() => undefined);
-        nextMetrics.images = images ? resolveTotal(images) : emptyValue;
-      }
-
-      if (access.canViewSystemLogs) {
-        const logs = await systemLogControllerFindAll(
-          { page: 1, pageSize: 5 },
-          { skipErrorHandler: true },
-        ).catch(() => undefined);
-        const logData = unwrapResponse<any>(logs ?? {});
-        nextMetrics.logs = logs ? resolveTotal(logs) : emptyValue;
-        if (mounted) {
-          setRecentLogs(logData?.data ?? []);
-        }
-      }
-
-      if (mounted) {
-        setMetrics(nextMetrics);
+        setHealth(summary?.health ?? {});
+        setMetrics(summary?.metrics ?? {});
+        setRecentLogs(summary?.recentLogs ?? []);
         setLoading(false);
       }
     };
@@ -116,7 +62,7 @@ const Dashboard: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [access.canShowRole, access.canShowUser, access.canViewImage, access.canViewSystemLogs]);
+  }, []);
 
   const metricCards = useMemo<DashboardMetric[]>(
     () => [
@@ -130,21 +76,21 @@ const Dashboard: React.FC = () => {
       {
         key: 'users',
         title: '用户',
-        value: metrics.users ?? emptyValue,
+        value: access.canShowUser ? (metrics.users ?? emptyValue) : emptyValue,
         description: access.canShowUser ? '当前系统用户总数' : '无用户统计权限',
         icon: <TeamOutlined />,
       },
       {
         key: 'roles',
         title: '角色',
-        value: metrics.roles ?? emptyValue,
+        value: access.canShowRole ? (metrics.roles ?? emptyValue) : emptyValue,
         description: access.canShowRole ? '可维护的角色数量' : '无角色统计权限',
         icon: <SafetyCertificateOutlined />,
       },
       {
         key: 'images',
         title: '资源',
-        value: metrics.images ?? emptyValue,
+        value: access.canViewImage ? (metrics.images ?? emptyValue) : emptyValue,
         description: access.canViewImage ? '图片资源数量' : '无资源统计权限',
         icon: <PictureOutlined />,
       },

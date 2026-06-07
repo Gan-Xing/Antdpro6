@@ -1,5 +1,4 @@
 import { useCache } from '@/hooks/useCache';
-import { Decrypt, Encrypt } from './encrypt';
 import { getLocal, removeLocals, setLocals } from 'ganxing';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -39,33 +38,6 @@ export const removeToken = () => {
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {
   return 'Bearer ' + token;
-};
-
-// ========== 账号相关 ==========
-
-const LoginFormKey = 'LOGINFORM';
-
-export type LoginFormType = {
-  username: string;
-  password: string;
-  rememberMe: boolean;
-};
-
-export const getLoginForm = () => {
-  const loginForm: LoginFormType = wsCache.get(LoginFormKey);
-  if (loginForm) {
-    loginForm.password = Decrypt(loginForm.password) as string;
-  }
-  return loginForm;
-};
-
-export const setLoginForm = (loginForm: LoginFormType) => {
-  loginForm.password = Encrypt(loginForm.password) as string;
-  wsCache.set(LoginFormKey, loginForm, { exp: 30 * 24 * 60 * 60 });
-};
-
-export const removeLoginForm = () => {
-  wsCache.delete(LoginFormKey);
 };
 
 // ========== 租户相关 ==========

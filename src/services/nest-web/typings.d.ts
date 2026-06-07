@@ -108,6 +108,34 @@ declare namespace NestWebAPI {
     roles: number[];
   };
 
+  type DashboardHealthEntity = {
+    status: string;
+    service: string;
+    timestamp: string;
+  };
+
+  type DashboardMetricsEntity = {
+    users: number | null;
+    roles: number | null;
+    images: number | null;
+    logs: number | null;
+  };
+
+  type DashboardRecentLogEntity = {
+    id: number;
+    username: string;
+    requestDescription: string;
+    duration: number;
+    success: boolean;
+    createdAt: string;
+  };
+
+  type DashboardSummaryEntity = {
+    health: DashboardHealthEntity;
+    metrics: DashboardMetricsEntity;
+    recentLogs: DashboardRecentLogEntity[];
+  };
+
   type ImagesControllerFindAllParams = {
     current?: number;
     pageSize?: number;
