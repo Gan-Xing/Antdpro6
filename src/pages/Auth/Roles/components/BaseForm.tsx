@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 interface Props {
   form?: FormInstance<any>;
   permissions?: { id: number; name: string }[];
+  showCode?: boolean;
 }
 
 const toCheckedPermissionKeys = (permissions?: { id: number }[]) =>
@@ -88,7 +89,7 @@ const renderPermissionTreeData = (nodes: NestWebAPI.PermissionTreeNodeEntity[]):
   }));
 
 const BaseForm: React.FC<Props> = (props) => {
-  const { form, permissions } = props;
+  const { form, permissions, showCode = false } = props;
   const intl = useIntl();
   const [treeData, setTreeData] = useState<NestWebAPI.PermissionTreeNodeEntity[]>([]);
   const [loadingTree, setLoadingTree] = useState(false);
@@ -161,6 +162,24 @@ const BaseForm: React.FC<Props> = (props) => {
   return (
     <>
       <ProForm.Group>
+        {showCode ? (
+          <ProFormText
+            rules={[
+              {
+                required: true,
+                message: '请输入角色编码',
+              },
+              {
+                pattern: /^[a-z][a-z0-9._-]*$/,
+                message: '角色编码必须以小写字母开头，仅支持小写字母、数字、点、下划线和短横线',
+              },
+            ]}
+            extra="创建后不可修改，例如 admin、user、project.manager"
+            label="角色编码"
+            width="md"
+            name="code"
+          />
+        ) : null}
         <ProFormText
           rules={[
             {

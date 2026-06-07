@@ -10,9 +10,9 @@ export async function appControllerGetHello(options?: { [key: string]: any }) {
   });
 }
 
-/** 此处后端没有提供注释 GET /greet */
-export async function appControllerGreet(options?: { [key: string]: any }) {
-  return request<any>('/greet', {
+/** 此处后端没有提供注释 GET /api/health */
+export async function appControllerGetHealth(options?: { [key: string]: any }) {
+  return request<any>('/api/health', {
     method: 'GET',
     ...(options || {}),
   });

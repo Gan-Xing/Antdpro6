@@ -26,7 +26,7 @@ const Create: React.FC<Props> = (props) => {
       onFinish={onFinish}
       initialValues={{}}
     >
-      <BaseForm form={form} />
+      <BaseForm form={form} showCode />
     </ModalForm>
   );
 };

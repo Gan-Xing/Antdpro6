@@ -136,10 +136,10 @@ const BaseForm: React.FC<Props> = (props) => {
           id: 'pages.searchTable.users.roles.placeholder',
           defaultMessage: '请选择角色',
         })}
-        options={roles?.map((role: { name: string; id: number }) => ({
-          disabled: protectAdminRole && role.name === 'admin',
+        options={roles?.map((role: { code?: string; name: string; id: number }) => ({
+          disabled: protectAdminRole && role.code === 'admin',
           label:
-            protectAdminRole && role.name === 'admin'
+            protectAdminRole && role.code === 'admin'
               ? `${role.name}（当前管理员角色）`
               : role.name,
           value: role.id,

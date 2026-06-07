@@ -15,7 +15,7 @@ import Create from './components/Create';
 import Show from './components/Show';
 import Update from './components/Update';
 
-const isSystemAdminRole = (role?: Partial<Roles.Entity>) => role?.name === 'admin';
+const isSystemAdminRole = (role?: Partial<Roles.Entity>) => role?.code === 'admin';
 
 /**
  * @en-US Add node
@@ -23,11 +23,12 @@ const isSystemAdminRole = (role?: Partial<Roles.Entity>) => role?.name === 'admi
  * @param fields
  */
 const toCreateRoleDto = (fields: Roles.CreateParams): NestWebAPI.CreateRoleDto => ({
+  code: fields.code,
   name: fields.name,
   permissions: fields.permissions ?? [],
 });
 
-const toUpdateRoleDto = (fields: Roles.CreateParams): NestWebAPI.UpdateRoleDto => ({
+const toUpdateRoleDto = (fields: Roles.UpdateParams): NestWebAPI.UpdateRoleDto => ({
   name: fields.name,
   permissions: fields.permissions ?? [],
 });
@@ -52,7 +53,7 @@ const handleAdd = async (fields: Roles.CreateParams) => {
  *
  * @param fields
  */
-const handleUpdate = async (fields: Roles.CreateParams) => {
+const handleUpdate = async (fields: Roles.UpdateParams) => {
   const hide = message.loading('正在更新');
   try {
     await rolesControllerUpdate({ id: Number(fields.id) }, toUpdateRoleDto(fields));
@@ -113,6 +114,16 @@ const TableList: React.FC = () => {
   const intl = useIntl();
   const { canCreateRole, canEditRole, canDeleteRole } = useAccess();
   const rawColumns: Array<ProColumns<Roles.Entity> | false> = [
+    {
+      title: '角色编码',
+      dataIndex: 'code',
+      width: 140,
+      render: (dom) => (
+        <Typography.Text code style={{ fontSize: 12 }}>
+          {dom}
+        </Typography.Text>
+      ),
+    },
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
       dataIndex: 'name',

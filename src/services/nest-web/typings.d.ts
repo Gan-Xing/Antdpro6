@@ -89,6 +89,8 @@ declare namespace NestWebAPI {
   };
 
   type CreateRoleDto = {
+    /** Stable role identity, such as admin or user. */
+    code: string;
     name: string;
     /** 权限对象数组 */
     permissions?: number[];
@@ -237,6 +239,7 @@ declare namespace NestWebAPI {
 
   type RoleEntity = {
     id: number;
+    code: string;
     name: string;
     createdAt: string;
     updatedAt: string;
@@ -298,6 +301,11 @@ declare namespace NestWebAPI {
 
   type SystemLogControllerFindOneParams = {
     id: number;
+  };
+
+  type TestSmsDto = {
+    /** Phone number used for the SMS provider check. */
+    phoneNumber: string;
   };
 
   type Token = {

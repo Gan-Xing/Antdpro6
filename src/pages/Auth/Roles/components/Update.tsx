@@ -6,7 +6,7 @@ import BaseForm from './BaseForm';
 
 export type UpdateFormProps = {
   onCancel: (visible: boolean) => void;
-  onSubmit: (values: Roles.CreateParams) => Promise<void>;
+  onSubmit: (values: Roles.UpdateParams) => Promise<void>;
   updateModalOpen: boolean;
   values: Roles.Entity | undefined;
 };

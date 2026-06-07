@@ -18,7 +18,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const currentUserId = initialState?.currentUser?.id;
   const protectAdminRole =
     values.id === currentUserId &&
-    values.roles?.some((role: Roles.Entity) => role.name === 'admin');
+    values.roles?.some((role: Roles.Entity) => role.code === 'admin');
 
   return (
     <ModalForm

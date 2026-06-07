@@ -10,6 +10,7 @@ import * as permissions from './permissions';
 import * as permissiongroups from './permissiongroups';
 import * as menus from './menus';
 import * as images from './images';
+import * as diagnostics from './diagnostics';
 import * as captcha from './captcha';
 import * as systemLog from './systemLog';
 import * as app from './app';
@@ -23,6 +24,7 @@ export default {
   permissiongroups,
   menus,
   images,
+  diagnostics,
   captcha,
   systemLog,
   app,
