@@ -62,6 +62,5 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
     canViewSystemLogs: can(currentUser, 'system.logs.view', '查看系统日志'),
     canExportSystemLogs: can(currentUser, 'system.logs.export', '导出系统日志'),
     canDeleteSystemLogs: can(currentUser, 'system.logs.delete', '删除系统日志'),
-    canAuditSystemLogs: can(currentUser, 'system.logs.audit', '审计系统日志'),
   };
 }
