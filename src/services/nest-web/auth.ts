@@ -86,29 +86,6 @@ export async function authControllerRegisterByEmail(
   });
 }
 
-/** 此处后端没有提供注释 GET /api/auth/test-redis */
-export async function authControllerTestRedis(options?: { [key: string]: any }) {
-  return request<any>('/api/auth/test-redis', {
-    method: 'GET',
-    ...(options || {}),
-  });
-}
-
-/** 此处后端没有提供注释 POST /api/auth/testSMS */
-export async function authControllerValidateSms(
-  body: NestWebAPI.ValidateTokenDto,
-  options?: { [key: string]: any },
-) {
-  return request<any>('/api/auth/testSMS', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
 /** 此处后端没有提供注释 POST /api/auth/validateCaptcha */
 export async function authControllerValidateCaptchaAndInitiateEmailVerification(
   body: NestWebAPI.SignUpFormData,

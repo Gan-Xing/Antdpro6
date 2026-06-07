@@ -9,6 +9,7 @@ import { authControllerRefresh } from '@/services/nest-web/auth';
 import { unwrapResponse } from '@/utils/apiResponse';
 
 const { base_url, request_timeout } = config;
+const loginPath = '/user/login';
 // const ignoreMsgs = [
 //   '无效的刷新令牌', // 刷新令牌被删除时，不用提示
 //   '刷新令牌已过期', // 使用刷新令牌，刷新获取新的访问令牌时，结果因为过期失败，此时需要忽略。否则，会导致继续 401，无法跳转到登出界面
@@ -27,10 +28,22 @@ const whiteList: string[] = [
 ];
 
 const refreshSessionToken = async () => {
+  const refreshToken = authUtil.getRefreshToken();
+  if (!refreshToken) {
+    return undefined;
+  }
+
   const response = await authControllerRefresh({
-    refreshToken: authUtil.getRefreshToken(),
+    refreshToken,
   });
   return unwrapResponse<Auth.Token>(response as any);
+};
+
+const redirectToLogin = () => {
+  authUtil.removeToken();
+  if (window.location.pathname !== loginPath) {
+    window.location.href = loginPath;
+  }
 };
 /**
  * @name 错误处理
@@ -114,10 +127,11 @@ export const errorConfig: RequestConfig = {
                 // 这里你可能还需要重新发送失败的请求
               } else {
                 // 如果刷新令牌请求失败，清除令牌并重定向到登录页面
-                authUtil.removeToken();
-                window.location.href = '/login'; // 替换为您的实际登录路由
+                redirectToLogin();
               }
             }
+          } else {
+            redirectToLogin();
           }
         } else if (status === 403) {
           message.error('当前操作没有权限');
@@ -166,8 +180,7 @@ export const errorConfig: RequestConfig = {
             accessToken = refreshedToken.accessToken;
           } else {
             // refreshToken request failed, clear tokens and redirect to login
-            authUtil.removeToken();
-            window.location.href = '/login'; // replace this with your actual login route
+            redirectToLogin();
           }
         }
       }
