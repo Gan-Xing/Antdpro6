@@ -96,7 +96,7 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
   const { canCreateRole, canEditRole, canDeleteRole } = useAccess();
-  const columns: ProColumns<Roles.Entity>[] = [
+  const rawColumns: Array<ProColumns<Roles.Entity> | false> = [
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
       dataIndex: 'name',
@@ -150,41 +150,43 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
-      render: (_, record) => [
-        canEditRole && (
-          <a
-            key="update"
-            onClick={() => {
-              handleUpdateModalOpen(true);
-              setCurrentRow(record);
-            }}
-          >
-            <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-          </a>
-        ),
-        canDeleteRole && (
-          <a
-            key="delete"
-            onClick={() => {
-              return Modal.confirm({
-                title: '确认删除？',
-                onOk: async () => {
-                  await handleRemove([record.id!]);
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
-              });
-            }}
-          >
-            <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-          </a>
-        ),
-      ],
+      render: (_, record) =>
+        [
+          canEditRole && (
+            <a
+              key="update"
+              onClick={() => {
+                handleUpdateModalOpen(true);
+                setCurrentRow(record);
+              }}
+            >
+              <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+            </a>
+          ),
+          canDeleteRole && (
+            <a
+              key="delete"
+              onClick={() => {
+                return Modal.confirm({
+                  title: '确认删除？',
+                  onOk: async () => {
+                    await handleRemove([record.id!]);
+                    setSelectedRows([]);
+                    actionRef.current?.reloadAndRest?.();
+                  },
+                  content: '确认删除吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                });
+              }}
+            >
+              <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+            </a>
+          ),
+        ].filter(Boolean),
     },
   ];
+  const columns = rawColumns.filter(Boolean) as ProColumns<Roles.Entity>[];
 
   const transformPermissions = (permissions: { id: number; name: string }[] | number[]) => {
     // 如果permissions是undefined或null，返回一个空数组

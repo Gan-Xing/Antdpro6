@@ -1,6 +1,6 @@
 import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
 import { Button, message, Modal } from 'antd';
@@ -90,7 +90,7 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
   const { canCreateMenu, canDeleteMenu, canEditMenu } = useAccess();
-  const columns = [
+  const rawColumns: Array<ProColumns<Menus.MenusType> | false> = [
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
       dataIndex: 'name',
@@ -129,41 +129,43 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right' as const,
-      render: (_: any, record: any) => [
-        canEditMenu && (
-          <a
-            key="update"
-            onClick={() => {
-              handleUpdateModalOpen(true);
-              setCurrentRow((prevState) => ({ ...prevState, ...record }));
-            }}
-          >
-            <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-          </a>
-        ),
-        canDeleteMenu && (
-          <a
-            key="delete"
-            onClick={() => {
-              return Modal.confirm({
-                title: '确认删除？',
-                onOk: async () => {
-                  await handleRemove([record.id!]);
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
-              });
-            }}
-          >
-            <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-          </a>
-        ),
-      ],
+      render: (_: any, record: any) =>
+        [
+          canEditMenu && (
+            <a
+              key="update"
+              onClick={() => {
+                handleUpdateModalOpen(true);
+                setCurrentRow((prevState) => ({ ...prevState, ...record }));
+              }}
+            >
+              <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+            </a>
+          ),
+          canDeleteMenu && (
+            <a
+              key="delete"
+              onClick={() => {
+                return Modal.confirm({
+                  title: '确认删除？',
+                  onOk: async () => {
+                    await handleRemove([record.id!]);
+                    setSelectedRows([]);
+                    actionRef.current?.reloadAndRest?.();
+                  },
+                  content: '确认删除吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                });
+              }}
+            >
+              <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+            </a>
+          ),
+        ].filter(Boolean),
     },
   ];
+  const columns = rawColumns.filter(Boolean) as ProColumns<Menus.MenusType>[];
 
   const processChildren = (items: Menus.MenusType[]): any => {
     return items.map((item: Menus.MenusType) => {

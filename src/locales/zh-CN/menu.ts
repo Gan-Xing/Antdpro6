@@ -55,7 +55,7 @@ export default {
   'menu.auth.permissions': '权限管理',
   'menu.auth.menus': '菜单管理',
   'menu.resources': '资源管理',
-  'menu.resources.images': ' 图片管理',
+  'menu.resources.images': '图片管理',
   'menu.system': '系统设置',
   'menu.system.logs': '系统日志',
 };

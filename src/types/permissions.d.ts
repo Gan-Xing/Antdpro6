@@ -1,5 +1,6 @@
 declare namespace Permissions {
   interface CreateParams {
+    code?: string;
     name: string;
     action: string;
     path: string;
@@ -7,6 +8,7 @@ declare namespace Permissions {
   }
   interface Entity {
     id: number;
+    code: string;
     name: string;
     action: string;
     path: string;

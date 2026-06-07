@@ -30,14 +30,14 @@ export async function addImage(data: Images.CreateParams, options?: { [key: stri
   });
 }
 
-/** 更新图片 PUT /api/images/:id */
+/** 更新图片 PATCH /api/images/:id */
 export async function updateImage(
   id: number,
   data: Images.UpdateParams,
   options?: { [key: string]: any },
 ) {
   return request<API.Response<Images.Entity>>(`/api/images/${id}`, {
-    method: 'PUT',
+    method: 'PATCH',
     data,
     ...(options || {}),
   });

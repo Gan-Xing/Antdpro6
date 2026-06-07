@@ -97,7 +97,7 @@ export default [
     routes: [
       {
         path: '/system/logs',
-        name: 'images',
+        name: 'logs',
         access: 'canViewSystemLogs',
         icon: 'FileTextOutlined', // 更适合日志的文本文件图标
         component: './System/SystemLogs',

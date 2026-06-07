@@ -96,7 +96,7 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
   const { canEditUser, canDeleteUser, canCreateUser } = useAccess();
-  const columns: ProColumns<User.UsersEntity>[] = [
+  const rawColumns: Array<ProColumns<User.UsersEntity> | false> = [
     {
       title: <FormattedMessage id="pages.users.username" defaultMessage="姓名" />,
       dataIndex: 'username',
@@ -198,41 +198,43 @@ const TableList: React.FC = () => {
       valueType: 'option',
       ellipsis: true,
       fixed: 'right',
-      render: (_, record) => [
-        canEditUser && (
-          <a
-            key="update"
-            onClick={() => {
-              handleUpdateModalOpen(true);
-              setCurrentRow(record);
-            }}
-          >
-            <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
-          </a>
-        ),
-        canDeleteUser && (
-          <a
-            key="delete"
-            onClick={() => {
-              return Modal.confirm({
-                title: '确认删除？',
-                onOk: async () => {
-                  await handleRemove([record.id!]);
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                },
-                content: '确认删除吗？',
-                okText: '确认',
-                cancelText: '取消',
-              });
-            }}
-          >
-            <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
-          </a>
-        ),
-      ],
+      render: (_, record) =>
+        [
+          canEditUser && (
+            <a
+              key="update"
+              onClick={() => {
+                handleUpdateModalOpen(true);
+                setCurrentRow(record);
+              }}
+            >
+              <FormattedMessage id="pages.searchTable.editting" defaultMessage="编辑" />
+            </a>
+          ),
+          canDeleteUser && (
+            <a
+              key="delete"
+              onClick={() => {
+                return Modal.confirm({
+                  title: '确认删除？',
+                  onOk: async () => {
+                    await handleRemove([record.id!]);
+                    setSelectedRows([]);
+                    actionRef.current?.reloadAndRest?.();
+                  },
+                  content: '确认删除吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                });
+              }}
+            >
+              <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+            </a>
+          ),
+        ].filter(Boolean),
     },
   ];
+  const columns = rawColumns.filter(Boolean) as ProColumns<User.UsersEntity>[];
 
   return (
     <PageContainer>
