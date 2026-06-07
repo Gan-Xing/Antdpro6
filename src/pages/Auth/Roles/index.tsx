@@ -1,4 +1,10 @@
-import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
+import {
+  rolesControllerCreate,
+  rolesControllerFindAll,
+  rolesControllerRemoveMany,
+  rolesControllerUpdate,
+} from '@/services/nest-web/roles';
+import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -17,7 +23,7 @@ import Update from './components/Update';
 const handleAdd = async (fields: any) => {
   const hide = message.loading('正在添加');
   try {
-    await addItems('/roles', { ...fields });
+    await rolesControllerCreate(fields as NestWebAPI.CreateRoleDto);
     hide();
     message.success('Added successfully');
     return true;
@@ -37,7 +43,10 @@ const handleAdd = async (fields: any) => {
 const handleUpdate = async (fields: Roles.CreateParams) => {
   const hide = message.loading('正在更新');
   try {
-    await updateItem(`/roles/${fields.id}`, fields);
+    await rolesControllerUpdate(
+      { id: Number(fields.id) },
+      fields as unknown as NestWebAPI.UpdateRoleDto,
+    );
     hide();
 
     message.success('更新成功');
@@ -59,9 +68,7 @@ const handleRemove = async (ids: number[]) => {
   const hide = message.loading('正在删除');
   if (!ids) return true;
   try {
-    await removeItem('/roles', {
-      ids,
-    });
+    await rolesControllerRemoveMany({ ids });
     hide();
     message.success('Deleted successfully and will refresh soon');
     return true;
@@ -228,7 +235,13 @@ const TableList: React.FC = () => {
             </Button>
           ),
         ]}
-        request={async (params, sort, filter) => queryList('/roles', params, sort, filter)}
+        request={async () => {
+          const data = unwrapResponse<NestWebAPI.RoleEntity[]>(await rolesControllerFindAll());
+          return {
+            data: data as unknown as Roles.Entity[],
+            success: true,
+          };
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

@@ -1,4 +1,10 @@
-import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
+import {
+  menusControllerCreate,
+  menusControllerFindAllPaged,
+  menusControllerRemoveByIds,
+  menusControllerUpdate,
+} from '@/services/nest-web/menus';
+import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -17,7 +23,7 @@ import Update from './components/Update';
 const handleAdd = async (fields: Menus.MenusType) => {
   const hide = message.loading('正在添加');
   try {
-    await addItems('/menus', { ...fields });
+    await menusControllerCreate(fields as unknown as NestWebAPI.CreateMenuDto);
     hide();
     message.success('Added successfully');
     return true;
@@ -37,7 +43,7 @@ const handleAdd = async (fields: Menus.MenusType) => {
 const handleUpdate = async (fields: any) => {
   const hide = message.loading('正在更新');
   try {
-    await updateItem(`/menus/${fields.id}`, fields);
+    await menusControllerUpdate({ id: fields.id }, fields as NestWebAPI.UpdateMenuDto);
     hide();
 
     message.success('更新成功');
@@ -59,9 +65,7 @@ const handleRemove = async (ids: number[]) => {
   const hide = message.loading('正在删除');
   if (!ids) return true;
   try {
-    await removeItem('/menus', {
-      ids,
-    });
+    await menusControllerRemoveByIds({ ids });
     hide();
     message.success('Deleted successfully and will refresh soon');
     return true;
@@ -211,14 +215,12 @@ const TableList: React.FC = () => {
           ),
         ]}
         request={async (params, sort, filter) => {
-          const { data } = await queryList(
-            '/menus',
-            {
+          const data = unwrapResponse<any>(
+            await menusControllerFindAllPaged({
               ...params,
               current: params.current || 1, // 添加默认值
-            },
-            sort,
-            filter,
+              ...filter,
+            } as NestWebAPI.MenusControllerFindAllPagedParams),
           );
           const processedData = processChildren(data.data);
           return {

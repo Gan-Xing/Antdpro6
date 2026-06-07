@@ -23,6 +23,10 @@ declare namespace NestWebAPI {
     id: number;
   };
 
+  type BatchIdsDto = {
+    ids: number[];
+  };
+
   type CaptchaControllerValidateCaptchaParams = {
     token: string;
     input: string;
@@ -142,9 +146,9 @@ declare namespace NestWebAPI {
   };
 
   type MenusControllerFindAllPagedParams = {
-    pageSize: string;
-    current: string;
-    name: string;
+    pageSize?: number;
+    current?: number;
+    name?: string;
   };
 
   type MenusControllerFindOneParams = {

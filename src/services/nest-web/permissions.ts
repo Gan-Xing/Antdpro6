@@ -26,9 +26,16 @@ export async function permissionsControllerCreate(
 }
 
 /** 此处后端没有提供注释 DELETE /api/permissions */
-export async function permissionsControllerRemoveMany(options?: { [key: string]: any }) {
+export async function permissionsControllerRemoveMany(
+  body: NestWebAPI.BatchIdsDto,
+  options?: { [key: string]: any },
+) {
   return request<NestWebAPI.PermissionEntity>('/api/permissions', {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }

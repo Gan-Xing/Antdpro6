@@ -26,9 +26,16 @@ export async function rolesControllerCreate(
 }
 
 /** 此处后端没有提供注释 DELETE /api/roles */
-export async function rolesControllerRemoveMany(options?: { [key: string]: any }) {
+export async function rolesControllerRemoveMany(
+  body: NestWebAPI.BatchIdsDto,
+  options?: { [key: string]: any },
+) {
   return request<NestWebAPI.RoleEntity>('/api/roles', {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }

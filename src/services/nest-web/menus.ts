@@ -33,9 +33,16 @@ export async function menusControllerCreate(
 }
 
 /** 此处后端没有提供注释 DELETE /api/menus */
-export async function menusControllerRemoveByIds(options?: { [key: string]: any }) {
+export async function menusControllerRemoveByIds(
+  body: NestWebAPI.BatchIdsDto,
+  options?: { [key: string]: any },
+) {
   return request<any>('/api/menus', {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }

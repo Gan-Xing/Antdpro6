@@ -1,5 +1,11 @@
 import useQueryList from '@/hooks/useQueryList';
-import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
+import {
+  usersControllerCreate,
+  usersControllerFindAllPaged,
+  usersControllerRemoveByIds,
+  usersControllerUpdate,
+} from '@/services/nest-web/users';
+import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -18,7 +24,7 @@ import Update from './components/Update';
 const handleAdd = async (fields: User.UsersEntity) => {
   const hide = message.loading('正在添加');
   try {
-    await addItems('/users', { ...fields });
+    await usersControllerCreate(fields as unknown as NestWebAPI.CreateUserDto);
     hide();
     message.success('Added successfully');
     return true;
@@ -38,7 +44,7 @@ const handleAdd = async (fields: User.UsersEntity) => {
 const handleUpdate = async (fields: User.UpdateUserParams) => {
   const hide = message.loading('正在更新');
   try {
-    await updateItem(`/users/${fields.id}`, fields);
+    await usersControllerUpdate({ id: fields.id! }, fields as unknown as NestWebAPI.UpdateUserDto);
     hide();
     message.success('更新成功');
     return true;
@@ -59,9 +65,7 @@ const handleRemove = async (ids: number[]) => {
   const hide = message.loading('正在删除');
   if (!ids) return true;
   try {
-    await removeItem('/users', {
-      ids,
-    });
+    await usersControllerRemoveByIds({ ids });
     hide();
     message.success('Deleted successfully and will refresh soon');
     return true;
@@ -268,7 +272,13 @@ const TableList: React.FC = () => {
           ),
         ]}
         request={async (params, sort, filter) => {
-          const { data } = await queryList('/users/page', params, sort, filter);
+          const data = unwrapResponse<any>(
+            await usersControllerFindAllPaged({
+              ...(params as NestWebAPI.UsersControllerFindAllPagedParams),
+              sorter: sort ? JSON.stringify(sort) : undefined,
+              ...filter,
+            }),
+          );
           return {
             data: data.data,
             current: data.pagination.current,

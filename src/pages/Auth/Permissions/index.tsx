@@ -1,4 +1,10 @@
-import { addItems, queryList, removeItem, updateItem } from '@/services/ant-design-pro/api';
+import {
+  permissionsControllerCreate,
+  permissionsControllerFindAll,
+  permissionsControllerRemoveMany,
+  permissionsControllerUpdate,
+} from '@/services/nest-web/permissions';
+import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -17,7 +23,7 @@ import Update, { FormValueType } from './components/Update';
 const handleAdd = async (fields: Permissions.CreateParams) => {
   const hide = message.loading('正在添加');
   try {
-    await addItems('/permissions', { ...fields });
+    await permissionsControllerCreate(fields as NestWebAPI.CreatePermissionDto);
     hide();
     message.success('Added successfully');
     return true;
@@ -37,7 +43,10 @@ const handleAdd = async (fields: Permissions.CreateParams) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('正在更新');
   try {
-    await updateItem(`/permissions/${fields.id}`, fields);
+    await permissionsControllerUpdate(
+      { id: fields.id! },
+      fields as unknown as NestWebAPI.UpdatePermissionDto,
+    );
     hide();
 
     message.success('更新成功');
@@ -59,9 +68,7 @@ const handleRemove = async (ids: number[]) => {
   const hide = message.loading('正在删除');
   if (!ids) return true;
   try {
-    await removeItem('/permissions', {
-      ids,
-    });
+    await permissionsControllerRemoveMany({ ids });
     hide();
     message.success('Deleted successfully and will refresh soon');
     return true;
@@ -203,7 +210,15 @@ const TableList: React.FC = () => {
             </Button>
           ),
         ]}
-        request={async (params, sort, filter) => queryList('/permissions', params, sort, filter)}
+        request={async () => {
+          const data = unwrapResponse<NestWebAPI.PermissionEntity[]>(
+            await permissionsControllerFindAll(),
+          );
+          return {
+            data: data as Permissions.Entity[],
+            success: true,
+          };
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

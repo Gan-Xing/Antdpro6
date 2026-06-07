@@ -26,9 +26,16 @@ export async function usersControllerCreate(
 }
 
 /** 此处后端没有提供注释 DELETE /api/users */
-export async function usersControllerRemoveByIds(options?: { [key: string]: any }) {
+export async function usersControllerRemoveByIds(
+  body: NestWebAPI.BatchIdsDto,
+  options?: { [key: string]: any },
+) {
   return request<any>('/api/users', {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }
