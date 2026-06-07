@@ -49,7 +49,6 @@ jobs:
           VAR_BASE_URL: ${{ vars.E2E_BASE_URL }}
           E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
-          E2E_ALLOW_DEFAULT_ADMIN: ${{ vars.E2E_ALLOW_DEFAULT_ADMIN }}
         run: |
           BASE_URL="${INPUT_BASE_URL:-$VAR_BASE_URL}"
 
@@ -61,12 +60,10 @@ jobs:
           fi
 
           if [ -z "$E2E_ADMIN_EMAIL" ] || [ -z "$E2E_ADMIN_PASSWORD" ]; then
-            if [ "$E2E_ALLOW_DEFAULT_ADMIN" != "true" ]; then
-              echo "should_run=false" >> "$GITHUB_OUTPUT"
-              echo "base_url=$BASE_URL" >> "$GITHUB_OUTPUT"
-              echo "E2E admin credentials are not configured. Skipping Playwright E2E."
-              exit 0
-            fi
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "base_url=$BASE_URL" >> "$GITHUB_OUTPUT"
+            echo "E2E admin credentials are not configured. Skipping Playwright E2E."
+            exit 0
           fi
 
           echo "should_run=true" >> "$GITHUB_OUTPUT"
@@ -87,7 +84,6 @@ jobs:
           E2E_BASE_URL: ${{ steps.e2e.outputs.base_url }}
           E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
-          E2E_ALLOW_DEFAULT_ADMIN: ${{ vars.E2E_ALLOW_DEFAULT_ADMIN }}
 
       - name: Upload Playwright report
         if: always() && steps.e2e.outputs.should_run == 'true'

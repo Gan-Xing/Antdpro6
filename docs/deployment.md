@@ -77,7 +77,10 @@ Do not hand-edit generated files in `src/services/nest-web` unless fixing a temp
 With NestWeb and Antdpro6 deployed:
 
 ```bash
-E2E_BASE_URL=http://localhost:8000 E2E_ALLOW_DEFAULT_ADMIN=true pnpm run e2e
+E2E_BASE_URL=http://localhost:8000 \
+E2E_ADMIN_EMAIL=test-admin@example.com \
+E2E_ADMIN_PASSWORD=replace-with-test-password \
+pnpm run e2e
 ```
 
-For shared or production-like environments, use `E2E_ADMIN_EMAIL` and `E2E_ADMIN_PASSWORD` instead of the seeded bootstrap account.
+For shared or production-like environments, use a dedicated E2E account instead of the seeded bootstrap account.

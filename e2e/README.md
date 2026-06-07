@@ -5,17 +5,19 @@ This suite verifies the production-facing auth and dashboard flow against a runn
 ## Local Run
 
 ```bash
-E2E_BASE_URL=http://127.0.0.1:8000 pnpm run e2e
+E2E_BASE_URL=http://127.0.0.1:8000 \
+E2E_ADMIN_EMAIL=test-admin@example.com \
+E2E_ADMIN_PASSWORD=replace-with-test-password \
+pnpm run e2e
 ```
 
-Local runs may use the seeded admin account by default. CI requires explicit secrets unless `E2E_ALLOW_DEFAULT_ADMIN=true` is set.
+E2E always requires an explicit test account. Do not rely on the bootstrap admin defaults.
 
 ## Environment
 
 - `E2E_BASE_URL`: frontend base URL, default `http://127.0.0.1:8000`.
 - `E2E_ADMIN_EMAIL`: admin test account email.
 - `E2E_ADMIN_PASSWORD`: admin test account password.
-- `E2E_ALLOW_DEFAULT_ADMIN`: set to `true` to allow `admin@example.com / admin123`.
 
 ## GitHub Actions
 
@@ -31,7 +33,7 @@ The workflow skips safely when `E2E_BASE_URL` or credentials are missing. To run
 - repository secrets `E2E_ADMIN_EMAIL`
 - repository secrets `E2E_ADMIN_PASSWORD`
 
-Only set `E2E_ALLOW_DEFAULT_ADMIN=true` for seeded non-production environments.
+Use a dedicated non-production admin test account for E2E.
 
 ## Coverage
 

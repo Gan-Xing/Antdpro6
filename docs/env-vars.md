@@ -33,12 +33,11 @@ Do not put durable production secrets in frontend build variables. Anything comp
 
 ## Playwright E2E
 
-| Variable | Purpose | CI behavior |
-| --- | --- | --- |
-| `E2E_BASE_URL` | Frontend URL under test | Required for CI E2E to run |
-| `E2E_ADMIN_EMAIL` | Admin test account email | Required unless default admin is explicitly allowed |
-| `E2E_ADMIN_PASSWORD` | Admin test account password | Required unless default admin is explicitly allowed |
-| `E2E_ALLOW_DEFAULT_ADMIN` | Allows `admin@example.com / admin123` | Local default, CI must set `true` explicitly |
+| Variable             | Purpose                     | CI behavior                |
+| -------------------- | --------------------------- | -------------------------- |
+| `E2E_BASE_URL`       | Frontend URL under test     | Required for CI E2E to run |
+| `E2E_ADMIN_EMAIL`    | Admin test account email    | Required for E2E to run    |
+| `E2E_ADMIN_PASSWORD` | Admin test account password | Required for E2E to run    |
 
 In GitHub Actions, configure:
 
@@ -47,3 +46,5 @@ In GitHub Actions, configure:
 - repository secrets `E2E_ADMIN_PASSWORD`
 
 If these values are missing, the E2E workflow skips safely instead of failing unrelated PRs.
+
+Use a dedicated non-production admin test account. Do not rely on bootstrap administrator defaults for E2E.
