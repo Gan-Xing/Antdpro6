@@ -2,6 +2,17 @@ name: E2E
 
 on:
   workflow_dispatch:
+    inputs:
+      base_url:
+        description: Frontend base URL. Falls back to repository variable E2E_BASE_URL.
+        required: false
+        type: string
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 concurrency:
   group: e2e-${{ github.workflow }}-${{ github.ref }}
@@ -30,22 +41,56 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
+      - name: Resolve E2E target
+        id: e2e
+        shell: bash
+        env:
+          INPUT_BASE_URL: ${{ github.event.inputs.base_url }}
+          VAR_BASE_URL: ${{ vars.E2E_BASE_URL }}
+          E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+          E2E_ALLOW_DEFAULT_ADMIN: ${{ vars.E2E_ALLOW_DEFAULT_ADMIN }}
+        run: |
+          BASE_URL="${INPUT_BASE_URL:-$VAR_BASE_URL}"
+
+          if [ -z "$BASE_URL" ]; then
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "base_url=" >> "$GITHUB_OUTPUT"
+            echo "E2E_BASE_URL is not configured. Skipping Playwright E2E."
+            exit 0
+          fi
+
+          if [ -z "$E2E_ADMIN_EMAIL" ] || [ -z "$E2E_ADMIN_PASSWORD" ]; then
+            if [ "$E2E_ALLOW_DEFAULT_ADMIN" != "true" ]; then
+              echo "should_run=false" >> "$GITHUB_OUTPUT"
+              echo "base_url=$BASE_URL" >> "$GITHUB_OUTPUT"
+              echo "E2E admin credentials are not configured. Skipping Playwright E2E."
+              exit 0
+            fi
+          fi
+
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+          echo "base_url=$BASE_URL" >> "$GITHUB_OUTPUT"
+
       - name: Install dependencies
+        if: steps.e2e.outputs.should_run == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browser
+        if: steps.e2e.outputs.should_run == 'true'
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run Playwright E2E
+        if: steps.e2e.outputs.should_run == 'true'
         run: pnpm run e2e
         env:
-          E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
+          E2E_BASE_URL: ${{ steps.e2e.outputs.base_url }}
           E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
           E2E_ALLOW_DEFAULT_ADMIN: ${{ vars.E2E_ALLOW_DEFAULT_ADMIN }}
 
       - name: Upload Playwright report
-        if: always()
+        if: always() && steps.e2e.outputs.should_run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report

@@ -17,6 +17,22 @@ Local runs may use the seeded admin account by default. CI requires explicit sec
 - `E2E_ADMIN_PASSWORD`: admin test account password.
 - `E2E_ALLOW_DEFAULT_ADMIN`: set to `true` to allow `admin@example.com / admin123`.
 
+## GitHub Actions
+
+`.github/workflows/e2e.yml` runs on:
+
+- `workflow_dispatch`
+- `push` to `main`
+- `pull_request` to `main`
+
+The workflow skips safely when `E2E_BASE_URL` or credentials are missing. To run against a deployed environment, configure:
+
+- repository variable `E2E_BASE_URL`
+- repository secrets `E2E_ADMIN_EMAIL`
+- repository secrets `E2E_ADMIN_PASSWORD`
+
+Only set `E2E_ALLOW_DEFAULT_ADMIN=true` for seeded non-production environments.
+
 ## Coverage
 
 - Login page loads with enterprise branding.

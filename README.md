@@ -1,57 +1,58 @@
-# Ant Design Pro
+# Antdpro6
 
-This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
+Antdpro6 is the frontend for the TS full-stack enterprise admin baseline. It is paired with the `NestWeb` backend.
 
-## Environment Prepare
+The current target is a single-tenant enterprise admin template with:
 
-Install `node_modules`:
+- productized dashboard and layout
+- NestWeb OpenAPI-generated client
+- dynamic backend menus
+- RBAC-aware pages for users, roles, permissions, and menus
+- centralized session refresh
+- Playwright E2E coverage for the auth flow
 
-```bash
-npm install
-```
+## Documentation
 
-or
+- [Frontend deployment](docs/deployment.md)
+- [Frontend environment variables](docs/env-vars.md)
+- [Playwright E2E](e2e/README.md)
 
-```bash
-yarn
-```
+Backend handoff and system-level docs live in the `NestWeb` repository.
 
-## Provided Scripts
-
-Ant Design Pro provides some useful script to help you quick start and build with web project, code style check and test.
-
-Scripts provided in `package.json`. It's safe to modify or add additional script:
-
-### Start project
+## Common Commands
 
 ```bash
-npm start
+pnpm install
+pnpm run tsc
+pnpm run lint:js
+pnpm test -- --runInBand
+pnpm run build
 ```
 
-### Build project
+## Local Development
+
+Start NestWeb first, then run:
 
 ```bash
-npm run build
+pnpm run start:dev
 ```
 
-### Check code style
+The local dev server uses `MOCK=none` and proxies API requests according to `config/proxy.ts`.
+
+## Docker Deployment
 
 ```bash
-npm run lint
+docker compose up -d --build
 ```
 
-You can also use script to auto fix some lint error:
+The frontend listens on `http://localhost:8000` and proxies `/api/*` to the `nestweb-api` service on the shared `nestweb_default` Docker network.
+
+## OpenAPI Client
+
+Regenerate the NestWeb client after backend API contract changes:
 
 ```bash
-npm run lint:fix
+OPENAPI_SCHEMA_URL=http://localhost:3030/openapi.json pnpm run openapi:nest
 ```
 
-### Test code
-
-```bash
-npm test
-```
-
-## More
-
-You can view full document on our [official website](https://pro.ant.design). And welcome any feedback in our [github](https://github.com/ant-design/ant-design-pro).
+Review generated files under `src/services/nest-web` before committing.
