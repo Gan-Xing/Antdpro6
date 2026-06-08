@@ -4,6 +4,7 @@ import {
   menusControllerRemoveByIds,
   menusControllerUpdate,
 } from '@/services/nest-web/menus';
+import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -17,6 +18,7 @@ import Update from './components/Update';
 
 const systemManagedMenuCodes = new Set([
   'dashboard',
+  'message.center',
   'auth',
   'auth.users',
   'auth.roles',
@@ -26,6 +28,18 @@ const systemManagedMenuCodes = new Set([
   'resources.images',
   'system',
   'system.logs',
+  'system.dicts',
+  'system.config',
+  'system.files',
+  'system.status',
+  'system.version',
+  'system.queues',
+  'security',
+  'security.loginLogs',
+  'approval.requests',
+  'common.export',
+  'account',
+  'account.profile',
 ]);
 
 const isSystemManagedMenu = (menu?: Partial<Menus.MenusType>) =>
@@ -109,7 +123,8 @@ const TableList: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
-  const { canCreateMenu, canDeleteMenu, canEditMenu } = useAccess();
+  const { canCreateMenu, canDeleteMenu, canEditMenu, canExportData } = useAccess();
+  const [currentRows, setCurrentRows] = useState<Menus.MenusType[]>([]);
   const rawColumns: Array<ProColumns<Menus.MenusType> | false> = [
     {
       title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
@@ -257,6 +272,22 @@ const TableList: React.FC = () => {
           labelWidth: 80,
         }}
         toolBarRender={() => [
+          canExportData ? (
+            <TableExportButton<Menus.MenusType>
+              key="export"
+              filename="menus.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '菜单编码', dataIndex: 'code' },
+                { title: '名称', dataIndex: 'name' },
+                { title: '路由路径', dataIndex: 'path' },
+                { title: '图标', dataIndex: 'icon' },
+                { title: '排序', dataIndex: 'sort' },
+                { title: '创建时间', dataIndex: 'createdAt' },
+              ]}
+            />
+          ) : null,
           canCreateMenu && (
             <Button
               type="primary"
@@ -278,6 +309,7 @@ const TableList: React.FC = () => {
             } as NestWebAPI.MenusControllerFindAllPagedParams),
           );
           const processedData = processChildren(data.data);
+          setCurrentRows(processedData);
           return {
             data: processedData,
             current: data.pagination.current,

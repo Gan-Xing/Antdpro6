@@ -63,6 +63,8 @@ test.describe('auth session', () => {
     await expectProtectedPageLoads(page, '/system/version', /版本信息/);
     await expectProtectedPageLoads(page, '/system/queues', /Waiting|队列/);
     await expectProtectedPageLoads(page, '/security/login-logs', /登录日志/);
+    await expectProtectedPageLoads(page, '/message-center', /消息中心|待办|通知/);
+    await expectProtectedPageLoads(page, '/approvals/requests', /审批请求|新建审批/);
   });
 
   test('restricted user cannot see or access unauthorized operations menu', async ({ page }) => {

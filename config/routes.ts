@@ -29,6 +29,13 @@ export default [
     component: './Dashboard',
   },
   {
+    path: '/message-center',
+    name: 'messageCenter',
+    access: 'canViewMessages',
+    icon: 'BellOutlined',
+    component: './MessageCenter',
+  },
+  {
     path: '/auth',
     name: 'auth',
     icon: 'table',
@@ -142,6 +149,13 @@ export default [
         component: './Security/LoginLogs',
       },
     ],
+  },
+  {
+    path: '/approvals/requests',
+    name: 'approvalRequests',
+    access: 'canViewApprovalRequests',
+    icon: 'AuditOutlined',
+    component: './Approvals/Requests',
   },
   {
     path: '/account/profile',

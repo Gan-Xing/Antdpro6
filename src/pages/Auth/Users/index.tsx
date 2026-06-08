@@ -1,5 +1,6 @@
 import useQueryList from '@/hooks/useQueryList';
 import { useDictOptions } from '@/hooks/useDictOptions';
+import TableExportButton from '@/components/TableExportButton';
 import {
   usersControllerCreate,
   usersControllerFindAllPaged,
@@ -165,8 +166,15 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const { canEditUser, canDeleteUser, canCreateUser, canDisableUser, canResetUserPassword } =
-    useAccess();
+  const {
+    canEditUser,
+    canDeleteUser,
+    canCreateUser,
+    canDisableUser,
+    canResetUserPassword,
+    canExportData,
+  } = useAccess();
+  const [currentRows, setCurrentRows] = useState<User.UsersEntity[]>([]);
   const { valueEnum: genderValueEnum } = useDictOptions('user.gender', genderFallbackOptions);
   const { valueEnum: userStatusValueEnum } = useDictOptions(
     'user.status',
@@ -385,6 +393,25 @@ const TableList: React.FC = () => {
         }}
         // scroll={{ x: 1200 }}
         toolBarRender={() => [
+          canExportData ? (
+            <TableExportButton<User.UsersEntity>
+              key="export"
+              filename="users.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '姓名', dataIndex: 'username' },
+                { title: '邮箱', dataIndex: 'email' },
+                { title: '状态', dataIndex: 'status' },
+                {
+                  title: '角色',
+                  renderText: (record) => record.roles?.map((role) => role.name).join(', '),
+                },
+                { title: '最近登录', dataIndex: 'lastLoginAt' },
+                { title: '创建时间', dataIndex: 'createdAt' },
+              ]}
+            />
+          ) : null,
           canCreateUser && (
             <Button
               type="primary"
@@ -405,6 +432,7 @@ const TableList: React.FC = () => {
               ...filter,
             }),
           );
+          setCurrentRows(data.data ?? []);
           return {
             data: data.data,
             current: data.pagination.current,

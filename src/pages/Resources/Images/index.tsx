@@ -4,6 +4,7 @@ import {
   imagesControllerRemove,
   imagesControllerUpdate,
 } from '@/services/nest-web/images';
+import TableExportButton from '@/components/TableExportButton';
 import { useDictOptions } from '@/hooks/useDictOptions';
 import { unwrapResponse } from '@/utils/apiResponse';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
@@ -84,7 +85,8 @@ const TableList: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<Images.Entity[]>([]);
 
   const intl = useIntl();
-  const { canCreateImage, canUpdateImage, canDeleteImage } = useAccess();
+  const { canCreateImage, canUpdateImage, canDeleteImage, canExportData } = useAccess();
+  const [currentRows, setCurrentRows] = useState<Images.Entity[]>([]);
   const { valueEnum: imageCategoryValueEnum } = useDictOptions(
     'image.category',
     imageCategoryFallbackOptions,
@@ -457,6 +459,27 @@ const TableList: React.FC = () => {
           showQuickJumper: true,
         }}
         toolBarRender={() => [
+          canExportData ? (
+            <TableExportButton<Images.Entity>
+              key="export"
+              filename="images.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '描述', dataIndex: 'description' },
+                { title: '工程类别', dataIndex: 'area' },
+                { title: '分类', dataIndex: 'category' },
+                { title: '桩号', dataIndex: 'stakeNumber' },
+                { title: '标签', renderText: (record) => record.tags?.join(', ') },
+                {
+                  title: '创建者',
+                  renderText: (record) =>
+                    record.createdBy?.username ?? `用户#${record.createdBy?.id ?? '-'}`,
+                },
+                { title: '创建时间', dataIndex: 'createdAt' },
+              ]}
+            />
+          ) : null,
           canCreateImage && (
             <Button
               type="primary"
@@ -476,6 +499,7 @@ const TableList: React.FC = () => {
               toImageQueryParams(params as API.PageParams & Record<string, any>),
             ),
           );
+          setCurrentRows(result.data ?? []);
           return {
             data: result.data || [],
             success: true,

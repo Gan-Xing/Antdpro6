@@ -10,6 +10,7 @@ import {
   systemLogControllerFindAll,
   systemLogControllerFindOne,
 } from '@/services/nest-web/systemLog';
+import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import moment from 'moment';
 import { useAccess } from '@umijs/max';
@@ -19,6 +20,7 @@ const SystemLogs: React.FC = () => {
   const access = useAccess();
   const [detailOpen, setDetailOpen] = useState(false);
   const [currentLog, setCurrentLog] = useState<API.SystemLogDetail>();
+  const [currentRows, setCurrentRows] = useState<API.SystemLog[]>([]);
 
   const openDetail = async (record: API.SystemLog) => {
     try {
@@ -169,6 +171,22 @@ const SystemLogs: React.FC = () => {
               导出日志
             </Button>
           ) : null,
+          access.canExportData ? (
+            <TableExportButton<API.SystemLog>
+              key="export-csv"
+              filename="system-logs.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '用户名', dataIndex: 'username' },
+                { title: '请求内容', dataIndex: 'requestDescription' },
+                { title: 'IP', dataIndex: 'ip' },
+                { title: '耗时', dataIndex: 'duration' },
+                { title: '成功', renderText: (record) => (record.success ? '成功' : '失败') },
+                { title: '创建时间', dataIndex: 'createdAt' },
+              ]}
+            />
+          ) : null,
         ]}
         request={async (
           params: {
@@ -188,6 +206,7 @@ const SystemLogs: React.FC = () => {
               ...rest,
             }),
           );
+          setCurrentRows(result.data ?? []);
           return {
             data: result.data,
             success: true,

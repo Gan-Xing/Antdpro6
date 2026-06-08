@@ -83,6 +83,20 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
     canViewSystemVersion: can(currentUser, 'system.version.view', '查看版本信息'),
     canViewSystemQueues: can(currentUser, 'system.queues.view', '查看队列状态'),
 
+    // 消息中心
+    canViewMessages: can(currentUser, 'message.view', '查看消息'),
+    canManageMessages: can(currentUser, 'message.manage', '管理消息'),
+    canCompleteMessages: can(currentUser, 'message.complete', '完成待办'),
+
+    // 审批请求
+    canViewApprovalRequests: can(currentUser, 'approval.requests.view', '查看审批请求'),
+    canCreateApprovalRequests: can(currentUser, 'approval.requests.create', '创建审批请求'),
+    canApproveApprovalRequests: can(currentUser, 'approval.requests.approve', '通过审批请求'),
+    canRejectApprovalRequests: can(currentUser, 'approval.requests.reject', '驳回审批请求'),
+    canCancelApprovalRequests: can(currentUser, 'approval.requests.cancel', '取消审批请求'),
+    canManageApprovalRequests: can(currentUser, 'approval.requests.manage', '管理全部审批请求'),
+    canExportData: can(currentUser, 'export.data', '导出数据'),
+
     // 账号安全
     canViewLoginLogs: can(currentUser, 'security.loginLogs.view', '查看登录日志'),
     canViewProfile: can(currentUser, 'account.profile.view', '查看个人资料'),

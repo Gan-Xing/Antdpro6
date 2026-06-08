@@ -2,10 +2,12 @@ import {
   loginLogsControllerFindAll,
   loginLogsControllerFindOne,
 } from '@/services/nest-web/loginLogs';
+import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { Drawer, message, Tag } from 'antd';
+import { useAccess } from '@umijs/max';
 import React, { useRef, useState } from 'react';
 
 const formatTime = (value?: string | null) => {
@@ -17,8 +19,10 @@ const formatTime = (value?: string | null) => {
 
 const LoginLogsPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const access = useAccess();
   const [detailOpen, setDetailOpen] = useState(false);
   const [currentLog, setCurrentLog] = useState<NestWebAPI.LoginLogEntity>();
+  const [currentRows, setCurrentRows] = useState<NestWebAPI.LoginLogEntity[]>([]);
 
   const columns: ProColumns<NestWebAPI.LoginLogEntity>[] = [
     {
@@ -103,6 +107,24 @@ const LoginLogsPage: React.FC = () => {
         search={{ labelWidth: 120 }}
         pagination={{ defaultPageSize: 20, showSizeChanger: true }}
         columns={columns}
+        toolBarRender={() => [
+          access.canExportData ? (
+            <TableExportButton<NestWebAPI.LoginLogEntity>
+              key="export"
+              filename="login-logs.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '用户', dataIndex: 'username' },
+                { title: '邮箱', dataIndex: 'email' },
+                { title: 'IP', dataIndex: 'ip' },
+                { title: '结果', renderText: (record) => (record.success ? '成功' : '失败') },
+                { title: '失败原因', dataIndex: 'failureReason' },
+                { title: '登录时间', dataIndex: 'createdAt' },
+              ]}
+            />
+          ) : null,
+        ]}
         request={async (
           params: NestWebAPI.LoginLogsControllerFindAllParams & {
             createdAt?: string[];
@@ -119,6 +141,7 @@ const LoginLogsPage: React.FC = () => {
               ...rest,
             }),
           );
+          setCurrentRows(result.data ?? []);
 
           return {
             data: result.data,

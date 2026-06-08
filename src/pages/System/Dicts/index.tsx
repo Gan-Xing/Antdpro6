@@ -8,6 +8,7 @@ import {
   dictsControllerUpdateItem,
   dictsControllerUpdateType,
 } from '@/services/nest-web/dicts';
+import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -59,7 +60,9 @@ const DictsPage: React.FC = () => {
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [editingType, setEditingType] = useState<NestWebAPI.DictTypeEntity>();
   const [editingItem, setEditingItem] = useState<NestWebAPI.DictItemEntity>();
-  const { canCreateDicts, canEditDicts, canDeleteDicts } = useAccess();
+  const { canCreateDicts, canEditDicts, canDeleteDicts, canExportData } = useAccess();
+  const [typeRows, setTypeRows] = useState<NestWebAPI.DictTypeEntity[]>([]);
+  const [itemRows, setItemRows] = useState<NestWebAPI.DictItemEntity[]>([]);
 
   const typeColumns = useMemo<ProColumns<NestWebAPI.DictTypeEntity>[]>(
     () => [
@@ -229,6 +232,20 @@ const DictsPage: React.FC = () => {
               record.id === currentType?.id ? 'ant-table-row-selected' : ''
             }
             toolBarRender={() => [
+              canExportData ? (
+                <TableExportButton<NestWebAPI.DictTypeEntity>
+                  key="export"
+                  filename="dict-types.csv"
+                  rows={typeRows}
+                  columns={[
+                    { title: 'ID', dataIndex: 'id' },
+                    { title: '编码', dataIndex: 'code' },
+                    { title: '名称', dataIndex: 'name' },
+                    { title: '状态', renderText: (record) => (record.enabled ? '启用' : '停用') },
+                    { title: '排序', dataIndex: 'sort' },
+                  ]}
+                />
+              ) : null,
               canCreateDicts && (
                 <Button
                   key="create"
@@ -251,6 +268,7 @@ const DictsPage: React.FC = () => {
                   keyword: params.keyword as string,
                 }),
               );
+              setTypeRows(result.data ?? []);
               return {
                 data: result.data,
                 success: true,
@@ -262,19 +280,37 @@ const DictsPage: React.FC = () => {
         <ProCard
           title={currentType ? `字典项：${currentType.name}` : '字典项'}
           extra={
-            canCreateDicts ? (
-              <Button
-                disabled={!currentType}
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  setEditingItem(undefined);
-                  setItemModalOpen(true);
-                }}
-              >
-                新增字典项
-              </Button>
-            ) : null
+            <Space>
+              {canExportData ? (
+                <TableExportButton<NestWebAPI.DictItemEntity>
+                  filename="dict-items.csv"
+                  rows={itemRows}
+                  disabled={!currentType}
+                  columns={[
+                    { title: 'ID', dataIndex: 'id' },
+                    { title: '编码', dataIndex: 'code' },
+                    { title: '标签', dataIndex: 'label' },
+                    { title: '值', dataIndex: 'value' },
+                    { title: '颜色', dataIndex: 'color' },
+                    { title: '状态', renderText: (record) => (record.enabled ? '启用' : '停用') },
+                    { title: '排序', dataIndex: 'sort' },
+                  ]}
+                />
+              ) : null}
+              {canCreateDicts ? (
+                <Button
+                  disabled={!currentType}
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => {
+                    setEditingItem(undefined);
+                    setItemModalOpen(true);
+                  }}
+                >
+                  新增字典项
+                </Button>
+              ) : null}
+            </Space>
           }
         >
           <ProTable<NestWebAPI.DictItemEntity>
@@ -285,11 +321,13 @@ const DictsPage: React.FC = () => {
             columns={itemColumns}
             request={async () => {
               if (!currentType?.id) {
+                setItemRows([]);
                 return { data: [], success: true };
               }
               const data = unwrapResponse<NestWebAPI.DictItemEntity[]>(
                 await dictsControllerFindItems({ dictTypeId: currentType.id }),
               );
+              setItemRows(data);
               return { data, success: true };
             }}
           />

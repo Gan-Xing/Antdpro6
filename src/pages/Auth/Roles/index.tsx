@@ -1,3 +1,4 @@
+import TableExportButton from '@/components/TableExportButton';
 import {
   rolesControllerCreate,
   rolesControllerFindAll,
@@ -118,7 +119,8 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const { canCreateRole, canEditRole, canDeleteRole } = useAccess();
+  const { canCreateRole, canEditRole, canDeleteRole, canExportData } = useAccess();
+  const [currentRows, setCurrentRows] = useState<Roles.Entity[]>([]);
   const rawColumns: Array<ProColumns<Roles.Entity> | false> = [
     {
       title: '角色编码',
@@ -277,6 +279,25 @@ const TableList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
+          canExportData ? (
+            <TableExportButton<Roles.Entity>
+              key="export"
+              filename="roles.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '角色编码', dataIndex: 'code' },
+                { title: '名称', dataIndex: 'name' },
+                { title: '说明', dataIndex: 'description' },
+                { title: '状态', renderText: (record) => (record.enabled ? '启用' : '停用') },
+                {
+                  title: '权限',
+                  renderText: (record) => record.permissions?.map((item) => item.name).join(', '),
+                },
+                { title: '创建时间', dataIndex: 'createdAt' },
+              ]}
+            />
+          ) : null,
           canCreateRole && (
             <Button
               type="primary"
@@ -291,6 +312,7 @@ const TableList: React.FC = () => {
         ]}
         request={async () => {
           const data = unwrapResponse<NestWebAPI.RoleEntity[]>(await rolesControllerFindAll());
+          setCurrentRows(data as unknown as Roles.Entity[]);
           return {
             data: data as unknown as Roles.Entity[],
             success: true,

@@ -4,6 +4,7 @@ import {
   permissionsControllerRemoveMany,
   permissionsControllerUpdate,
 } from '@/services/nest-web/permissions';
+import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -17,6 +18,9 @@ import Update, { FormValueType } from './components/Update';
 
 const systemManagedPermissionCodes = new Set([
   'dashboard.view',
+  'message.view',
+  'message.manage',
+  'message.complete',
   'auth.users.view',
   'auth.users.create',
   'auth.users.update',
@@ -43,6 +47,30 @@ const systemManagedPermissionCodes = new Set([
   'system.logs.detail',
   'system.logs.export',
   'system.logs.delete',
+  'system.dicts.view',
+  'system.dicts.create',
+  'system.dicts.update',
+  'system.dicts.delete',
+  'system.config.view',
+  'system.config.update',
+  'system.files.view',
+  'system.files.upload',
+  'system.files.download',
+  'system.files.delete',
+  'system.status.view',
+  'system.version.view',
+  'system.queues.view',
+  'security.loginLogs.view',
+  'approval.requests.view',
+  'approval.requests.create',
+  'approval.requests.approve',
+  'approval.requests.reject',
+  'approval.requests.cancel',
+  'approval.requests.manage',
+  'account.profile.view',
+  'account.profile.update',
+  'account.password.change',
+  'export.data',
 ]);
 
 const isSystemManagedPermission = (permission?: Partial<Permissions.Entity>) =>
@@ -135,7 +163,9 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
-  const { canEditPermission, canDeletePermission, canCreatePermission } = useAccess();
+  const { canEditPermission, canDeletePermission, canCreatePermission, canExportData } =
+    useAccess();
+  const [currentRows, setCurrentRows] = useState<Permissions.Entity[]>([]);
   const rawColumns: Array<ProColumns<Permissions.Entity> | false> = [
     {
       title: <FormattedMessage id="pages.permission.name" defaultMessage="权限名称" />,
@@ -281,6 +311,28 @@ const TableList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
+          canExportData ? (
+            <TableExportButton<Permissions.Entity>
+              key="export"
+              filename="permissions.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '权限编码', dataIndex: 'code' },
+                { title: '权限名称', dataIndex: 'name' },
+                { title: '请求方法', dataIndex: 'action' },
+                { title: '请求路径', dataIndex: 'path' },
+                {
+                  title: '权限组',
+                  renderText: (record) =>
+                    `${record.permissionGroup?.parent?.name ? `${record.permissionGroup.parent.name}-` : ''}${
+                      record.permissionGroup?.name ?? ''
+                    }`,
+                },
+                { title: '创建时间', dataIndex: 'createdAt' },
+              ]}
+            />
+          ) : null,
           canCreatePermission && (
             <Button
               type="primary"
@@ -297,6 +349,7 @@ const TableList: React.FC = () => {
           const data = unwrapResponse<NestWebAPI.PermissionEntity[]>(
             await permissionsControllerFindAll(),
           );
+          setCurrentRows(data as Permissions.Entity[]);
           return {
             data: data as Permissions.Entity[],
             success: true,

@@ -4,6 +4,7 @@ import {
   filesControllerRemove,
   filesControllerUpload,
 } from '@/services/nest-web/files';
+import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import { InboxOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -11,7 +12,7 @@ import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { useAccess } from '@umijs/max';
 import { Modal, Space, Tag, Upload, message } from 'antd';
 import type { UploadProps } from 'antd/es/upload/interface';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 const formatFileSize = (size: number) => {
   if (size < 1024) return `${size} B`;
@@ -21,7 +22,8 @@ const formatFileSize = (size: number) => {
 
 const FilesPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const { canUploadFiles, canDownloadFiles, canDeleteFiles } = useAccess();
+  const { canUploadFiles, canDownloadFiles, canDeleteFiles, canExportData } = useAccess();
+  const [currentRows, setCurrentRows] = useState<NestWebAPI.FileAssetEntity[]>([]);
 
   const handleDownload = async (record: NestWebAPI.FileAssetEntity) => {
     try {
@@ -159,6 +161,27 @@ const FilesPage: React.FC = () => {
           search={{ labelWidth: 90 }}
           pagination={{ defaultPageSize: 20, showSizeChanger: true }}
           columns={columns}
+          toolBarRender={() => [
+            canExportData ? (
+              <TableExportButton<NestWebAPI.FileAssetEntity>
+                key="export"
+                filename="files.csv"
+                rows={currentRows}
+                columns={[
+                  { title: 'ID', dataIndex: 'id' },
+                  { title: '文件名', dataIndex: 'originalName' },
+                  { title: '类型', dataIndex: 'mimeType' },
+                  { title: '分类', dataIndex: 'category' },
+                  { title: '大小', dataIndex: 'size' },
+                  {
+                    title: '上传人',
+                    renderText: (record) => record.uploader?.username ?? record.uploader?.email,
+                  },
+                  { title: '上传时间', dataIndex: 'createdAt' },
+                ]}
+              />
+            ) : null,
+          ]}
           request={async (params) => {
             const [startTime, endTime] = (params.createdAt as string[]) || [];
             const result = unwrapResponse<any>(
@@ -172,6 +195,7 @@ const FilesPage: React.FC = () => {
                 endTime,
               }),
             );
+            setCurrentRows(result.data ?? []);
             return {
               data: result.data,
               success: true,

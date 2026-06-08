@@ -46,4 +46,5 @@ Use a dedicated non-production admin test account for E2E.
 - Logout returns to `/user/login`.
 - Accessing a protected page after logout redirects to `/user/login`.
 - Dashboard, system status, system version, system queues, and login logs pages load for an admin.
+- Message center and approval request pages load for an admin.
 - A restricted user cannot see unauthorized operations menus and receives the 403 result when visiting those routes directly.

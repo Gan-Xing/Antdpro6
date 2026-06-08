@@ -723,6 +723,141 @@ declare namespace NestWebAPI {
     id: number;
   };
 
+  type MessageType = 'NOTIFICATION' | 'TODO';
+
+  type MessageCategory = 'SYSTEM' | 'SECURITY' | 'APPROVAL' | 'TASK' | 'CUSTOM';
+
+  type MessageEntity = {
+    id: number;
+    userId: number;
+    title: string;
+    content?: string | null;
+    type: MessageType;
+    category: MessageCategory;
+    link?: string | null;
+    businessType?: string | null;
+    businessId?: string | null;
+    readAt?: string | null;
+    completedAt?: string | null;
+    cancelledAt?: string | null;
+    createdById?: number | null;
+    createdAt: string;
+    updatedAt: string;
+  };
+
+  type MessageUnreadCountEntity = {
+    unreadNotifications: number;
+    pendingTodos: number;
+    total: number;
+  };
+
+  type MessageListEntity = {
+    data: MessageEntity[];
+    pagination: {
+      current: number;
+      pageSize: number;
+      total: number;
+      totalPages?: number;
+    };
+  };
+
+  type MessagesControllerFindAllParams = {
+    current?: number;
+    pageSize?: number;
+    type?: MessageType | 'notification' | 'todo';
+    category?: MessageCategory | 'system' | 'security' | 'approval' | 'task' | 'custom';
+    state?: 'unread' | 'read' | 'pending' | 'done' | 'cancelled';
+    keyword?: string;
+    businessType?: string;
+    businessId?: string;
+    scope?: 'mine' | 'all';
+  };
+
+  type MessagesControllerMessageActionParams = {
+    id: number;
+  };
+
+  type ApprovalRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+
+  type ApprovalApproverType = 'USER' | 'ROLE';
+
+  type ApprovalActionType = 'SUBMIT' | 'APPROVE' | 'REJECT' | 'CANCEL' | 'COMMENT';
+
+  type ApprovalActionEntity = {
+    id: number;
+    requestId: number;
+    actorId: number;
+    action: ApprovalActionType;
+    comment?: string | null;
+    createdAt: string;
+    actor?: Pick<UserEntity, 'id' | 'username' | 'email'>;
+  };
+
+  type ApprovalRequestEntity = {
+    id: number;
+    title: string;
+    description?: string | null;
+    businessType: string;
+    businessId?: string | null;
+    payload?: Record<string, any> | null;
+    applicantId: number;
+    applicant?: Pick<UserEntity, 'id' | 'username' | 'email'>;
+    approverType: ApprovalApproverType;
+    approverUserId?: number | null;
+    approverUser?: Pick<UserEntity, 'id' | 'username' | 'email'> | null;
+    approverRoleCode?: string | null;
+    status: ApprovalRequestStatus;
+    decidedAt?: string | null;
+    createdAt: string;
+    updatedAt: string;
+    actions?: ApprovalActionEntity[];
+  };
+
+  type ApprovalRequestListEntity = {
+    data: ApprovalRequestEntity[];
+    pagination: {
+      current: number;
+      pageSize: number;
+      total: number;
+      totalPages?: number;
+    };
+  };
+
+  type CreateApprovalRequestDto = {
+    title: string;
+    description?: string;
+    businessType: string;
+    businessId?: string;
+    approverType: ApprovalApproverType;
+    approverUserId?: number;
+    approverRoleCode?: string;
+    payload?: Record<string, any>;
+  };
+
+  type ApprovalActionDto = {
+    comment?: string;
+  };
+
+  type ApprovalRequestsControllerFindAllParams = {
+    current?: number;
+    pageSize?: number;
+    status?: ApprovalRequestStatus;
+    keyword?: string;
+    businessType?: string;
+    applicantId?: number;
+    approverRoleCode?: string;
+    mine?: boolean;
+    pendingForMe?: boolean;
+  };
+
+  type ApprovalRequestsControllerFindOneParams = {
+    id: number;
+  };
+
+  type ApprovalRequestsControllerActionParams = {
+    id: number;
+  };
+
   type SystemDependencyStatus = 'ok' | 'error';
 
   type SystemDependencyHealthEntity = {

@@ -2,6 +2,7 @@ import {
   systemConfigControllerFindAll,
   systemConfigControllerUpdate,
 } from '@/services/nest-web/systemConfig';
+import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
@@ -18,8 +19,9 @@ import React, { useRef, useState } from 'react';
 const SystemConfigPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentConfig, setCurrentConfig] = useState<NestWebAPI.SystemConfigEntity>();
+  const [currentRows, setCurrentRows] = useState<NestWebAPI.SystemConfigEntity[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const { canEditSystemConfig } = useAccess();
+  const { canEditSystemConfig, canExportData } = useAccess();
 
   const columns: ProColumns<NestWebAPI.SystemConfigEntity>[] = [
     {
@@ -117,6 +119,24 @@ const SystemConfigPage: React.FC = () => {
         search={{ labelWidth: 90 }}
         pagination={{ defaultPageSize: 20, showSizeChanger: true }}
         columns={columns}
+        toolBarRender={() => [
+          canExportData ? (
+            <TableExportButton<NestWebAPI.SystemConfigEntity>
+              key="export"
+              filename="system-config.csv"
+              rows={currentRows}
+              columns={[
+                { title: 'ID', dataIndex: 'id' },
+                { title: '参数键', dataIndex: 'key' },
+                { title: '名称', dataIndex: 'name' },
+                { title: '分组', dataIndex: 'group' },
+                { title: '类型', dataIndex: 'valueType' },
+                { title: '值', dataIndex: 'value' },
+                { title: '更新时间', dataIndex: 'updatedAt' },
+              ]}
+            />
+          ) : null,
+        ]}
         request={async (params) => {
           const result = unwrapResponse<any>(
             await systemConfigControllerFindAll({
@@ -126,6 +146,7 @@ const SystemConfigPage: React.FC = () => {
               keyword: params.keyword as string,
             }),
           );
+          setCurrentRows(result.data ?? []);
           return {
             data: result.data,
             success: true,

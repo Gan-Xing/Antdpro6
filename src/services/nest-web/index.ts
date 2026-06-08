@@ -20,6 +20,8 @@ import * as dicts from './dicts';
 import * as systemConfig from './systemConfig';
 import * as files from './files';
 import * as system from './system';
+import * as messages from './messages';
+import * as approvalRequests from './approvalRequests';
 import * as app from './app';
 import * as prometheus from './prometheus';
 export default {
@@ -41,6 +43,8 @@ export default {
   systemConfig,
   files,
   system,
+  messages,
+  approvalRequests,
   app,
   prometheus,
 };
