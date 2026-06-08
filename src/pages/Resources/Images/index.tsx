@@ -4,6 +4,7 @@ import {
   imagesControllerRemove,
   imagesControllerUpdate,
 } from '@/services/nest-web/images';
+import { useDictOptions } from '@/hooks/useDictOptions';
 import { unwrapResponse } from '@/utils/apiResponse';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -15,6 +16,7 @@ import Create from './components/Create';
 import Show from './components/Show';
 import Update from './components/Update';
 import ImagePreview from './components/ImagePreview';
+import { imageCategoryFallbackOptions } from './constants';
 
 const { RangePicker } = DatePicker;
 
@@ -83,6 +85,10 @@ const TableList: React.FC = () => {
 
   const intl = useIntl();
   const { canCreateImage, canUpdateImage, canDeleteImage } = useAccess();
+  const { valueEnum: imageCategoryValueEnum } = useDictOptions(
+    'image.category',
+    imageCategoryFallbackOptions,
+  );
 
   /**
    * @en-US Add node
@@ -261,11 +267,7 @@ const TableList: React.FC = () => {
       dataIndex: 'category',
       valueType: 'select',
       responsive: ['sm'],
-      valueEnum: {
-        progress: { text: intl.formatMessage({ id: 'pages.resources.images.category.progress' }) },
-        safety: { text: intl.formatMessage({ id: 'pages.resources.images.category.safety' }) },
-        quality: { text: intl.formatMessage({ id: 'pages.resources.images.category.quality' }) },
-      },
+      valueEnum: imageCategoryValueEnum,
       ellipsis: true,
     },
     {

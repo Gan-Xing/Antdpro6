@@ -3,6 +3,7 @@ import {
   accountControllerProfile,
   accountControllerUpdateProfile,
 } from '@/services/nest-web/account';
+import { useDictOptions } from '@/hooks/useDictOptions';
 import { clearSessionAndRedirect } from '@/utils/session';
 import { unwrapResponse } from '@/utils/apiResponse';
 import {
@@ -16,7 +17,7 @@ import {
 import { useAccess, useModel } from '@umijs/max';
 import { Alert, Button, Col, Form, message, Row, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { genderValueEnum, renderUserStatus } from '../../Auth/Users/constants';
+import { genderFallbackOptions, renderUserStatus } from '../../Auth/Users/constants';
 
 const formatTime = (value?: string | Date | null) => {
   if (!value) return '-';
@@ -31,6 +32,7 @@ const ProfilePage: React.FC = () => {
   const [profileForm] = Form.useForm();
   const { setInitialState } = useModel('@@initialState');
   const { canEditProfile, canChangePassword } = useAccess();
+  const { options: genderOptions } = useDictOptions('user.gender', genderFallbackOptions);
 
   const loadProfile = async () => {
     setLoading(true);
@@ -98,7 +100,7 @@ const ProfilePage: React.FC = () => {
                   name="gender"
                   label="性别"
                   width="md"
-                  valueEnum={genderValueEnum}
+                  options={genderOptions}
                   placeholder="请选择"
                 />
               </ProForm.Group>

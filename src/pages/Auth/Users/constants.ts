@@ -1,6 +1,17 @@
 import { Tag } from 'antd';
 import React from 'react';
 
+export const userStatusFallbackOptions = [
+  { label: '启用', value: 'active', color: 'success' },
+  { label: '禁用', value: 'disabled', color: 'error' },
+  { label: '离职', value: 'resigned', color: 'default' },
+];
+
+export const genderFallbackOptions = [
+  { label: '男', value: 'Male', color: 'blue' },
+  { label: '女', value: 'Female', color: 'magenta' },
+];
+
 export const userStatusValueEnum = {
   active: { text: '启用', status: 'Success' },
   disabled: { text: '禁用', status: 'Error' },

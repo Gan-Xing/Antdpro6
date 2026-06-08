@@ -1,8 +1,9 @@
 import useQueryList from '@/hooks/useQueryList';
+import { useDictOptions } from '@/hooks/useDictOptions';
 import { ProForm, ProFormCheckbox, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import React from 'react';
-import { genderValueEnum, userStatusValueEnum } from '../constants';
+import { genderFallbackOptions, userStatusFallbackOptions } from '../constants';
 interface Props {
   newRecord?: boolean;
   protectAdminRole?: boolean;
@@ -10,6 +11,8 @@ interface Props {
 const BaseForm: React.FC<Props> = (props) => {
   const { newRecord, protectAdminRole } = props;
   const { items: roles } = useQueryList('/roles');
+  const { options: genderOptions } = useDictOptions('user.gender', genderFallbackOptions);
+  const { options: statusOptions } = useDictOptions('user.status', userStatusFallbackOptions);
   const intl = useIntl();
   return (
     <>
@@ -60,7 +63,7 @@ const BaseForm: React.FC<Props> = (props) => {
             id: 'pages.users.gender',
             defaultMessage: '性别',
           })}
-          valueEnum={genderValueEnum}
+          options={genderOptions}
           width="md"
           placeholder={intl.formatMessage({
             id: 'pages.searchTable.select.placeholder',
@@ -105,7 +108,7 @@ const BaseForm: React.FC<Props> = (props) => {
             id: 'pages.users.status',
             defaultMessage: '在职状态',
           })}
-          valueEnum={userStatusValueEnum}
+          options={statusOptions}
           width="md"
           placeholder={intl.formatMessage({
             id: 'pages.searchTable.select.placeholder',

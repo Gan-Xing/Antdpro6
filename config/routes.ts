@@ -85,6 +85,27 @@ export default [
         icon: 'FileTextOutlined', // 更适合日志的文本文件图标
         component: './System/SystemLogs',
       },
+      {
+        path: '/system/dicts',
+        name: 'dicts',
+        access: 'canViewDicts',
+        icon: 'ProfileOutlined',
+        component: './System/Dicts',
+      },
+      {
+        path: '/system/config',
+        name: 'config',
+        access: 'canViewSystemConfig',
+        icon: 'ControlOutlined',
+        component: './System/Config',
+      },
+      {
+        path: '/system/files',
+        name: 'files',
+        access: 'canViewFiles',
+        icon: 'CloudUploadOutlined',
+        component: './System/Files',
+      },
     ],
   },
   {

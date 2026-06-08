@@ -65,6 +65,19 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
     canExportSystemLogs: can(currentUser, 'system.logs.export', '导出系统日志'),
     canDeleteSystemLogs: can(currentUser, 'system.logs.delete', '删除系统日志'),
 
+    canViewDicts: can(currentUser, 'system.dicts.view', '查看字典'),
+    canCreateDicts: can(currentUser, 'system.dicts.create', '新增字典'),
+    canEditDicts: can(currentUser, 'system.dicts.update', '编辑字典'),
+    canDeleteDicts: can(currentUser, 'system.dicts.delete', '删除字典'),
+
+    canViewSystemConfig: can(currentUser, 'system.config.view', '查看系统参数'),
+    canEditSystemConfig: can(currentUser, 'system.config.update', '编辑系统参数'),
+
+    canViewFiles: can(currentUser, 'system.files.view', '查看文件'),
+    canUploadFiles: can(currentUser, 'system.files.upload', '上传文件'),
+    canDownloadFiles: can(currentUser, 'system.files.download', '下载文件'),
+    canDeleteFiles: can(currentUser, 'system.files.delete', '删除文件'),
+
     // 账号安全
     canViewLoginLogs: can(currentUser, 'security.loginLogs.view', '查看登录日志'),
     canViewProfile: can(currentUser, 'account.profile.view', '查看个人资料'),

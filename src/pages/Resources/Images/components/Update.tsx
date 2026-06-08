@@ -4,9 +4,11 @@ import { message, Upload } from 'antd';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import React, { useEffect, useState } from 'react';
 import { getAccessToken, formatToken } from '@/utils/auth';
+import { useDictOptions } from '@/hooks/useDictOptions';
 import MapPicker from './MapPicker';
 import { Form } from 'antd';
 import { useIntl } from '@umijs/max';
+import { imageCategoryFallbackOptions } from '../constants';
 
 interface UpdateFormProps {
   updateModalOpen: boolean;
@@ -20,6 +22,10 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [mapLocation, setMapLocation] = useState<Images.LocationType>();
   const [form] = Form.useForm();
   const intl = useIntl();
+  const { options: imageCategoryOptions } = useDictOptions(
+    'image.category',
+    imageCategoryFallbackOptions,
+  );
 
   useEffect(() => {
     if (props.updateModalOpen && props.values) {
@@ -289,20 +295,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           id: 'pages.resources.images.category.placeholder',
           defaultMessage: '请选择分类',
         })}
-        options={[
-          {
-            label: intl.formatMessage({ id: 'pages.resources.images.category.progress' }),
-            value: 'progress',
-          },
-          {
-            label: intl.formatMessage({ id: 'pages.resources.images.category.safety' }),
-            value: 'safety',
-          },
-          {
-            label: intl.formatMessage({ id: 'pages.resources.images.category.quality' }),
-            value: 'quality',
-          },
-        ]}
+        options={imageCategoryOptions}
         rules={[{ required: true }]}
       />
       <ProFormSelect

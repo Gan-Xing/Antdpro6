@@ -16,6 +16,9 @@ import * as systemLog from './systemLog';
 import * as dashboard from './dashboard';
 import * as account from './account';
 import * as loginLogs from './loginLogs';
+import * as dicts from './dicts';
+import * as systemConfig from './systemConfig';
+import * as files from './files';
 import * as app from './app';
 import * as prometheus from './prometheus';
 export default {
@@ -33,6 +36,9 @@ export default {
   dashboard,
   account,
   loginLogs,
+  dicts,
+  systemConfig,
+  files,
   app,
   prometheus,
 };

@@ -121,6 +121,41 @@ declare namespace NestWebAPI {
     newPassword: string;
   };
 
+  type CreateDictTypeDto = {
+    code: string;
+    name: string;
+    description?: string;
+    enabled?: boolean;
+    sort?: number;
+  };
+
+  type UpdateDictTypeDto = {
+    name?: string;
+    description?: string;
+    enabled?: boolean;
+    sort?: number;
+  };
+
+  type CreateDictItemDto = {
+    dictTypeId: number;
+    code: string;
+    label: string;
+    value: string;
+    color?: string;
+    description?: string;
+    enabled?: boolean;
+    sort?: number;
+  };
+
+  type UpdateDictItemDto = {
+    label?: string;
+    value?: string;
+    color?: string;
+    description?: string;
+    enabled?: boolean;
+    sort?: number;
+  };
+
   type DashboardHealthEntity = {
     status: string;
     service: string;
@@ -147,6 +182,158 @@ declare namespace NestWebAPI {
     health: DashboardHealthEntity;
     metrics: DashboardMetricsEntity;
     recentLogs: DashboardRecentLogEntity[];
+  };
+
+  type DictTypeEntity = {
+    id: number;
+    code: string;
+    name: string;
+    description?: string | null;
+    enabled: boolean;
+    sort: number;
+    createdAt: string;
+    updatedAt: string;
+    items?: DictItemEntity[];
+  };
+
+  type DictItemEntity = {
+    id: number;
+    dictTypeId: number;
+    code: string;
+    label: string;
+    value: string;
+    color?: string | null;
+    description?: string | null;
+    enabled: boolean;
+    sort: number;
+    createdAt: string;
+    updatedAt: string;
+    dictType?: DictTypeEntity;
+  };
+
+  type DictsControllerFindTypesParams = {
+    current?: number;
+    pageSize?: number;
+    keyword?: string;
+    enabled?: boolean;
+  };
+
+  type DictsControllerUpdateTypeParams = {
+    id: number;
+  };
+
+  type DictsControllerRemoveTypeParams = {
+    id: number;
+  };
+
+  type DictsControllerFindItemsParams = {
+    dictTypeId?: number;
+    typeCode?: string;
+    keyword?: string;
+    enabled?: boolean;
+  };
+
+  type DictsControllerFindItemsByTypeCodeParams = {
+    code: string;
+  };
+
+  type DictsControllerUpdateItemParams = {
+    id: number;
+  };
+
+  type DictsControllerRemoveItemParams = {
+    id: number;
+  };
+
+  type SystemConfigEntity = {
+    id: number;
+    key: string;
+    name: string;
+    value: string;
+    valueType: string;
+    group: string;
+    description?: string | null;
+    editable: boolean;
+    enabled: boolean;
+    sort: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+
+  type UpdateSystemConfigDto = {
+    value: string;
+  };
+
+  type SystemConfigControllerFindAllParams = {
+    current?: number;
+    pageSize?: number;
+    group?: string;
+    keyword?: string;
+    enabled?: boolean;
+  };
+
+  type SystemConfigControllerFindOneParams = {
+    id: number;
+  };
+
+  type SystemConfigControllerUpdateParams = {
+    id: number;
+  };
+
+  type UploadFileAssetDto = {
+    category?: string;
+    description?: string;
+  };
+
+  type FileAssetEntity = {
+    id: number;
+    originalName: string;
+    filename: string;
+    storagePath: string;
+    url: string;
+    mimeType: string;
+    size: number;
+    extension?: string | null;
+    category?: string | null;
+    description?: string | null;
+    uploaderId?: number | null;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt?: string | null;
+    uploader?: {
+      id: number;
+      username?: string | null;
+      email?: string | null;
+      avatar?: string | null;
+    } | null;
+  };
+
+  type FileDownloadEntity = {
+    id: number;
+    originalName: string;
+    url: string;
+  };
+
+  type FilesControllerFindAllParams = {
+    current?: number;
+    pageSize?: number;
+    keyword?: string;
+    category?: string;
+    mimeType?: string;
+    startTime?: string;
+    endTime?: string;
+  };
+
+  type FilesControllerFindOneParams = {
+    id: number;
+  };
+
+  type FilesControllerGetDownloadUrlParams = {
+    id: number;
+  };
+
+  type FilesControllerRemoveParams = {
+    id: number;
   };
 
   type ImagesControllerFindAllParams = {

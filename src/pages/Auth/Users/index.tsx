@@ -1,4 +1,5 @@
 import useQueryList from '@/hooks/useQueryList';
+import { useDictOptions } from '@/hooks/useDictOptions';
 import {
   usersControllerCreate,
   usersControllerFindAllPaged,
@@ -17,7 +18,7 @@ import React, { useRef, useState } from 'react';
 import Create from './components/Create';
 import Show from './components/Show';
 import Update from './components/Update';
-import { genderValueEnum, renderUserStatus, userStatusValueEnum } from './constants';
+import { genderFallbackOptions, renderUserStatus, userStatusFallbackOptions } from './constants';
 
 /**
  * @en-US Add node
@@ -166,6 +167,11 @@ const TableList: React.FC = () => {
   const intl = useIntl();
   const { canEditUser, canDeleteUser, canCreateUser, canDisableUser, canResetUserPassword } =
     useAccess();
+  const { valueEnum: genderValueEnum } = useDictOptions('user.gender', genderFallbackOptions);
+  const { valueEnum: userStatusValueEnum } = useDictOptions(
+    'user.status',
+    userStatusFallbackOptions,
+  );
   const isCurrentUser = (user?: Partial<User.UsersEntity>) => user?.id === currentUserId;
   const rawColumns: Array<ProColumns<User.UsersEntity> | false> = [
     {

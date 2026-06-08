@@ -5,8 +5,10 @@ import type { RcFile, UploadProps } from 'antd/es/upload';
 import type { UploadFile } from 'antd/es/upload/interface';
 import MapPicker from './MapPicker';
 import { getAccessToken, formatToken } from '@/utils/auth';
+import { useDictOptions } from '@/hooks/useDictOptions';
 import React, { useState } from 'react';
 import { useIntl } from '@umijs/max';
+import { imageCategoryFallbackOptions } from '../constants';
 
 interface CreateFormProps {
   createModalOpen: boolean;
@@ -20,6 +22,10 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
   const [locations, setLocations] = useState<Images.LocationType[]>([]);
   const [form] = Form.useForm();
   const intl = useIntl();
+  const { options: imageCategoryOptions } = useDictOptions(
+    'image.category',
+    imageCategoryFallbackOptions,
+  );
 
   const handleUpload = async ({ file, fileList }: any) => {
     const updatedFileList = fileList.map((f: UploadFile) => {
@@ -281,20 +287,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           id: 'pages.resources.images.category.placeholder',
           defaultMessage: '请选择分类',
         })}
-        options={[
-          {
-            label: intl.formatMessage({ id: 'pages.resources.images.category.progress' }),
-            value: 'progress',
-          },
-          {
-            label: intl.formatMessage({ id: 'pages.resources.images.category.safety' }),
-            value: 'safety',
-          },
-          {
-            label: intl.formatMessage({ id: 'pages.resources.images.category.quality' }),
-            value: 'quality',
-          },
-        ]}
+        options={imageCategoryOptions}
         initialValue="progress"
         rules={[{ required: true }]}
       />
