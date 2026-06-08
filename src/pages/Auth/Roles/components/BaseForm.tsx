@@ -1,6 +1,12 @@
 import { permissionsControllerFindTree } from '@/services/nest-web/permissions';
 import { unwrapResponse } from '@/utils/apiResponse';
-import { ProForm, ProFormText } from '@ant-design/pro-components';
+import {
+  ProForm,
+  ProFormDigit,
+  ProFormSwitch,
+  ProFormText,
+  ProFormTextArea,
+} from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Form, FormInstance, message, Spin, Tag, Tree, Typography } from 'antd';
 import type { DataNode } from 'antd/es/tree';
@@ -198,6 +204,30 @@ const BaseForm: React.FC<Props> = (props) => {
           })}
           width="md"
           name="name"
+        />
+        <ProFormDigit
+          label="排序"
+          width="sm"
+          name="sort"
+          min={0}
+          fieldProps={{ precision: 0 }}
+          initialValue={0}
+        />
+        <ProFormSwitch
+          label="是否启用"
+          name="enabled"
+          initialValue
+          checkedChildren="启用"
+          unCheckedChildren="停用"
+        />
+        <ProFormTextArea
+          label="职责说明"
+          name="description"
+          width="xl"
+          fieldProps={{
+            autoSize: { minRows: 2, maxRows: 4 },
+          }}
+          placeholder="说明这个角色代表的岗位、职责或能力包"
         />
         <Form.Item label="选择权限" name="permissions">
           <div style={{ minWidth: 560 }}>

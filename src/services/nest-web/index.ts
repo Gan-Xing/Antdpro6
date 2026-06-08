@@ -14,6 +14,8 @@ import * as diagnostics from './diagnostics';
 import * as captcha from './captcha';
 import * as systemLog from './systemLog';
 import * as dashboard from './dashboard';
+import * as account from './account';
+import * as loginLogs from './loginLogs';
 import * as app from './app';
 import * as prometheus from './prometheus';
 export default {
@@ -29,6 +31,8 @@ export default {
   captcha,
   systemLog,
   dashboard,
+  account,
+  loginLogs,
   app,
   prometheus,
 };

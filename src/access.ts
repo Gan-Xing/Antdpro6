@@ -47,6 +47,8 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
     canDeleteUser: can(currentUser, 'auth.users.delete', '删除用户'),
     canEditUser: can(currentUser, 'auth.users.update', '编辑用户'),
     canShowUser: can(currentUser, 'auth.users.view', '查看用户'),
+    canDisableUser: can(currentUser, 'auth.users.disable', '启停用户'),
+    canResetUserPassword: can(currentUser, 'auth.users.resetPassword', '重置用户密码'),
 
     canCreateMenu: can(currentUser, 'auth.menus.create', '新增菜单'),
     canDeleteMenu: can(currentUser, 'auth.menus.delete', '删除菜单'),
@@ -62,5 +64,11 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
     canViewSystemLogs: can(currentUser, 'system.logs.view', '查看系统日志'),
     canExportSystemLogs: can(currentUser, 'system.logs.export', '导出系统日志'),
     canDeleteSystemLogs: can(currentUser, 'system.logs.delete', '删除系统日志'),
+
+    // 账号安全
+    canViewLoginLogs: can(currentUser, 'security.loginLogs.view', '查看登录日志'),
+    canViewProfile: can(currentUser, 'account.profile.view', '查看个人资料'),
+    canEditProfile: can(currentUser, 'account.profile.update', '编辑个人资料'),
+    canChangePassword: can(currentUser, 'account.password.change', '修改个人密码'),
   };
 }

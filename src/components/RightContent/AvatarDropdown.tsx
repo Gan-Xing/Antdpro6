@@ -59,6 +59,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         loginOut();
         return;
       }
+      if (key === 'profile') {
+        history.push('/account/profile');
+        return;
+      }
       history.push(`/account/${key}`);
     },
     [setInitialState],
@@ -87,6 +91,11 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   }
 
   const menuItems = [
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: '个人中心',
+    },
     ...(menu
       ? [
           {

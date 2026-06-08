@@ -87,6 +87,42 @@ export async function usersControllerUpdate(
   });
 }
 
+/** 此处后端没有提供注释 PATCH /api/users/${param0}/status */
+export async function usersControllerUpdateStatus(
+  params: NestWebAPI.UsersControllerUpdateStatusParams,
+  body: NestWebAPI.UpdateUserStatusDto,
+  options?: { [key: string]: any },
+) {
+  const { id: param0, ...queryParams } = params;
+  return request<NestWebAPI.UserEntity>(`/api/users/${param0}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params: { ...queryParams },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 此处后端没有提供注释 POST /api/users/${param0}/reset-password */
+export async function usersControllerResetPassword(
+  params: NestWebAPI.UsersControllerResetPasswordParams,
+  body: NestWebAPI.ResetPasswordDto,
+  options?: { [key: string]: any },
+) {
+  const { id: param0, ...queryParams } = params;
+  return request<NestWebAPI.UserEntity>(`/api/users/${param0}/reset-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params: { ...queryParams },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 此处后端没有提供注释 GET /api/users/current */
 export async function usersControllerFindCurrent(options?: { [key: string]: any }) {
   return request<NestWebAPI.UserEntity>('/api/users/current', {

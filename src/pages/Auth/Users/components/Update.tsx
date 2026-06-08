@@ -38,8 +38,8 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         ...values,
         password: undefined,
         roles: values.roles?.map((role: Roles.Entity) => role.id),
-        gender: values.gender?.toString(), // 将gender值从数字转换为字符串
-        status: values.status ? values.status?.toString() : '1', // 将gender值从数字转换为字符串
+        gender: values.gender?.toString(),
+        status: values.status ? values.status?.toString() : 'active',
       }}
     >
       <BaseForm protectAdminRole={protectAdminRole} />

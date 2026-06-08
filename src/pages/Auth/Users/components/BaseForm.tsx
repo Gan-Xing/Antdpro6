@@ -2,6 +2,7 @@ import useQueryList from '@/hooks/useQueryList';
 import { ProForm, ProFormCheckbox, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import React from 'react';
+import { genderValueEnum, userStatusValueEnum } from '../constants';
 interface Props {
   newRecord?: boolean;
   protectAdminRole?: boolean;
@@ -59,10 +60,7 @@ const BaseForm: React.FC<Props> = (props) => {
             id: 'pages.users.gender',
             defaultMessage: '性别',
           })}
-          valueEnum={{
-            1: '男',
-            0: '女',
-          }}
+          valueEnum={genderValueEnum}
           width="md"
           placeholder={intl.formatMessage({
             id: 'pages.searchTable.select.placeholder',
@@ -107,10 +105,7 @@ const BaseForm: React.FC<Props> = (props) => {
             id: 'pages.users.status',
             defaultMessage: '在职状态',
           })}
-          valueEnum={{
-            1: '在职',
-            0: '离职',
-          }}
+          valueEnum={userStatusValueEnum}
           width="md"
           placeholder={intl.formatMessage({
             id: 'pages.searchTable.select.placeholder',
@@ -136,14 +131,18 @@ const BaseForm: React.FC<Props> = (props) => {
           id: 'pages.searchTable.users.roles.placeholder',
           defaultMessage: '请选择角色',
         })}
-        options={roles?.map((role: { code?: string; name: string; id: number }) => ({
-          disabled: protectAdminRole && role.code === 'admin',
-          label:
-            protectAdminRole && role.code === 'admin'
-              ? `${role.name}（当前管理员角色）`
-              : role.name,
-          value: role.id,
-        }))}
+        options={roles?.map(
+          (role: { code?: string; name: string; id: number; enabled?: boolean }) => ({
+            disabled: (protectAdminRole && role.code === 'admin') || role.enabled === false,
+            label:
+              protectAdminRole && role.code === 'admin'
+                ? `${role.name}（当前管理员角色）`
+                : role.enabled === false
+                  ? `${role.name}（已停用）`
+                  : role.name,
+            value: role.id,
+          }),
+        )}
       />
     </>
   );

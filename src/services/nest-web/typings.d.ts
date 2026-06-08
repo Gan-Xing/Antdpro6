@@ -1,4 +1,6 @@
 declare namespace NestWebAPI {
+  type UserStatus = 'active' | 'disabled' | 'resigned';
+
   type ArticleEntity = {
     id: number;
     title: string;
@@ -92,6 +94,12 @@ declare namespace NestWebAPI {
     /** Stable role identity, such as admin or user. */
     code: string;
     name: string;
+    /** Role capability pack description. */
+    description?: string;
+    /** Display order for role lists. */
+    sort?: number;
+    /** Whether this role can be assigned. */
+    enabled?: boolean;
     /** 权限对象数组 */
     permissions?: number[];
   };
@@ -100,12 +108,17 @@ declare namespace NestWebAPI {
     username: string;
     email: string;
     password: string;
-    status: string;
-    avatar: string;
+    status?: UserStatus;
+    avatar?: string;
     gender: string;
-    isAdmin: boolean;
-    departmentId: number;
+    isAdmin?: boolean;
+    departmentId?: number;
     roles: number[];
+  };
+
+  type ChangePasswordDto = {
+    currentPassword: string;
+    newPassword: string;
   };
 
   type DashboardHealthEntity = {
@@ -269,12 +282,15 @@ declare namespace NestWebAPI {
     id: number;
     code: string;
     name: string;
+    description?: string | null;
+    sort: number;
+    enabled: boolean;
     createdAt: string;
     updatedAt: string;
     /** 权限对象数组 */
-    permissions?: any[][];
+    permissions?: PermissionEntity[];
     /** 用户对象数组 */
-    users?: any[][];
+    users?: UserEntity[];
   };
 
   type RolesControllerFindOneParams = {
@@ -401,15 +417,31 @@ declare namespace NestWebAPI {
 
   type UpdateRoleDto = {
     name?: string;
+    description?: string;
+    sort?: number;
+    enabled?: boolean;
     /** 权限对象数组 */
     permissions?: number[];
+  };
+
+  type ResetPasswordDto = {
+    password: string;
+  };
+
+  type UpdateProfileDto = {
+    username?: string;
+    avatar?: string;
+    gender?: string;
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
   };
 
   type UpdateUserDto = {
     email?: string;
     password?: string;
     roles?: number[];
-    status?: string;
+    status?: UserStatus;
     username?: string;
     avatar?: string;
     gender?: string;
@@ -417,26 +449,35 @@ declare namespace NestWebAPI {
     departmentId?: number;
   };
 
+  type UpdateUserStatusDto = {
+    status: UserStatus;
+  };
+
   type UserEntity = {
     id: number;
-    email: string;
-    status: string;
-    username: string;
-    avatar: string;
-    gender: string;
+    email?: string | null;
+    status?: UserStatus | string | null;
+    username?: string | null;
+    avatar?: string | null;
+    gender?: string | null;
     isAdmin: boolean;
-    departmentId: number;
+    departmentId?: number | null;
     createdAt: string;
     updatedAt: string;
+    lastLoginAt?: string | null;
+    lastLoginIp?: string | null;
+    passwordUpdatedAt?: string | null;
     /** 角色对象数组 */
-    roles?: any[][];
+    roles?: RoleEntity[];
     /** 用户文章数组 */
-    articles?: any[][];
-    phoneNumber: string;
-    firstName: string;
-    lastName: string;
-    wechatId: string;
-    miniWechatId: string;
+    articles?: any[];
+    /** 用户登录日志 */
+    loginLogs?: LoginLogEntity[];
+    phoneNumber?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    wechatId?: string | null;
+    miniWechatId?: string | null;
   };
 
   type UsersControllerFindAllPagedParams = {
@@ -455,6 +496,43 @@ declare namespace NestWebAPI {
   };
 
   type UsersControllerUpdateParams = {
+    id: number;
+  };
+
+  type UsersControllerUpdateStatusParams = {
+    id: number;
+  };
+
+  type UsersControllerResetPasswordParams = {
+    id: number;
+  };
+
+  type LoginLogEntity = {
+    id: number;
+    userId?: number | null;
+    username?: string | null;
+    email?: string | null;
+    ip?: string | null;
+    userAgent?: string | null;
+    success: boolean;
+    failureCode?: string | null;
+    failureReason?: string | null;
+    createdAt: string;
+  };
+
+  type LoginLogsControllerFindAllParams = {
+    current?: number;
+    pageSize?: number;
+    keyword?: string;
+    username?: string;
+    email?: string;
+    ip?: string;
+    success?: boolean;
+    startTime?: string;
+    endTime?: string;
+  };
+
+  type LoginLogsControllerFindOneParams = {
     id: number;
   };
 

@@ -14,7 +14,7 @@ declare namespace Permissions {
     path: string;
     createdAt: string;
     updatedAt: string;
-    permissionGroup: Menus.MenusType;
+    permissionGroup?: Menus.MenusType;
     permissionGroupId: number;
   }
 }

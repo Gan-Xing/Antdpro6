@@ -6,8 +6,11 @@ import {
   FolderOutlined,
   LinkOutlined,
   PictureOutlined,
+  AuditOutlined,
+  SafetyOutlined,
   SettingOutlined,
   TableOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
@@ -29,9 +32,12 @@ const menuIconMap: Record<string, React.ReactNode> = {
   FileTextOutlined: <FileTextOutlined />,
   FolderOutlined: <FolderOutlined />,
   PictureOutlined: <PictureOutlined />,
+  AuditOutlined: <AuditOutlined />,
+  SafetyOutlined: <SafetyOutlined />,
   SettingOutlined: <SettingOutlined />,
   table: <TableOutlined />,
   TableOutlined: <TableOutlined />,
+  UserOutlined: <UserOutlined />,
 };
 
 const resolveMenuIcon = (icon: unknown): React.ReactNode | undefined => {
@@ -117,7 +123,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       },
     },
     waterMarkProps: {
-      content: initialState?.currentUser?.username,
+      content: initialState?.currentUser?.username ?? undefined,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {

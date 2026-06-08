@@ -88,6 +88,27 @@ export default [
     ],
   },
   {
+    path: '/security',
+    name: 'security',
+    icon: 'SafetyOutlined',
+    routes: [
+      {
+        path: '/security/login-logs',
+        name: 'loginLogs',
+        access: 'canViewLoginLogs',
+        icon: 'AuditOutlined',
+        component: './Security/LoginLogs',
+      },
+    ],
+  },
+  {
+    path: '/account/profile',
+    name: 'profile',
+    access: 'canViewProfile',
+    hideInMenu: true,
+    component: './Account/Profile',
+  },
+  {
     path: '/',
     redirect: '/dashboard',
   },

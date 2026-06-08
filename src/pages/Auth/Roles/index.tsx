@@ -25,11 +25,17 @@ const isSystemAdminRole = (role?: Partial<Roles.Entity>) => role?.code === 'admi
 const toCreateRoleDto = (fields: Roles.CreateParams): NestWebAPI.CreateRoleDto => ({
   code: fields.code,
   name: fields.name,
+  description: fields.description,
+  sort: fields.sort ?? 0,
+  enabled: fields.enabled ?? true,
   permissions: fields.permissions ?? [],
 });
 
 const toUpdateRoleDto = (fields: Roles.UpdateParams): NestWebAPI.UpdateRoleDto => ({
   name: fields.name,
+  description: fields.description,
+  sort: fields.sort ?? 0,
+  enabled: fields.enabled ?? true,
   permissions: fields.permissions ?? [],
 });
 
@@ -144,6 +150,31 @@ const TableList: React.FC = () => {
           </a>
         );
       },
+    },
+    {
+      title: '职责说明',
+      dataIndex: 'description',
+      ellipsis: true,
+      hideInSearch: true,
+      renderText: (value) => value || '-',
+    },
+    {
+      title: '排序',
+      dataIndex: 'sort',
+      width: 90,
+      hideInSearch: true,
+      sorter: (a, b) => (a.sort ?? 0) - (b.sort ?? 0),
+    },
+    {
+      title: '状态',
+      dataIndex: 'enabled',
+      width: 90,
+      valueEnum: {
+        true: { text: '启用', status: 'Success' },
+        false: { text: '停用', status: 'Default' },
+      },
+      render: (_, entity) =>
+        entity.enabled ? <Tag color="success">启用</Tag> : <Tag color="default">停用</Tag>,
     },
     {
       title: <FormattedMessage id="pages.roles.permissions" defaultMessage="权限列表" />,

@@ -20,6 +20,7 @@ const Create: React.FC<Props> = (props) => {
       open={open}
       onOpenChange={onOpenChange}
       onFinish={onFinish}
+      initialValues={{ status: 'active' }}
     >
       <BaseForm newRecord />
     </ModalForm>
