@@ -1,19 +1,36 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-components';
+import { PageContainer, ProDescriptions } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, message, Modal, Tag } from 'antd';
-import { useRef } from 'react';
+import { Button, Drawer, message, Modal, Tag, Typography } from 'antd';
+import { useRef, useState } from 'react';
 import {
   systemLogControllerClear,
   systemLogControllerExport,
   systemLogControllerFindAll,
+  systemLogControllerFindOne,
 } from '@/services/nest-web/systemLog';
 import { unwrapResponse } from '@/utils/apiResponse';
 import moment from 'moment';
+import { useAccess } from '@umijs/max';
 
 const SystemLogs: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const access = useAccess();
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [currentLog, setCurrentLog] = useState<API.SystemLogDetail>();
+
+  const openDetail = async (record: API.SystemLog) => {
+    try {
+      const data = unwrapResponse<API.SystemLogDetail>(
+        await systemLogControllerFindOne({ id: record.id }),
+      );
+      setCurrentLog(data);
+      setDetailOpen(true);
+    } catch (error: any) {
+      message.error(error?.response?.data?.message ?? '系统日志详情加载失败');
+    }
+  };
 
   const columns: ProColumns<API.SystemLog>[] = [
     {
@@ -84,6 +101,19 @@ const SystemLogs: React.FC = () => {
       width: 160,
       render: (_, record) => moment(record.createdAt).format('YYYY-MM-DD HH:mm:ss'),
     },
+    {
+      title: '操作',
+      valueType: 'option',
+      width: 90,
+      render: (_, record) =>
+        access.canViewSystemLogDetail
+          ? [
+              <a key="detail" onClick={() => openDetail(record)}>
+                详情
+              </a>,
+            ]
+          : [],
+    },
   ];
 
   const handleClear = () => {
@@ -129,12 +159,16 @@ const SystemLogs: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() => [
-          <Button key="clear" onClick={handleClear}>
-            清理日志
-          </Button>,
-          <Button key="export" type="primary" onClick={handleExport}>
-            导出日志
-          </Button>,
+          access.canDeleteSystemLogs ? (
+            <Button key="clear" onClick={handleClear}>
+              清理日志
+            </Button>
+          ) : null,
+          access.canExportSystemLogs ? (
+            <Button key="export" type="primary" onClick={handleExport}>
+              导出日志
+            </Button>
+          ) : null,
         ]}
         request={async (
           params: {
@@ -163,6 +197,52 @@ const SystemLogs: React.FC = () => {
         columns={columns}
         scroll={{ x: 'max-content' }}
       />
+      <Drawer
+        width={680}
+        open={detailOpen}
+        title="系统日志详情"
+        onClose={() => {
+          setDetailOpen(false);
+          setCurrentLog(undefined);
+        }}
+        destroyOnClose
+      >
+        <ProDescriptions<API.SystemLogDetail>
+          column={1}
+          dataSource={currentLog}
+          columns={[
+            { title: 'ID', dataIndex: 'id' },
+            { title: '用户 ID', dataIndex: 'userId' },
+            { title: '用户名', dataIndex: 'username' },
+            { title: '请求地址', dataIndex: 'requestUrl', copyable: true },
+            { title: '请求方法', dataIndex: 'method' },
+            { title: 'HTTP 状态', dataIndex: 'status' },
+            { title: 'IP', dataIndex: 'ip' },
+            { title: 'User Agent', dataIndex: 'userAgent' },
+            {
+              title: '耗时',
+              dataIndex: 'duration',
+              render: (_, entity) => `${entity.duration ?? 0}ms`,
+            },
+            {
+              title: '创建时间',
+              dataIndex: 'createdAt',
+              render: (_, entity) =>
+                entity.createdAt ? moment(entity.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-',
+            },
+            {
+              title: '请求数据',
+              dataIndex: 'requestData',
+              render: (_, entity) => (
+                <Typography.Paragraph style={{ whiteSpace: 'pre-wrap', marginBottom: 0 }}>
+                  {entity.requestData ? JSON.stringify(entity.requestData, null, 2) : '-'}
+                </Typography.Paragraph>
+              ),
+            },
+            { title: '错误信息', dataIndex: 'errorMsg' },
+          ]}
+        />
+      </Drawer>
     </PageContainer>
   );
 };

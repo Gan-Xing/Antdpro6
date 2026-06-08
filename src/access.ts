@@ -62,6 +62,7 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
 
     // 系统日志管理
     canViewSystemLogs: can(currentUser, 'system.logs.view', '查看系统日志'),
+    canViewSystemLogDetail: can(currentUser, 'system.logs.detail', '查看系统日志详情'),
     canExportSystemLogs: can(currentUser, 'system.logs.export', '导出系统日志'),
     canDeleteSystemLogs: can(currentUser, 'system.logs.delete', '删除系统日志'),
 
@@ -77,6 +78,10 @@ export default function access(initialState: { currentUser?: User.UsersEntity } 
     canUploadFiles: can(currentUser, 'system.files.upload', '上传文件'),
     canDownloadFiles: can(currentUser, 'system.files.download', '下载文件'),
     canDeleteFiles: can(currentUser, 'system.files.delete', '删除文件'),
+
+    canViewSystemStatus: can(currentUser, 'system.status.view', '查看系统状态'),
+    canViewSystemVersion: can(currentUser, 'system.version.view', '查看版本信息'),
+    canViewSystemQueues: can(currentUser, 'system.queues.view', '查看队列状态'),
 
     // 账号安全
     canViewLoginLogs: can(currentUser, 'security.loginLogs.view', '查看登录日志'),

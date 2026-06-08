@@ -11,6 +11,17 @@ declare namespace API {
     createdAt: string;
   };
 
+  type SystemLogDetail = SystemLog & {
+    userId: number;
+    requestUrl: string;
+    method: string;
+    status: number;
+    ip: string;
+    userAgent?: string | null;
+    requestData?: unknown;
+    errorMsg?: string | null;
+  };
+
   type SystemLogList = {
     data: SystemLog[];
     total: number;

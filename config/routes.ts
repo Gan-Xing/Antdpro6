@@ -106,6 +106,27 @@ export default [
         icon: 'CloudUploadOutlined',
         component: './System/Files',
       },
+      {
+        path: '/system/status',
+        name: 'status',
+        access: 'canViewSystemStatus',
+        icon: 'DashboardOutlined',
+        component: './System/Status',
+      },
+      {
+        path: '/system/version',
+        name: 'version',
+        access: 'canViewSystemVersion',
+        icon: 'InfoCircleOutlined',
+        component: './System/Version',
+      },
+      {
+        path: '/system/queues',
+        name: 'queues',
+        access: 'canViewSystemQueues',
+        icon: 'ClusterOutlined',
+        component: './System/Queues',
+      },
     ],
   },
   {

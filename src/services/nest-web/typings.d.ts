@@ -723,6 +723,58 @@ declare namespace NestWebAPI {
     id: number;
   };
 
+  type SystemDependencyStatus = 'ok' | 'error';
+
+  type SystemDependencyHealthEntity = {
+    status: SystemDependencyStatus;
+    latencyMs: number;
+    error?: string;
+  };
+
+  type QueueStatusEntity = {
+    name: string;
+    status: SystemDependencyStatus;
+    waiting: number;
+    active: number;
+    completed: number;
+    failed: number;
+    delayed: number;
+    error?: string;
+  };
+
+  type SystemQueuesEntity = {
+    status: SystemDependencyStatus;
+    queues: QueueStatusEntity[];
+    totals: {
+      waiting: number;
+      active: number;
+      completed: number;
+      failed: number;
+      delayed: number;
+    };
+  };
+
+  type SystemStatusEntity = {
+    status: SystemDependencyStatus;
+    checkedAt: string;
+    dependencies: {
+      database: SystemDependencyHealthEntity;
+      redis: SystemDependencyHealthEntity;
+      rabbitmq: SystemDependencyHealthEntity;
+      minio: SystemDependencyHealthEntity;
+      queue: SystemDependencyHealthEntity;
+    };
+  };
+
+  type SystemVersionEntity = {
+    service: string;
+    version: string;
+    nodeVersion: string;
+    env: string;
+    commitSha: string;
+    buildTime: string;
+  };
+
   type ValidateTokenDto = {
     token: string;
     code: string;
