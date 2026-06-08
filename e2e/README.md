@@ -6,7 +6,7 @@ This suite verifies the production-facing auth and dashboard flow against a runn
 
 ```bash
 E2E_BASE_URL=http://127.0.0.1:8000 \
-E2E_ADMIN_EMAIL=test-admin@example.com \
+E2E_ADMIN_EMAIL=e2e-admin@example.com \
 E2E_ADMIN_PASSWORD=replace-with-test-password \
 pnpm run e2e
 ```
@@ -38,8 +38,12 @@ Use a dedicated non-production admin test account for E2E.
 ## Coverage
 
 - Login page loads with enterprise branding.
+- Invalid credentials stay on the login page and show a failure message.
 - Admin can log in and land on `/dashboard`.
 - Dynamic menus are loaded.
 - Page refresh keeps the session.
 - Expired access token refreshes through the refresh token.
 - Logout returns to `/user/login`.
+- Accessing a protected page after logout redirects to `/user/login`.
+- Dashboard, system status, system version, system queues, and login logs pages load for an admin.
+- A restricted user cannot see unauthorized operations menus and receives the 403 result when visiting those routes directly.

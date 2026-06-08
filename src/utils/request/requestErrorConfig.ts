@@ -85,12 +85,12 @@ export const errorConfig: RequestConfig = {
         } else if (status === 500) {
           message.error('服务器问题，请联系管理员处理');
         } else {
-          message.error(`Response status:${error.response.status}`);
+          message.error(`请求失败，HTTP 状态码：${error.response.status}`);
         }
       } else if (error.request) {
-        message.error('None response! Please retry.');
+        message.error('网络异常或服务未响应，请检查连接后重试。');
       } else {
-        message.error('Request error, please retry.');
+        message.error('请求失败，请稍后重试。');
       }
     },
   },

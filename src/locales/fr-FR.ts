@@ -11,7 +11,7 @@ export default {
   'layout.user.link.help': 'Aide',
   'layout.user.link.privacy': 'Confidentialité',
   'layout.user.link.terms': 'Conditions',
-  'app.copyright.produced': 'Produit par Ant Financial Experience Department',
+  'app.copyright.produced': 'Plateforme d’administration entreprise',
   'app.preview.down.block': 'Télécharger cette page dans votre projet local',
   'app.welcome.link.fetch-blocks': 'Obtenir tous les blocs',
   'app.welcome.link.block-list':

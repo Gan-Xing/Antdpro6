@@ -155,6 +155,16 @@ export default [
     redirect: '/dashboard',
   },
   {
+    path: '/403',
+    hideInMenu: true,
+    component: './403',
+  },
+  {
+    path: '/500',
+    hideInMenu: true,
+    component: './500',
+  },
+  {
     path: '*',
     layout: false,
     component: './404',

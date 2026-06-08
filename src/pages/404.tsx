@@ -6,10 +6,10 @@ const NoFoundPage: React.FC = () => (
   <Result
     status="404"
     title="404"
-    subTitle="Sorry, the page you visited does not exist."
+    subTitle="当前页面不存在或已被移动。"
     extra={
-      <Button type="primary" onClick={() => history.push('/')}>
-        Back Home
+      <Button type="primary" onClick={() => history.push('/dashboard')}>
+        返回工作台
       </Button>
     }
   />

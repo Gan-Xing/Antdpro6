@@ -78,7 +78,7 @@ With NestWeb and Antdpro6 deployed:
 
 ```bash
 E2E_BASE_URL=http://localhost:8000 \
-E2E_ADMIN_EMAIL=test-admin@example.com \
+E2E_ADMIN_EMAIL=e2e-admin@example.com \
 E2E_ADMIN_PASSWORD=replace-with-test-password \
 pnpm run e2e
 ```

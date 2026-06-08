@@ -2,6 +2,31 @@ import { expect, type Page } from '@playwright/test';
 import { getAdminUser } from '../fixtures/users';
 
 const accessTokenKey = 'ACCESS_TOKEN';
+const tokenTtlMs = 60 * 60 * 1000;
+
+type WrappedResponse<T> = {
+  statusCode: number;
+  timestamp: string;
+  message: string;
+  data: T;
+  success: boolean;
+  showType: number;
+};
+
+function wrapResponse<T>(data: T): WrappedResponse<T> {
+  return {
+    statusCode: 200,
+    timestamp: new Date().toISOString(),
+    message: 'Operation successful',
+    data,
+    success: true,
+    showType: 0,
+  };
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 export async function expectDashboardReady(page: Page) {
   await expect(page).toHaveURL(/\/dashboard(?:[/?#]|$)/);
@@ -23,6 +48,24 @@ export async function loginAsAdmin(page: Page) {
 
   await page.waitForURL(/\/dashboard(?:[/?#]|$)/);
   await expectDashboardReady(page);
+}
+
+export async function attemptInvalidLogin(page: Page) {
+  const admin = getAdminUser();
+
+  await page.goto('/user/login');
+  await page.getByPlaceholder(/邮箱|Email/i).fill(admin.email);
+  await page.getByPlaceholder(/密码|Password/i).fill(`${admin.password}-invalid`);
+  const loginResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/auth/login') && response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: /登录|Login/i }).click();
+  const response = await loginResponse;
+
+  expect(response.status()).toBeGreaterThanOrEqual(400);
+  await expect(page).toHaveURL(/\/user\/login(?:[/?#]|$)/);
+  await expect(page.getByRole('button', { name: /登录|Login/i })).toBeVisible();
 }
 
 export async function logout(page: Page) {
@@ -75,4 +118,91 @@ export async function getStoredAccessToken(page: Page) {
     const parsed = JSON.parse(current);
     return parsed?.value as string | undefined;
   }, accessTokenKey);
+}
+
+export async function expectProtectedPageRedirectsToLogin(page: Page, path = '/system/status') {
+  await page.goto(path);
+  await expect(page).toHaveURL(/\/user\/login\?redirect=/);
+}
+
+export async function expectProtectedPageLoads(page: Page, path: string, visibleText: RegExp) {
+  await page.goto(path);
+  await expect(page).toHaveURL(new RegExp(`${escapeRegExp(path)}(?:[/?#]|$)`));
+  await expect(page.getByText(visibleText).first()).toBeVisible();
+}
+
+export async function seedRestrictedUserSession(page: Page) {
+  const accessToken = buildJwt({
+    exp: Math.floor((Date.now() + tokenTtlMs) / 1000),
+    sub: 'e2e-restricted-user',
+  });
+
+  await page.addInitScript(
+    ({ key, token, ttl }) => {
+      window.localStorage.setItem(
+        key,
+        JSON.stringify({
+          value: token,
+          expiresAt: Date.now() + ttl,
+        }),
+      );
+    },
+    { key: accessTokenKey, token: accessToken, ttl: tokenTtlMs },
+  );
+
+  await page.route('**/api/users/current', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(
+        wrapResponse({
+          id: 9001,
+          username: 'limited-user',
+          email: 'limited-user@example.com',
+          isAdmin: false,
+          roles: [
+            {
+              id: 9001,
+              code: 'user',
+              name: '普通用户',
+              permissions: [{ id: 1, code: 'dashboard.view', name: '查看工作台' }],
+            },
+          ],
+        }),
+      ),
+    });
+  });
+
+  await page.route('**/api/menus/user', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(
+        wrapResponse([
+          {
+            id: 1,
+            code: 'dashboard',
+            name: '工作台',
+            path: '/dashboard',
+            icon: 'DashboardOutlined',
+            children: [],
+          },
+        ]),
+      ),
+    });
+  });
+
+  await page.route('**/api/dashboard/summary', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(
+        wrapResponse({
+          health: { status: 'ok', service: 'NestWeb API' },
+          metrics: {},
+          recentLogs: [],
+        }),
+      ),
+    });
+  });
 }

@@ -21,9 +21,11 @@ import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
+import { ConfigProvider } from 'antd';
 import * as React from 'react';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
+import { AccessDeniedResult, renderEmpty } from './components/ResultStates';
 import { menusControllerFindUserMenus } from './services/nest-web/menus';
 import { usersControllerFindCurrent } from './services/nest-web/users';
 import { unwrapResponse } from './utils/apiResponse';
@@ -71,6 +73,10 @@ const processRemoteMenuData = (menuItem: any): any => {
 
   return newMenuItem;
 };
+
+export function rootContainer(container: React.ReactNode) {
+  return <ConfigProvider renderEmpty={renderEmpty}>{container}</ConfigProvider>;
+}
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -153,8 +159,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         ]
       : [],
     menuHeaderRender: undefined,
-    // 自定义 403 页面
-    // unAccessible: <div>unAccessible</div>,
+    unAccessible: <AccessDeniedResult />,
     // 增加一个 loading 的状态
     childrenRender: (children) => {
       // if (initialState?.loading) return <PageLoading />;

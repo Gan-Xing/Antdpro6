@@ -9,7 +9,7 @@ The current target is a single-tenant enterprise admin template with:
 - dynamic backend menus
 - RBAC-aware pages for users, roles, permissions, and menus
 - centralized session refresh
-- Playwright E2E coverage for the auth flow
+- Playwright E2E coverage for auth, session refresh, operations pages, and restricted access
 
 ## Documentation
 
@@ -17,7 +17,7 @@ The current target is a single-tenant enterprise admin template with:
 - [Frontend environment variables](docs/env-vars.md)
 - [Playwright E2E](e2e/README.md)
 
-Backend handoff and system-level docs live in the `NestWeb` repository.
+Backend handoff and system-level docs live in the `NestWeb` repository. Use the NestWeb v2 handoff, page inventory, permission inventory, operations runbook, and release checklist for delivery acceptance.
 
 ## Common Commands
 
@@ -27,6 +27,7 @@ pnpm run tsc
 pnpm run lint:js
 pnpm test -- --runInBand
 pnpm run build
+pnpm run e2e
 ```
 
 ## Local Development

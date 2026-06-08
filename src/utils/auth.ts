@@ -1,8 +1,4 @@
-import { useCache } from '@/hooks/useCache';
 import { getLocal, removeLocals, setLocals } from 'ganxing';
-
-// eslint-disable-next-line react-hooks/rules-of-hooks
-const { wsCache } = useCache();
 
 enum TokenKeys {
   Access = 'ACCESS_TOKEN',
@@ -38,33 +34,4 @@ export const removeToken = () => {
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {
   return 'Bearer ' + token;
-};
-
-// ========== 租户相关 ==========
-
-const TenantIdKey = 'TENANT_ID';
-const TenantNameKey = 'TENANT_NAME';
-
-export const getTenantName = () => {
-  return wsCache.get(TenantNameKey);
-};
-
-export const setTenantName = (username: string) => {
-  wsCache.set(TenantNameKey, username, { exp: 30 * 24 * 60 * 60 });
-};
-
-export const removeTenantName = () => {
-  wsCache.delete(TenantNameKey);
-};
-
-export const getTenantId = () => {
-  return wsCache.get(TenantIdKey);
-};
-
-export const setTenantId = (username: string) => {
-  wsCache.set(TenantIdKey, username);
-};
-
-export const removeTenantId = () => {
-  wsCache.delete(TenantIdKey);
 };

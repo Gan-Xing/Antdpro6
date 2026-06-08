@@ -76,7 +76,7 @@ describe('Login Page', () => {
     (usersControllerFindCurrent as jest.Mock).mockResolvedValue({
       id: 1,
       username: 'admin',
-      email: 'admin@example.com',
+      email: 'enterprise-admin@example.com',
       access: 'admin',
     });
     (menusControllerFindUserMenus as jest.Mock).mockResolvedValue([]);
@@ -112,13 +112,13 @@ describe('Login Page', () => {
     const emailInput = await rootContainer.findByPlaceholderText(/邮箱|email/i);
 
     act(() => {
-      fireEvent.change(emailInput, { target: { value: 'admin@example.com' } });
+      fireEvent.change(emailInput, { target: { value: 'enterprise-admin@example.com' } });
     });
 
     const passwordInput = await rootContainer.findByPlaceholderText(/密码|password/i);
 
     act(() => {
-      fireEvent.change(passwordInput, { target: { value: 'ant.design' } });
+      fireEvent.change(passwordInput, { target: { value: 'Admin1234.' } });
     });
 
     fireEvent.click(rootContainer.getByRole('button', { name: /login|登录/i }));
@@ -126,8 +126,8 @@ describe('Login Page', () => {
     await waitFor(() => {
       expect(authControllerLogin).toHaveBeenCalledWith(
         expect.objectContaining({
-          email: 'admin@example.com',
-          password: 'ant.design',
+          email: 'enterprise-admin@example.com',
+          password: 'Admin1234.',
         }),
       );
     });
