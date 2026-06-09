@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 import {
   attemptInvalidLogin,
   expectDashboardReady,
+  getLegacyStoredRefreshToken,
+  getRefreshCookie,
   expectProtectedPageLoads,
   expectProtectedPageRedirectsToLogin,
   expireAccessToken,
@@ -18,6 +20,10 @@ test.describe('auth session', () => {
 
   test('login success lands on dashboard', async ({ page }) => {
     await loginAsAdmin(page);
+    await expect.poll(() => getLegacyStoredRefreshToken(page)).toBeNull();
+    const refreshCookie = await getRefreshCookie(page);
+    expect(refreshCookie?.httpOnly).toBe(true);
+    expect(refreshCookie?.value).toBeTruthy();
   });
 
   test('refresh page keeps login session', async ({ page }) => {
@@ -40,8 +46,17 @@ test.describe('auth session', () => {
     await expectProtectedPageRedirectsToLogin(page, '/system/status');
   });
 
+  test('message and approval pages redirect to login after logout', async ({ page }) => {
+    await loginAsAdmin(page);
+    await logout(page);
+
+    await expectProtectedPageRedirectsToLogin(page, '/message-center');
+    await expectProtectedPageRedirectsToLogin(page, '/approvals/requests');
+  });
+
   test('expired access token refreshes session', async ({ page }) => {
     await loginAsAdmin(page);
+    const refreshCookieBefore = await getRefreshCookie(page);
 
     const expiredToken = await expireAccessToken(page);
     const refreshResponse = page.waitForResponse((response) =>
@@ -53,6 +68,11 @@ test.describe('auth session', () => {
     await expectDashboardReady(page);
 
     await expect.poll(() => getStoredAccessToken(page)).not.toBe(expiredToken);
+    await expect.poll(() => getLegacyStoredRefreshToken(page)).toBeNull();
+    const refreshCookieAfter = await getRefreshCookie(page);
+    expect(refreshCookieAfter?.httpOnly).toBe(true);
+    expect(refreshCookieAfter?.value).toBeTruthy();
+    expect(refreshCookieAfter?.value).not.toBe(refreshCookieBefore?.value);
   });
 
   test('operations pages load for admin', async ({ page }) => {

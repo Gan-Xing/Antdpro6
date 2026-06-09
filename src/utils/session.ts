@@ -9,6 +9,7 @@ const refreshSkewMs = 10_000;
 const publicRequestPaths = [
   '/api/auth/exchange-code-for-user',
   '/api/auth/login',
+  '/api/auth/logout',
   '/api/auth/miniprogram-login',
   '/api/auth/refresh',
   '/api/auth/register',
@@ -62,13 +63,8 @@ export function isAccessTokenFresh(accessToken?: string) {
 }
 
 export async function refreshSessionToken() {
-  const refreshToken = authUtil.getRefreshToken();
-  if (!refreshToken) {
-    return undefined;
-  }
-
   if (!refreshSessionPromise) {
-    refreshSessionPromise = authControllerRefresh({ refreshToken }, { skipErrorHandler: true })
+    refreshSessionPromise = authControllerRefresh({ skipErrorHandler: true })
       .then((response) => {
         const token = unwrapResponse<Auth.Token>(response as any);
         if (token?.accessToken) {

@@ -2,6 +2,8 @@ import { expect, type Page } from '@playwright/test';
 import { getAdminUser } from '../fixtures/users';
 
 const accessTokenKey = 'ACCESS_TOKEN';
+const legacyRefreshTokenKey = 'REFRESH_TOKEN';
+const refreshCookieName = 'nestweb_refresh_token';
 const tokenTtlMs = 60 * 60 * 1000;
 
 type WrappedResponse<T> = {
@@ -44,7 +46,13 @@ export async function loginAsAdmin(page: Page) {
 
   await page.getByPlaceholder(/邮箱|Email/i).fill(admin.email);
   await page.getByPlaceholder(/密码|Password/i).fill(admin.password);
+  const loginResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/auth/login') && response.request().method() === 'POST',
+  );
   await page.getByRole('button', { name: /登\s*录|Login/i }).click();
+  const response = await loginResponse;
+  expect(response.status()).toBeLessThan(300);
 
   await page.waitForURL(/\/dashboard(?:[/?#]|$)/);
   await expectDashboardReady(page);
@@ -118,6 +126,15 @@ export async function getStoredAccessToken(page: Page) {
     const parsed = JSON.parse(current);
     return parsed?.value as string | undefined;
   }, accessTokenKey);
+}
+
+export async function getLegacyStoredRefreshToken(page: Page) {
+  return page.evaluate((key) => window.localStorage.getItem(key), legacyRefreshTokenKey);
+}
+
+export async function getRefreshCookie(page: Page) {
+  const cookies = await page.context().cookies();
+  return cookies.find((cookie) => cookie.name === refreshCookieName);
 }
 
 export async function expectProtectedPageRedirectsToLogin(page: Page, path = '/system/status') {

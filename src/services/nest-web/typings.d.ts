@@ -598,10 +598,6 @@ declare namespace NestWebAPI {
     error?: string;
   };
 
-  type RefreshTokenDto = {
-    refreshToken: string;
-  };
-
   type RegisterByEmailDto = {
     token: string;
     code: string;
@@ -810,8 +806,8 @@ declare namespace NestWebAPI {
 
   type Token = {
     accessToken: string;
-    refreshToken: string;
     accessExpiresIn: number;
+    /** Refresh token expiry timestamp in milliseconds. The refresh token itself is stored in an HttpOnly cookie. */
     refreshExpiresIn: number;
   };
 

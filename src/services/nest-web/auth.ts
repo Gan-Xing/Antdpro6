@@ -45,7 +45,7 @@ export async function authControllerMiniprogramLogin(
   body: NestWebAPI.WechatCodeDto,
   options?: { [key: string]: any },
 ) {
-  return request<any>('/api/auth/miniprogram-login', {
+  return request<NestWebAPI.Token>('/api/auth/miniprogram-login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -56,16 +56,9 @@ export async function authControllerMiniprogramLogin(
 }
 
 /** 此处后端没有提供注释 POST /api/auth/refresh */
-export async function authControllerRefresh(
-  body: NestWebAPI.RefreshTokenDto,
-  options?: { [key: string]: any },
-) {
+export async function authControllerRefresh(options?: { [key: string]: any }) {
   return request<NestWebAPI.Token>('/api/auth/refresh', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
     ...(options || {}),
   });
 }

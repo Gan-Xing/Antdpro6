@@ -13,7 +13,6 @@ jest.mock('@/services/nest-web/auth', () => ({
 
 jest.mock('@/utils/auth', () => ({
   getAccessToken: jest.fn(),
-  getRefreshToken: jest.fn(),
   removeToken: jest.fn(),
   setToken: jest.fn(),
 }));
@@ -32,7 +31,6 @@ function buildJwt(payload: Record<string, unknown>) {
 
 const token: Auth.Token = {
   accessToken: buildJwt({ exp: Math.floor(Date.now() / 1000) + 3600 }),
-  refreshToken: 'next-refresh-token',
   accessExpiresIn: 3600,
   refreshExpiresIn: 7200,
 };
@@ -59,7 +57,6 @@ describe('session utilities', () => {
 
   it('refreshes expired access token with a single in-flight refresh', async () => {
     (authUtil.getAccessToken as jest.Mock).mockReturnValue(buildJwt({ exp: 1 }));
-    (authUtil.getRefreshToken as jest.Mock).mockReturnValue('refresh-token');
     (authControllerRefresh as jest.Mock).mockResolvedValue({
       success: true,
       data: token,
@@ -70,11 +67,11 @@ describe('session utilities', () => {
     ).resolves.toEqual([token.accessToken, token.accessToken]);
 
     expect(authControllerRefresh).toHaveBeenCalledTimes(1);
+    expect(authControllerRefresh).toHaveBeenCalledWith({ skipErrorHandler: true });
     expect(authUtil.setToken).toHaveBeenCalledWith(token);
   });
 
   it('clears local tokens when refresh fails', async () => {
-    (authUtil.getRefreshToken as jest.Mock).mockReturnValue('refresh-token');
     (authControllerRefresh as jest.Mock).mockRejectedValue(new Error('refresh failed'));
 
     await expect(refreshSessionToken()).rejects.toThrow('refresh failed');

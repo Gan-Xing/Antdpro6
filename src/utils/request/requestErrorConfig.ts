@@ -20,7 +20,7 @@ const { base_url, request_timeout } = config;
 export const errorConfig: RequestConfig = {
   baseURL: base_url,
   timeout: request_timeout,
-  withCredentials: false,
+  withCredentials: true,
   errorConfig: {
     errorThrower: (res) => {
       const {

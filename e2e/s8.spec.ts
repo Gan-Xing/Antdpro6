@@ -67,6 +67,17 @@ async function exportCurrentPage(page: Page, expectedFilename: RegExp) {
   expect(download.suggestedFilename()).toMatch(expectedFilename);
 }
 
+async function expectEmptyExportWarning(page: Page) {
+  const keyword = `no-data-${Date.now()}`;
+  const keywordInput = page.getByRole('textbox', { name: /关键词|Keyword/i });
+  await expect(keywordInput).toBeVisible();
+  await keywordInput.fill(keyword);
+  await page.getByRole('button', { name: /查\s*询|Search/i }).click();
+  await expect(page.locator('.ant-empty')).toBeVisible();
+  await page.getByRole('button', { name: /导出当前页|Export current page/i }).click();
+  await expect(page.getByText(/当前没有可导出的数据|There is no data to export/)).toBeVisible();
+}
+
 test.describe('S8 message and approval acceptance', () => {
   test('creates and approves an approval request with message and CSV export coverage', async ({
     page,
@@ -77,6 +88,7 @@ test.describe('S8 message and approval acceptance', () => {
     const unique = Date.now();
     const title = `E2E 审批 ${unique}`;
     const businessId = `e2e-${unique}`;
+    const approveComment = `S8 E2E approved ${unique}`;
 
     await page.goto('/approvals/requests');
     await expect(page.getByText(/审批请求/).first()).toBeVisible();
@@ -107,14 +119,38 @@ test.describe('S8 message and approval acceptance', () => {
       page.locator('.ant-table-tbody tr').filter({ hasText: title }).first(),
     ).toBeVisible();
 
+    await page.getByRole('tab', { name: /待我审批/ }).click();
+    await expect(
+      page.locator('.ant-table-tbody tr').filter({ hasText: title }).first(),
+    ).toBeVisible();
+
     await page.goto('/message-center');
     await expect(page.getByText(/消息中心/).first()).toBeVisible();
+    await expect(page.getByRole('tab', { name: /待办/ })).toBeVisible();
+    await expect(page.getByRole('tab', { name: /通知/ })).toBeVisible();
+    await expect(page.getByRole('tab', { name: /已处理/ })).toBeVisible();
     const messageRow = page
       .locator('.ant-table-tbody tr')
       .filter({ hasText: `待审批：${title}` })
       .first();
     await expect(messageRow).toBeVisible();
     await exportCurrentPage(page, /^messages-todos\.csv$/);
+
+    const completeResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/messages/') &&
+        response.url().includes('/complete') &&
+        response.request().method() === 'POST' &&
+        response.status() < 300,
+    );
+    await messageRow.getByText('完成').click();
+    await completeResponse;
+    await expect(page.getByText(/待办已完成/)).toBeVisible();
+
+    await page.getByRole('tab', { name: /已处理/ }).click();
+    await expect(
+      page.locator('.ant-table-tbody tr').filter({ hasText: title }).first(),
+    ).toBeVisible();
 
     await page.goto('/approvals/requests');
     const approvalRow = page.locator('.ant-table-tbody tr').filter({ hasText: title }).first();
@@ -123,7 +159,7 @@ test.describe('S8 message and approval acceptance', () => {
     await approvalRow.getByText('通过').click();
     const confirm = page.locator('.ant-modal-confirm').last();
     await expect(confirm).toBeVisible();
-    await confirm.locator('textarea').fill('S8 E2E approved');
+    await confirm.locator('textarea').fill(approveComment);
 
     const approveResponse = page.waitForResponse(
       (response) =>
@@ -137,5 +173,41 @@ test.describe('S8 message and approval acceptance', () => {
     await expect(page.getByText(/操作成功/)).toBeVisible();
     await expect(approvalRow.getByText('已通过')).toBeVisible();
     await exportCurrentPage(page, /^approval-requests-all\.csv$/);
+
+    await page.goto('/message-center');
+    await page.getByRole('tab', { name: /通知/ }).click();
+    const notificationRow = page
+      .locator('.ant-table-tbody tr')
+      .filter({ hasText: approveComment })
+      .first();
+    await expect(notificationRow).toBeVisible();
+    const readResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/messages/') &&
+        response.url().includes('/read') &&
+        response.request().method() === 'POST' &&
+        response.status() < 300,
+    );
+    await notificationRow.getByText('标记已读').click();
+    await readResponse;
+    await expect(page.getByText(/已标记为已读/)).toBeVisible();
+
+    const readAllResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/messages/read-all') &&
+        response.request().method() === 'POST' &&
+        response.status() < 300,
+    );
+    await page.getByRole('button', { name: /全部已读/ }).click();
+    await readAllResponse;
+    await expect(page.getByText(/已标记 \d+ 条通知/)).toBeVisible();
+  });
+
+  test('shows empty export warning for filtered message table', async ({ page }) => {
+    await loginAsAdmin(page);
+    await page.goto('/message-center');
+    await expect(page.getByText(/消息中心/).first()).toBeVisible();
+
+    await expectEmptyExportWarning(page);
   });
 });

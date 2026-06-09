@@ -39,14 +39,12 @@ jest.mock('@/services/nest-web/users', () => ({
 jest.mock('@/utils/auth', () => ({
   formatToken: jest.fn((token: string) => `Bearer ${token}`),
   getAccessToken: jest.fn(() => 'access-token'),
-  getRefreshToken: jest.fn(() => 'refresh-token'),
   removeToken: jest.fn(),
   setToken: jest.fn(),
 }));
 
 const token: Auth.Token = {
   accessToken: 'access-token',
-  refreshToken: 'refresh-token',
   accessExpiresIn: 3600,
   refreshExpiresIn: 7200,
 };

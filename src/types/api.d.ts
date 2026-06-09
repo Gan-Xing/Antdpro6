@@ -3,7 +3,6 @@
 
 declare namespace API {
   type LoginResult = {
-    refreshToken?: string;
     success?: boolean;
     token?: string;
     status?: string;
@@ -12,7 +11,6 @@ declare namespace API {
   };
 
   type RefreshResult = {
-    refreshToken?: string;
     success?: boolean;
     token?: string;
     status?: string;
