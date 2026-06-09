@@ -38,8 +38,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Checkout NestWeb OpenAPI contract
+        uses: actions/checkout@v4
+        with:
+          repository: Gan-Xing/NestWeb
+          ref: main
+          path: .ci/NestWeb
+
       - name: Audit production dependencies
         run: pnpm audit --prod
+
+      - name: Verify OpenAPI client is current
+        run: pnpm run openapi:nest:check
+        env:
+          OPENAPI_SCHEMA_URL: ${{ github.workspace }}/.ci/NestWeb/docs/openapi/nestweb.openapi.json
 
       - name: Typecheck
         run: pnpm run tsc
