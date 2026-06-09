@@ -1,12 +1,17 @@
 // https://umijs.org/config/
 import { defineConfig } from '@umijs/max';
+import { resolve } from 'path';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 import { brand } from '../src/config/brand';
 
 const { REACT_APP_ENV = 'dev' } = process.env;
-const nestWebOpenApiSchema = process.env.OPENAPI_SCHEMA_URL || 'http://localhost:3030/openapi.json';
+const defaultNestWebOpenApiSchema = resolve(
+  __dirname,
+  '../../NestWeb/docs/openapi/nestweb.openapi.json',
+);
+const nestWebOpenApiSchema = process.env.OPENAPI_SCHEMA_URL || defaultNestWebOpenApiSchema;
 
 export default defineConfig({
   /**

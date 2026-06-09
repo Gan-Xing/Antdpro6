@@ -50,10 +50,11 @@ The frontend listens on `http://localhost:8000` and proxies `/api/*` to the `nes
 
 ## OpenAPI Client
 
-Regenerate the NestWeb client after backend API contract changes:
+Regenerate the NestWeb client after backend API contract changes. Generate the schema from the sibling `NestWeb` source tree first, then run the frontend generator:
 
 ```bash
-OPENAPI_SCHEMA_URL=http://localhost:3030/openapi.json pnpm run openapi:nest
+(cd ../NestWeb && pnpm run openapi:generate)
+pnpm run openapi:nest
 ```
 
-Review generated files under `src/services/nest-web` before committing.
+By default, `pnpm run openapi:nest` reads `../NestWeb/docs/openapi/nestweb.openapi.json`. Override `OPENAPI_SCHEMA_URL` only when you intentionally want to test another schema source. Review generated files under `src/services/nest-web` before committing.

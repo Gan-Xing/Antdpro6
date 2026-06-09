@@ -2,8 +2,9 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** 查询审批请求 GET /api/approval-requests */
+/** 此处后端没有提供注释 GET /api/approval-requests */
 export async function approvalRequestsControllerFindAll(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: NestWebAPI.ApprovalRequestsControllerFindAllParams,
   options?: { [key: string]: any },
 ) {
@@ -16,7 +17,7 @@ export async function approvalRequestsControllerFindAll(
   });
 }
 
-/** 创建审批请求 POST /api/approval-requests */
+/** 此处后端没有提供注释 POST /api/approval-requests */
 export async function approvalRequestsControllerCreate(
   body: NestWebAPI.CreateApprovalRequestDto,
   options?: { [key: string]: any },
@@ -31,8 +32,9 @@ export async function approvalRequestsControllerCreate(
   });
 }
 
-/** 获取审批请求详情 GET /api/approval-requests/${param0} */
+/** 此处后端没有提供注释 GET /api/approval-requests/${param0} */
 export async function approvalRequestsControllerFindOne(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: NestWebAPI.ApprovalRequestsControllerFindOneParams,
   options?: { [key: string]: any },
 ) {
@@ -44,9 +46,10 @@ export async function approvalRequestsControllerFindOne(
   });
 }
 
-/** 通过审批请求 POST /api/approval-requests/${param0}/approve */
+/** 此处后端没有提供注释 POST /api/approval-requests/${param0}/approve */
 export async function approvalRequestsControllerApprove(
-  params: NestWebAPI.ApprovalRequestsControllerActionParams,
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: NestWebAPI.ApprovalRequestsControllerApproveParams,
   body: NestWebAPI.ApprovalActionDto,
   options?: { [key: string]: any },
 ) {
@@ -62,27 +65,10 @@ export async function approvalRequestsControllerApprove(
   });
 }
 
-/** 驳回审批请求 POST /api/approval-requests/${param0}/reject */
-export async function approvalRequestsControllerReject(
-  params: NestWebAPI.ApprovalRequestsControllerActionParams,
-  body: NestWebAPI.ApprovalActionDto,
-  options?: { [key: string]: any },
-) {
-  const { id: param0, ...queryParams } = params;
-  return request<NestWebAPI.ApprovalRequestEntity>(`/api/approval-requests/${param0}/reject`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    params: { ...queryParams },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** 取消审批请求 POST /api/approval-requests/${param0}/cancel */
+/** 此处后端没有提供注释 POST /api/approval-requests/${param0}/cancel */
 export async function approvalRequestsControllerCancel(
-  params: NestWebAPI.ApprovalRequestsControllerActionParams,
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: NestWebAPI.ApprovalRequestsControllerCancelParams,
   body: NestWebAPI.ApprovalActionDto,
   options?: { [key: string]: any },
 ) {
@@ -98,14 +84,34 @@ export async function approvalRequestsControllerCancel(
   });
 }
 
-/** 评论审批请求 POST /api/approval-requests/${param0}/comment */
+/** 此处后端没有提供注释 POST /api/approval-requests/${param0}/comment */
 export async function approvalRequestsControllerComment(
-  params: NestWebAPI.ApprovalRequestsControllerActionParams,
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: NestWebAPI.ApprovalRequestsControllerCommentParams,
   body: NestWebAPI.ApprovalActionDto,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
   return request<NestWebAPI.ApprovalRequestEntity>(`/api/approval-requests/${param0}/comment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params: { ...queryParams },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 此处后端没有提供注释 POST /api/approval-requests/${param0}/reject */
+export async function approvalRequestsControllerReject(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: NestWebAPI.ApprovalRequestsControllerRejectParams,
+  body: NestWebAPI.ApprovalActionDto,
+  options?: { [key: string]: any },
+) {
+  const { id: param0, ...queryParams } = params;
+  return request<NestWebAPI.ApprovalRequestEntity>(`/api/approval-requests/${param0}/reject`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -37,8 +37,11 @@ import {
 } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
+type ApprovalRequestStatus = NestWebAPI.ApprovalRequestEntity['status'];
+type ApprovalActionType = NestWebAPI.ApprovalActionEntity['action'];
+
 const statusMap: Record<
-  NestWebAPI.ApprovalRequestStatus,
+  ApprovalRequestStatus,
   { text: string; color: string; status: 'Processing' | 'Success' | 'Error' | 'Default' }
 > = {
   PENDING: { text: '待审批', color: 'processing', status: 'Processing' },
@@ -47,7 +50,7 @@ const statusMap: Record<
   CANCELLED: { text: '已取消', color: 'default', status: 'Default' },
 };
 
-const actionMap: Record<NestWebAPI.ApprovalActionType, string> = {
+const actionMap: Record<ApprovalActionType, string> = {
   SUBMIT: '提交',
   APPROVE: '通过',
   REJECT: '驳回',

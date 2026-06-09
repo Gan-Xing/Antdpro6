@@ -3,9 +3,16 @@
 import { request } from '@umijs/max';
 
 /** 此处后端没有提供注释 POST /api/auth/exchange-code-for-user */
-export async function authControllerExchangeCodeForUserId(options?: { [key: string]: any }) {
+export async function authControllerExchangeCodeForUserId(
+  body: NestWebAPI.WechatCodeDto,
+  options?: { [key: string]: any },
+) {
   return request<any>('/api/auth/exchange-code-for-user', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }
@@ -34,9 +41,16 @@ export async function authControllerLogout(options?: { [key: string]: any }) {
 }
 
 /** 此处后端没有提供注释 POST /api/auth/miniprogram-login */
-export async function authControllerMiniprogramLogin(options?: { [key: string]: any }) {
+export async function authControllerMiniprogramLogin(
+  body: NestWebAPI.WechatCodeDto,
+  options?: { [key: string]: any },
+) {
   return request<any>('/api/auth/miniprogram-login', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }

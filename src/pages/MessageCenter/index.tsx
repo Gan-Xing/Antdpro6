@@ -13,7 +13,9 @@ import { history, useAccess } from '@umijs/max';
 import { Button, message, Modal, Space, Tabs, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 
-const messageCategoryMap: Record<NestWebAPI.MessageCategory, { text: string; color: string }> = {
+type MessageCategory = NestWebAPI.MessageEntity['category'];
+
+const messageCategoryMap: Record<MessageCategory, { text: string; color: string }> = {
   SYSTEM: { text: '系统', color: 'blue' },
   SECURITY: { text: '安全', color: 'red' },
   APPROVAL: { text: '审批', color: 'purple' },

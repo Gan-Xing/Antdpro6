@@ -8,7 +8,7 @@ export async function systemLogControllerFindAll(
   params: NestWebAPI.SystemLogControllerFindAllParams,
   options?: { [key: string]: any },
 ) {
-  return request<any>('/api/system-log', {
+  return request<NestWebAPI.SystemLogListResponseDto>('/api/system-log', {
     method: 'GET',
     params: {
       ...params,
@@ -24,7 +24,7 @@ export async function systemLogControllerFindOne(
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<any>(`/api/system-log/${param0}`, {
+  return request<NestWebAPI.SystemLogDetailResponseDto>(`/api/system-log/${param0}`, {
     method: 'GET',
     params: { ...queryParams },
     ...(options || {}),

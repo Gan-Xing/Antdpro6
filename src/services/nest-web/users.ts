@@ -87,15 +87,16 @@ export async function usersControllerUpdate(
   });
 }
 
-/** 此处后端没有提供注释 PATCH /api/users/${param0}/status */
-export async function usersControllerUpdateStatus(
-  params: NestWebAPI.UsersControllerUpdateStatusParams,
-  body: NestWebAPI.UpdateUserStatusDto,
+/** 此处后端没有提供注释 POST /api/users/${param0}/reset-password */
+export async function usersControllerResetPassword(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: NestWebAPI.UsersControllerResetPasswordParams,
+  body: NestWebAPI.ResetPasswordDto,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<NestWebAPI.UserEntity>(`/api/users/${param0}/status`, {
-    method: 'PATCH',
+  return request<NestWebAPI.UserEntity>(`/api/users/${param0}/reset-password`, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -105,15 +106,16 @@ export async function usersControllerUpdateStatus(
   });
 }
 
-/** 此处后端没有提供注释 POST /api/users/${param0}/reset-password */
-export async function usersControllerResetPassword(
-  params: NestWebAPI.UsersControllerResetPasswordParams,
-  body: NestWebAPI.ResetPasswordDto,
+/** 此处后端没有提供注释 PATCH /api/users/${param0}/status */
+export async function usersControllerUpdateStatus(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: NestWebAPI.UsersControllerUpdateStatusParams,
+  body: NestWebAPI.UpdateUserStatusDto,
   options?: { [key: string]: any },
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<NestWebAPI.UserEntity>(`/api/users/${param0}/reset-password`, {
-    method: 'POST',
+  return request<NestWebAPI.UserEntity>(`/api/users/${param0}/status`, {
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
     },

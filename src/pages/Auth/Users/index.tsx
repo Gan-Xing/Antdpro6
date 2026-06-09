@@ -81,7 +81,7 @@ const handleRemove = async (ids: number[]) => {
   }
 };
 
-const handleUpdateStatus = async (id: number, status: NestWebAPI.UserStatus) => {
+const handleUpdateStatus = async (id: number, status: NestWebAPI.UpdateUserStatusDto['status']) => {
   const hide = message.loading(status === 'active' ? '正在启用' : '正在禁用');
   try {
     await usersControllerUpdateStatus({ id }, { status });
