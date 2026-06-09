@@ -2,6 +2,8 @@
 
 This guide covers the frontend deployment flow for the single-tenant enterprise admin baseline.
 
+Last updated: 2026-06-09
+
 ## Runtime Model
 
 Antdpro6 builds to static assets and is served by Nginx.
@@ -59,7 +61,13 @@ If the API is also public, keep `CORS_ORIGINS` in NestWeb restricted to the fron
 After NestWeb DTO/controller changes:
 
 ```bash
-OPENAPI_SCHEMA_URL=http://localhost:3030/openapi.json pnpm run openapi:nest
+cd ../NestWeb
+pnpm run openapi:generate
+pnpm run openapi:check
+
+cd ../Antdpro6
+pnpm run openapi:nest
+pnpm run openapi:nest:check
 ```
 
 Then run:
@@ -71,6 +79,8 @@ pnpm run build
 ```
 
 Do not hand-edit generated files in `src/services/nest-web` unless fixing a temporary generator issue that is documented in the commit.
+
+Do not default to a running environment `/openapi.json`; use the sibling `../NestWeb/docs/openapi/nestweb.openapi.json` contract unless the task explicitly requires validating another schema source.
 
 ## E2E Verification
 

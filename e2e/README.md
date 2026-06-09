@@ -2,6 +2,8 @@
 
 This suite verifies the production-facing auth and dashboard flow against a running Antdpro6 + NestWeb environment.
 
+Last updated: 2026-06-09
+
 ## Local Run
 
 ```bash

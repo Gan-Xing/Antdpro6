@@ -2,6 +2,8 @@
 
 Antdpro6 is the frontend for the TS full-stack enterprise admin baseline. It is paired with the `NestWeb` backend.
 
+Last updated: 2026-06-09
+
 The current target is a single-tenant enterprise admin template with:
 
 - productized dashboard and layout
@@ -9,7 +11,8 @@ The current target is a single-tenant enterprise admin template with:
 - dynamic backend menus
 - RBAC-aware pages for users, roles, permissions, and menus
 - centralized session refresh
-- Playwright E2E coverage for auth, session refresh, operations pages, and restricted access
+- message center, approval lite, and current-page CSV exports
+- Playwright E2E coverage for auth, session refresh, operations pages, S8 workflows, and restricted access
 
 ## Documentation
 
@@ -25,6 +28,7 @@ Backend handoff and system-level docs live in the `NestWeb` repository. Use the 
 pnpm install
 pnpm run tsc
 pnpm run lint:js
+pnpm run openapi:nest:check
 pnpm test -- --runInBand
 pnpm run build
 pnpm run e2e
@@ -58,3 +62,5 @@ pnpm run openapi:nest
 ```
 
 By default, `pnpm run openapi:nest` reads `../NestWeb/docs/openapi/nestweb.openapi.json`. Override `OPENAPI_SCHEMA_URL` only when you intentionally want to test another schema source. Review generated files under `src/services/nest-web` before committing.
+
+CI runs `pnpm run openapi:nest:check` to regenerate the client and fail if `src/services/nest-web` has uncommitted drift.
