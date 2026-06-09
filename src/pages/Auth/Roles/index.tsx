@@ -6,6 +6,7 @@ import {
   rolesControllerUpdate,
 } from '@/services/nest-web/roles';
 import { unwrapResponse } from '@/utils/apiResponse';
+import { formatGlobalMessage } from '@/utils/i18n';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -41,15 +42,18 @@ const toUpdateRoleDto = (fields: Roles.UpdateParams): NestWebAPI.UpdateRoleDto =
 });
 
 const handleAdd = async (fields: Roles.CreateParams) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading(formatGlobalMessage('common.loading.add', 'Adding'));
   try {
     await rolesControllerCreate(toCreateRoleDto(fields));
     hide();
-    message.success('Added successfully');
+    message.success(formatGlobalMessage('common.message.addSuccess', 'Added successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Adding failed, please try again!');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.addFailure', 'Adding failed, please try again'),
+    );
     return false;
   }
 };
@@ -61,16 +65,19 @@ const handleAdd = async (fields: Roles.CreateParams) => {
  * @param fields
  */
 const handleUpdate = async (fields: Roles.UpdateParams) => {
-  const hide = message.loading('正在更新');
+  const hide = message.loading(formatGlobalMessage('common.loading.update', 'Updating'));
   try {
     await rolesControllerUpdate({ id: Number(fields.id) }, toUpdateRoleDto(fields));
     hide();
 
-    message.success('更新成功');
+    message.success(formatGlobalMessage('common.message.updateSuccess', 'Updated successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? '更新失败,请重试');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.updateFailure', 'Update failed, please try again'),
+    );
     return false;
   }
 };
@@ -82,16 +89,19 @@ const handleUpdate = async (fields: Roles.UpdateParams) => {
  * @param ids
  */
 const handleRemove = async (ids: number[]) => {
-  const hide = message.loading('正在删除');
+  const hide = message.loading(formatGlobalMessage('common.loading.delete', 'Deleting'));
   if (!ids) return true;
   try {
     await rolesControllerRemoveMany({ ids });
     hide();
-    message.success('Deleted successfully and will refresh soon');
+    message.success(formatGlobalMessage('common.message.deleteSuccess', 'Deleted successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Delete failed, please try again');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.deleteFailure', 'Delete failed, please try again'),
+    );
     return false;
   }
 };
@@ -123,7 +133,7 @@ const TableList: React.FC = () => {
   const [currentRows, setCurrentRows] = useState<Roles.Entity[]>([]);
   const rawColumns: Array<ProColumns<Roles.Entity> | false> = [
     {
-      title: '角色编码',
+      title: intl.formatMessage({ id: 'pages.roles.code' }),
       dataIndex: 'code',
       width: 140,
       render: (dom) => (
@@ -133,9 +143,9 @@ const TableList: React.FC = () => {
       ),
     },
     {
-      title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
+      title: <FormattedMessage id="pages.roles.name" defaultMessage="Name" />,
       dataIndex: 'name',
-      tip: '名称',
+      tip: intl.formatMessage({ id: 'pages.roles.name' }),
       width: '75px',
       render: (dom, entity) => {
         return (
@@ -147,36 +157,42 @@ const TableList: React.FC = () => {
           >
             <Space size={8}>
               {dom}
-              {isSystemAdminRole(entity) ? <Tag color="blue">系统内置</Tag> : null}
+              {isSystemAdminRole(entity) ? (
+                <Tag color="blue">{intl.formatMessage({ id: 'pages.roles.systemManagedTag' })}</Tag>
+              ) : null}
             </Space>
           </a>
         );
       },
     },
     {
-      title: '职责说明',
+      title: intl.formatMessage({ id: 'pages.roles.description' }),
       dataIndex: 'description',
       ellipsis: true,
       hideInSearch: true,
       renderText: (value) => value || '-',
     },
     {
-      title: '排序',
+      title: intl.formatMessage({ id: 'pages.roles.sort' }),
       dataIndex: 'sort',
       width: 90,
       hideInSearch: true,
       sorter: (a, b) => (a.sort ?? 0) - (b.sort ?? 0),
     },
     {
-      title: '状态',
+      title: intl.formatMessage({ id: 'common.status' }),
       dataIndex: 'enabled',
       width: 90,
       valueEnum: {
-        true: { text: '启用', status: 'Success' },
-        false: { text: '停用', status: 'Default' },
+        true: { text: intl.formatMessage({ id: 'common.enabled' }), status: 'Success' },
+        false: { text: intl.formatMessage({ id: 'pages.roles.disabled' }), status: 'Default' },
       },
       render: (_, entity) =>
-        entity.enabled ? <Tag color="success">启用</Tag> : <Tag color="default">停用</Tag>,
+        entity.enabled ? (
+          <Tag color="success">{intl.formatMessage({ id: 'common.enabled' })}</Tag>
+        ) : (
+          <Tag color="default">{intl.formatMessage({ id: 'pages.roles.disabled' })}</Tag>
+        ),
     },
     {
       title: <FormattedMessage id="pages.roles.permissions" defaultMessage="权限列表" />,
@@ -188,7 +204,7 @@ const TableList: React.FC = () => {
       hideInTable: true,
     },
     {
-      title: <FormattedMessage id="pages.roles.users" defaultMessage="用户列表" />,
+      title: <FormattedMessage id="pages.roles.users" defaultMessage="Users" />,
       dataIndex: 'users',
       renderText: (val) => {
         return val.map((item: { username: string }) => item.username).join(', ');
@@ -196,20 +212,20 @@ const TableList: React.FC = () => {
       hideInSearch: true,
     },
     {
-      title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
+      title: <FormattedMessage id="pages.users.createTime" defaultMessage="Created At" />,
       hideInSearch: true,
       dataIndex: 'createdAt',
       valueType: 'date',
     },
     {
-      title: <FormattedMessage id="pages.roles.updatedTime" defaultMessage="更新时间" />,
+      title: <FormattedMessage id="pages.roles.updatedTime" defaultMessage="Updated At" />,
       hideInSearch: true,
       hideInTable: true,
       dataIndex: 'updatedAt',
       valueType: 'date',
     },
     (canEditRole || canDeleteRole) && {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Actions" />,
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
@@ -219,8 +235,13 @@ const TableList: React.FC = () => {
         return [
           canEditRole &&
             (systemAdminRole ? (
-              <Tooltip key="update-disabled" title="admin 是系统管理员角色，不能在后台编辑">
-                <Typography.Text type="secondary">编辑</Typography.Text>
+              <Tooltip
+                key="update-disabled"
+                title={intl.formatMessage({ id: 'pages.roles.systemAdminEditTip' })}
+              >
+                <Typography.Text type="secondary">
+                  {intl.formatMessage({ id: 'common.edit' })}
+                </Typography.Text>
               </Tooltip>
             ) : (
               <a
@@ -235,27 +256,32 @@ const TableList: React.FC = () => {
             )),
           canDeleteRole &&
             (systemAdminRole ? (
-              <Tooltip key="delete-disabled" title="admin 是系统管理员角色，不能在后台删除">
-                <Typography.Text type="secondary">删除</Typography.Text>
+              <Tooltip
+                key="delete-disabled"
+                title={intl.formatMessage({ id: 'pages.roles.systemAdminDeleteTip' })}
+              >
+                <Typography.Text type="secondary">
+                  {intl.formatMessage({ id: 'common.delete' })}
+                </Typography.Text>
               </Tooltip>
             ) : (
               <a
                 key="delete"
                 onClick={() => {
                   return Modal.confirm({
-                    title: '确认删除？',
+                    title: intl.formatMessage({ id: 'common.confirmDelete' }),
                     onOk: async () => {
                       await handleRemove([record.id!]);
                       setSelectedRows([]);
                       actionRef.current?.reloadAndRest?.();
                     },
-                    content: '确认删除吗？',
-                    okText: '确认',
-                    cancelText: '取消',
+                    content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                    okText: intl.formatMessage({ id: 'common.confirm' }),
+                    cancelText: intl.formatMessage({ id: 'common.cancel' }),
                   });
                 }}
               >
-                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="Delete" />
               </a>
             )),
         ].filter(Boolean);
@@ -285,16 +311,25 @@ const TableList: React.FC = () => {
               filename="roles.csv"
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '角色编码', dataIndex: 'code' },
-                { title: '名称', dataIndex: 'name' },
-                { title: '说明', dataIndex: 'description' },
-                { title: '状态', renderText: (record) => (record.enabled ? '启用' : '停用') },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                { title: intl.formatMessage({ id: 'pages.roles.code' }), dataIndex: 'code' },
+                { title: intl.formatMessage({ id: 'common.name' }), dataIndex: 'name' },
                 {
-                  title: '权限',
+                  title: intl.formatMessage({ id: 'common.description' }),
+                  dataIndex: 'description',
+                },
+                {
+                  title: intl.formatMessage({ id: 'common.status' }),
+                  renderText: (record) =>
+                    record.enabled
+                      ? intl.formatMessage({ id: 'common.enabled' })
+                      : intl.formatMessage({ id: 'pages.roles.disabled' }),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.roles.permissions' }),
                   renderText: (record) => record.permissions?.map((item) => item.name).join(', '),
                 },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                { title: intl.formatMessage({ id: 'common.createdAt' }), dataIndex: 'createdAt' },
               ]}
             />
           ) : null,
@@ -340,7 +375,11 @@ const TableList: React.FC = () => {
           }
         >
           <Tooltip
-            title={selectedContainsAdminRole ? '已选择 admin 角色，不能批量删除' : undefined}
+            title={
+              selectedContainsAdminRole
+                ? intl.formatMessage({ id: 'pages.roles.selectedAdminDeleteTip' })
+                : undefined
+            }
           >
             <Button
               type="primary"
@@ -348,15 +387,15 @@ const TableList: React.FC = () => {
               disabled={selectedContainsAdminRole}
               onClick={() => {
                 return Modal.confirm({
-                  title: '确认删除？',
+                  title: intl.formatMessage({ id: 'common.confirmDelete' }),
                   onOk: async () => {
                     await handleRemove(selectedRowsState?.map((item) => item.id!));
                     setSelectedRows([]);
                     actionRef.current?.reloadAndRest?.();
                   },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
+                  content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                  okText: intl.formatMessage({ id: 'common.confirm' }),
+                  cancelText: intl.formatMessage({ id: 'common.cancel' }),
                 });
               }}
             >

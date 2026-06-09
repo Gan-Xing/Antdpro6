@@ -1,3 +1,4 @@
+import { formatGlobalMessage } from '@/utils/i18n';
 import { history } from '@umijs/max';
 import { Button, Empty, Result } from 'antd';
 import type { ReactNode } from 'react';
@@ -7,22 +8,31 @@ type EmptyStateProps = {
   description?: ReactNode;
 };
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ description = '暂无数据' }) => (
-  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={description} />
-);
+export const EmptyState: React.FC<EmptyStateProps> = ({
+  description = formatGlobalMessage('common.empty.data', 'No data'),
+}) => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={description} />;
 
 export const renderEmpty = (componentName?: string) => (
-  <EmptyState description={componentName === 'Table' ? '暂无数据' : '暂无内容'} />
+  <EmptyState
+    description={
+      componentName === 'Table'
+        ? formatGlobalMessage('common.empty.data', 'No data')
+        : formatGlobalMessage('common.empty.content', 'No content')
+    }
+  />
 );
 
 export const AccessDeniedResult: React.FC = () => (
   <Result
     status="403"
     title="403"
-    subTitle="当前账号没有访问该页面的权限。"
+    subTitle={formatGlobalMessage(
+      'common.result.403.subtitle',
+      'This account does not have permission to access this page.',
+    )}
     extra={
       <Button type="primary" onClick={() => history.push('/dashboard')}>
-        返回工作台
+        {formatGlobalMessage('common.backDashboard', 'Back to Dashboard')}
       </Button>
     }
   />
@@ -32,10 +42,13 @@ export const ServerErrorResult: React.FC = () => (
   <Result
     status="500"
     title="500"
-    subTitle="服务器暂时不可用，请稍后重试或联系管理员。"
+    subTitle={formatGlobalMessage(
+      'common.result.500.subtitle',
+      'The server is temporarily unavailable. Please try again later or contact the administrator.',
+    )}
     extra={
       <Button type="primary" onClick={() => history.push('/dashboard')}>
-        返回工作台
+        {formatGlobalMessage('common.backDashboard', 'Back to Dashboard')}
       </Button>
     }
   />
@@ -44,11 +57,14 @@ export const ServerErrorResult: React.FC = () => (
 export const RequestFailureResult: React.FC = () => (
   <Result
     status="error"
-    title="请求失败"
-    subTitle="网络异常或服务未响应，请检查连接后重试。"
+    title={formatGlobalMessage('common.result.requestFailure.title', 'Request failed')}
+    subTitle={formatGlobalMessage(
+      'common.result.requestFailure.subtitle',
+      'Network error or service unavailable. Check the connection and try again.',
+    )}
     extra={
       <Button type="primary" onClick={() => window.location.reload()}>
-        重新加载
+        {formatGlobalMessage('common.reload', 'Reload')}
       </Button>
     }
   />

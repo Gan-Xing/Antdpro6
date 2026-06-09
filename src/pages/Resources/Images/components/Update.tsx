@@ -95,7 +95,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           intl.formatMessage(
             {
               id: 'pages.resources.images.upload.success',
-              defaultMessage: '{name} 上传成功',
+              defaultMessage: '{name} uploaded successfully',
             },
             {
               name: file.name,
@@ -107,13 +107,13 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           intl.formatMessage(
             {
               id: 'pages.resources.images.upload.error',
-              defaultMessage: '{name} 上传失败: {error}',
+              defaultMessage: '{name} upload failed: {error}',
             },
             {
               name: file.name,
               error: intl.formatMessage({
                 id: 'pages.resources.images.upload.error.noUrl',
-                defaultMessage: '未获取到URL',
+                defaultMessage: 'No URL returned',
               }),
             },
           ),
@@ -125,7 +125,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         intl.formatMessage(
           {
             id: 'pages.resources.images.upload.error',
-            defaultMessage: '{name} 上传失败: {error}',
+            defaultMessage: '{name} upload failed: {error}',
           },
           {
             name: file.name,
@@ -133,7 +133,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
               file.error?.message ||
               intl.formatMessage({
                 id: 'pages.resources.images.upload.error.unknown',
-                defaultMessage: '未知错误',
+                defaultMessage: 'Unknown error',
               }),
           },
         ),
@@ -148,7 +148,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       <div style={{ marginTop: 8 }}>
         {intl.formatMessage({
           id: 'pages.resources.images.upload',
-          defaultMessage: '上传',
+          defaultMessage: 'Upload',
         })}
       </div>
     </div>
@@ -169,7 +169,12 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     beforeUpload: (file: RcFile) => {
       const isImage = file.type.startsWith('image/') || file.name.toLowerCase().endsWith('.heic');
       if (!isImage) {
-        message.error(`${file.name} 不是图片文件`);
+        message.error(
+          intl.formatMessage(
+            { id: 'pages.resources.images.upload.error.type' },
+            { name: file.name },
+          ),
+        );
         return Upload.LIST_IGNORE;
       }
       return true;
@@ -180,7 +185,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     <ModalForm
       title={intl.formatMessage({
         id: 'pages.resources.images.edit',
-        defaultMessage: '编辑',
+        defaultMessage: 'Edit',
       })}
       width={800}
       form={form}
@@ -204,7 +209,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           .filter(Boolean) as string[];
 
         if (photos.length === 0) {
-          message.error('请至少上传一张图片');
+          message.error(intl.formatMessage({ id: 'pages.resources.images.upload.required' }));
           return false;
         }
 
@@ -227,11 +232,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         name="area"
         label={intl.formatMessage({
           id: 'pages.resources.images.area',
-          defaultMessage: '工程类别',
+          defaultMessage: 'Project Area',
         })}
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.area.placeholder',
-          defaultMessage: '请选择工程类别',
+          defaultMessage: 'Please select project area',
         })}
         options={[
           {
@@ -289,11 +294,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         name="category"
         label={intl.formatMessage({
           id: 'pages.resources.images.category',
-          defaultMessage: '分类',
+          defaultMessage: 'Category',
         })}
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.category.placeholder',
-          defaultMessage: '请选择分类',
+          defaultMessage: 'Please select category',
         })}
         options={imageCategoryOptions}
         rules={[{ required: true }]}
@@ -302,12 +307,12 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         name="tags"
         label={intl.formatMessage({
           id: 'pages.resources.images.tags',
-          defaultMessage: '标签',
+          defaultMessage: 'Tags',
         })}
         mode="tags"
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.tags.placeholder',
-          defaultMessage: '请输入标签（支持多个标签）',
+          defaultMessage: 'Enter tags. Multiple tags are supported.',
         })}
         fieldProps={{
           tokenSeparators: [',', ' '],
@@ -317,11 +322,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         name="description"
         label={intl.formatMessage({
           id: 'pages.resources.images.description',
-          defaultMessage: '描述',
+          defaultMessage: 'Description',
         })}
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.description.required',
-          defaultMessage: '请输入描述',
+          defaultMessage: 'Please enter description',
         })}
         rules={[
           {
@@ -336,11 +341,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             name="stakeNumber"
             label={intl.formatMessage({
               id: 'pages.resources.images.stakeNumber',
-              defaultMessage: '桩号',
+              defaultMessage: 'Stake Number',
             })}
             placeholder={intl.formatMessage({
               id: 'pages.resources.images.stakeNumber.placeholder',
-              defaultMessage: '请输入桩号',
+              defaultMessage: 'Please enter stake number',
             })}
           />
         </div>
@@ -349,11 +354,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             name="offset"
             label={intl.formatMessage({
               id: 'pages.resources.images.offset',
-              defaultMessage: '偏距',
+              defaultMessage: 'Offset',
             })}
             placeholder={intl.formatMessage({
               id: 'pages.resources.images.offset.placeholder',
-              defaultMessage: '请输入偏距',
+              defaultMessage: 'Please enter offset',
             })}
           />
         </div>
@@ -362,11 +367,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         name="location"
         label={intl.formatMessage({
           id: 'pages.resources.images.location',
-          defaultMessage: '位置',
+          defaultMessage: 'Location',
         })}
         tooltip={intl.formatMessage({
           id: 'pages.resources.images.location.tooltip',
-          defaultMessage: '点击地图选择位置，或点击"获取当前位置"按钮',
+          defaultMessage: 'Click the map to select a location, or click "Get Current Location".',
         })}
       >
         <MapPicker
@@ -380,12 +385,12 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       <Form.Item
         label={intl.formatMessage({
           id: 'pages.resources.images.photos',
-          defaultMessage: '照片',
+          defaultMessage: 'Photos',
         })}
         required
         tooltip={intl.formatMessage({
           id: 'pages.resources.images.photos.tooltip',
-          defaultMessage: '支持 jpg、png、gif、webp、heic 格式',
+          defaultMessage: 'Supports jpg, png, gif, webp, and heic formats',
         })}
       >
         <Upload {...uploadProps}>{fileList.length >= 1 ? null : uploadButton}</Upload>

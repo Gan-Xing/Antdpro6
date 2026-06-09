@@ -2,12 +2,14 @@ import { systemControllerGetQueues } from '@/services/nest-web/system';
 import { unwrapResponse } from '@/utils/apiResponse';
 import type { ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProCard, ProTable, StatisticCard } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
 import { Button, Space, Tag, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const statusColor = (status?: string) => (status === 'ok' ? 'success' : 'error');
 
 const SystemQueuesPage: React.FC = () => {
+  const intl = useIntl();
   const [loading, setLoading] = useState(false);
   const [queues, setQueues] = useState<NestWebAPI.SystemQueuesEntity>();
 
@@ -17,7 +19,10 @@ const SystemQueuesPage: React.FC = () => {
       const data = unwrapResponse<NestWebAPI.SystemQueuesEntity>(await systemControllerGetQueues());
       setQueues(data);
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '队列状态加载失败');
+      message.error(
+        error?.response?.data?.message ??
+          intl.formatMessage({ id: 'pages.system.queues.loadFailed' }),
+      );
     } finally {
       setLoading(false);
     }
@@ -29,12 +34,12 @@ const SystemQueuesPage: React.FC = () => {
 
   const columns: ProColumns<NestWebAPI.QueueStatusEntity>[] = [
     {
-      title: '队列',
+      title: intl.formatMessage({ id: 'pages.system.queues.queue' }),
       dataIndex: 'name',
       ellipsis: true,
     },
     {
-      title: '状态',
+      title: intl.formatMessage({ id: 'pages.system.status.status' }),
       dataIndex: 'status',
       width: 100,
       render: (_, record) => <Tag color={statusColor(record.status)}>{record.status}</Tag>,
@@ -45,7 +50,7 @@ const SystemQueuesPage: React.FC = () => {
     { title: 'Failed', dataIndex: 'failed', search: false },
     { title: 'Delayed', dataIndex: 'delayed', search: false },
     {
-      title: '错误',
+      title: intl.formatMessage({ id: 'pages.system.status.error' }),
       dataIndex: 'error',
       ellipsis: true,
       search: false,
@@ -57,7 +62,7 @@ const SystemQueuesPage: React.FC = () => {
     <PageContainer
       extra={
         <Button loading={loading} onClick={loadQueues}>
-          刷新
+          {intl.formatMessage({ id: 'common.refresh' })}
         </Button>
       }
     >

@@ -7,7 +7,7 @@ import { unwrapResponse } from '@/utils/apiResponse';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { Drawer, message, Tag } from 'antd';
-import { useAccess } from '@umijs/max';
+import { useAccess, useIntl } from '@umijs/max';
 import React, { useRef, useState } from 'react';
 
 const formatTime = (value?: string | null) => {
@@ -20,18 +20,19 @@ const formatTime = (value?: string | null) => {
 const LoginLogsPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const access = useAccess();
+  const intl = useIntl();
   const [detailOpen, setDetailOpen] = useState(false);
   const [currentLog, setCurrentLog] = useState<NestWebAPI.LoginLogEntity>();
   const [currentRows, setCurrentRows] = useState<NestWebAPI.LoginLogEntity[]>([]);
 
   const columns: ProColumns<NestWebAPI.LoginLogEntity>[] = [
     {
-      title: '关键词',
+      title: intl.formatMessage({ id: 'common.keyword' }),
       dataIndex: 'keyword',
       hideInTable: true,
     },
     {
-      title: '用户',
+      title: intl.formatMessage({ id: 'common.user' }),
       dataIndex: 'username',
       ellipsis: true,
       render: (dom, record) => (
@@ -44,7 +45,10 @@ const LoginLogsPage: React.FC = () => {
               setCurrentLog(data);
               setDetailOpen(true);
             } catch (error: any) {
-              message.error(error?.response?.data?.message ?? '登录日志详情加载失败');
+              message.error(
+                error?.response?.data?.message ??
+                  intl.formatMessage({ id: 'pages.security.loginLogs.loadDetailFailed' }),
+              );
             }
           }}
         >
@@ -53,7 +57,7 @@ const LoginLogsPage: React.FC = () => {
       ),
     },
     {
-      title: '邮箱',
+      title: intl.formatMessage({ id: 'common.email' }),
       dataIndex: 'email',
       ellipsis: true,
       copyable: true,
@@ -65,26 +69,30 @@ const LoginLogsPage: React.FC = () => {
       width: 150,
     },
     {
-      title: '结果',
+      title: intl.formatMessage({ id: 'pages.security.loginLogs.result' }),
       dataIndex: 'success',
       width: 100,
       valueEnum: {
-        true: { text: '成功', status: 'Success' },
-        false: { text: '失败', status: 'Error' },
+        true: { text: intl.formatMessage({ id: 'common.success' }), status: 'Success' },
+        false: { text: intl.formatMessage({ id: 'common.failure' }), status: 'Error' },
       },
       render: (_, record) => (
-        <Tag color={record.success ? 'success' : 'error'}>{record.success ? '成功' : '失败'}</Tag>
+        <Tag color={record.success ? 'success' : 'error'}>
+          {record.success
+            ? intl.formatMessage({ id: 'common.success' })
+            : intl.formatMessage({ id: 'common.failure' })}
+        </Tag>
       ),
     },
     {
-      title: '失败原因',
+      title: intl.formatMessage({ id: 'pages.security.loginLogs.failureReason' }),
       dataIndex: 'failureReason',
       ellipsis: true,
       hideInSearch: true,
       renderText: (value) => value || '-',
     },
     {
-      title: '登录时间',
+      title: intl.formatMessage({ id: 'pages.security.loginLogs.loginTime' }),
       dataIndex: 'createdAt',
       valueType: 'dateTimeRange',
       render: (_, record) => formatTime(record.createdAt),
@@ -101,7 +109,7 @@ const LoginLogsPage: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<NestWebAPI.LoginLogEntity>
-        headerTitle="登录日志"
+        headerTitle={intl.formatMessage({ id: 'pages.security.loginLogs.title' })}
         actionRef={actionRef}
         rowKey="id"
         search={{ labelWidth: 120 }}
@@ -114,13 +122,25 @@ const LoginLogsPage: React.FC = () => {
               filename="login-logs.csv"
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '用户', dataIndex: 'username' },
-                { title: '邮箱', dataIndex: 'email' },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                { title: intl.formatMessage({ id: 'common.user' }), dataIndex: 'username' },
+                { title: intl.formatMessage({ id: 'common.email' }), dataIndex: 'email' },
                 { title: 'IP', dataIndex: 'ip' },
-                { title: '结果', renderText: (record) => (record.success ? '成功' : '失败') },
-                { title: '失败原因', dataIndex: 'failureReason' },
-                { title: '登录时间', dataIndex: 'createdAt' },
+                {
+                  title: intl.formatMessage({ id: 'pages.security.loginLogs.result' }),
+                  renderText: (record) =>
+                    record.success
+                      ? intl.formatMessage({ id: 'common.success' })
+                      : intl.formatMessage({ id: 'common.failure' }),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.security.loginLogs.failureReason' }),
+                  dataIndex: 'failureReason',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.security.loginLogs.loginTime' }),
+                  dataIndex: 'createdAt',
+                },
               ]}
             />
           ) : null,
@@ -156,7 +176,7 @@ const LoginLogsPage: React.FC = () => {
       <Drawer
         width={560}
         open={detailOpen}
-        title="登录日志详情"
+        title={intl.formatMessage({ id: 'pages.security.loginLogs.detailTitle' })}
         onClose={() => {
           setDetailOpen(false);
           setCurrentLog(undefined);
@@ -167,25 +187,37 @@ const LoginLogsPage: React.FC = () => {
           column={1}
           dataSource={currentLog}
           columns={[
-            { title: 'ID', dataIndex: 'id' },
-            { title: '用户 ID', dataIndex: 'userId' },
-            { title: '用户名', dataIndex: 'username' },
-            { title: '邮箱', dataIndex: 'email', copyable: true },
+            { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+            { title: intl.formatMessage({ id: 'common.userId' }), dataIndex: 'userId' },
+            { title: intl.formatMessage({ id: 'common.username' }), dataIndex: 'username' },
+            {
+              title: intl.formatMessage({ id: 'common.email' }),
+              dataIndex: 'email',
+              copyable: true,
+            },
             { title: 'IP', dataIndex: 'ip' },
             {
-              title: '结果',
+              title: intl.formatMessage({ id: 'pages.security.loginLogs.result' }),
               dataIndex: 'success',
               render: (_, entity) => (
                 <Tag color={entity.success ? 'success' : 'error'}>
-                  {entity.success ? '成功' : '失败'}
+                  {entity.success
+                    ? intl.formatMessage({ id: 'common.success' })
+                    : intl.formatMessage({ id: 'common.failure' })}
                 </Tag>
               ),
             },
-            { title: '失败编码', dataIndex: 'failureCode' },
-            { title: '失败原因', dataIndex: 'failureReason' },
+            {
+              title: intl.formatMessage({ id: 'pages.security.loginLogs.failureCode' }),
+              dataIndex: 'failureCode',
+            },
+            {
+              title: intl.formatMessage({ id: 'pages.security.loginLogs.failureReason' }),
+              dataIndex: 'failureReason',
+            },
             { title: 'User Agent', dataIndex: 'userAgent' },
             {
-              title: '创建时间',
+              title: intl.formatMessage({ id: 'common.createdAt' }),
               dataIndex: 'createdAt',
               render: (_, entity) => formatTime(entity.createdAt),
             },

@@ -67,7 +67,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           intl.formatMessage(
             {
               id: 'pages.resources.images.upload.success',
-              defaultMessage: '{name} 上传成功',
+              defaultMessage: '{name} uploaded successfully',
             },
             {
               name: file.name,
@@ -79,11 +79,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           intl.formatMessage(
             {
               id: 'pages.resources.images.upload.error',
-              defaultMessage: '{name} 上传失败: {error}',
+              defaultMessage: '{name} upload failed: {error}',
             },
             {
               name: file.name,
-              error: '未获取到URL',
+              error: intl.formatMessage({ id: 'pages.resources.images.upload.error.noUrl' }),
             },
           ),
         );
@@ -94,11 +94,13 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         intl.formatMessage(
           {
             id: 'pages.resources.images.upload.error',
-            defaultMessage: '{name} 上传失败: {error}',
+            defaultMessage: '{name} upload failed: {error}',
           },
           {
             name: file.name,
-            error: file.error?.message || '未知错误',
+            error:
+              file.error?.message ||
+              intl.formatMessage({ id: 'pages.resources.images.upload.error.unknown' }),
           },
         ),
       );
@@ -123,7 +125,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       <div style={{ marginTop: 8 }}>
         {intl.formatMessage({
           id: 'pages.resources.images.upload',
-          defaultMessage: '上传',
+          defaultMessage: 'Upload',
         })}
       </div>
     </div>
@@ -149,7 +151,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           intl.formatMessage(
             {
               id: 'pages.resources.images.upload.error.type',
-              defaultMessage: '{name} 不是图片文件',
+              defaultMessage: '{name} is not an image file',
             },
             {
               name: file.name,
@@ -166,7 +168,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
     <ModalForm
       title={intl.formatMessage({
         id: 'pages.resources.images.create',
-        defaultMessage: '新建图片',
+        defaultMessage: 'New Image',
       })}
       width={800}
       form={form}
@@ -190,7 +192,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
           message.error(
             intl.formatMessage({
               id: 'pages.resources.images.upload.required',
-              defaultMessage: '请至少上传一张图片',
+              defaultMessage: 'Please upload at least one image',
             }),
           );
           return false;
@@ -218,11 +220,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         name="area"
         label={intl.formatMessage({
           id: 'pages.resources.images.area',
-          defaultMessage: '工程类别',
+          defaultMessage: 'Project Area',
         })}
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.area.placeholder',
-          defaultMessage: '请选择工程类别',
+          defaultMessage: 'Please select project area',
         })}
         options={[
           {
@@ -281,11 +283,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         name="category"
         label={intl.formatMessage({
           id: 'pages.resources.images.category',
-          defaultMessage: '分类',
+          defaultMessage: 'Category',
         })}
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.category.placeholder',
-          defaultMessage: '请选择分类',
+          defaultMessage: 'Please select category',
         })}
         options={imageCategoryOptions}
         initialValue="progress"
@@ -295,12 +297,12 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         name="tags"
         label={intl.formatMessage({
           id: 'pages.resources.images.tags',
-          defaultMessage: '标签',
+          defaultMessage: 'Tags',
         })}
         mode="tags"
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.tags.placeholder',
-          defaultMessage: '请输入标签（支持多个标签）',
+          defaultMessage: 'Enter tags. Multiple tags are supported.',
         })}
         fieldProps={{
           tokenSeparators: [',', ' '],
@@ -310,11 +312,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         name="description"
         label={intl.formatMessage({
           id: 'pages.resources.images.description',
-          defaultMessage: '描述',
+          defaultMessage: 'Description',
         })}
         placeholder={intl.formatMessage({
           id: 'pages.resources.images.description.required',
-          defaultMessage: '请输入描述',
+          defaultMessage: 'Please enter description',
         })}
         rules={[
           {
@@ -329,11 +331,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             name="stakeNumber"
             label={intl.formatMessage({
               id: 'pages.resources.images.stakeNumber',
-              defaultMessage: '桩号',
+              defaultMessage: 'Stake Number',
             })}
             placeholder={intl.formatMessage({
               id: 'pages.resources.images.stakeNumber.placeholder',
-              defaultMessage: '请输入桩号',
+              defaultMessage: 'Please enter stake number',
             })}
           />
         </div>
@@ -342,11 +344,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             name="offset"
             label={intl.formatMessage({
               id: 'pages.resources.images.offset',
-              defaultMessage: '偏距',
+              defaultMessage: 'Offset',
             })}
             placeholder={intl.formatMessage({
               id: 'pages.resources.images.offset.placeholder',
-              defaultMessage: '请输入偏距',
+              defaultMessage: 'Please enter offset',
             })}
           />
         </div>
@@ -355,11 +357,11 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         name="location"
         label={intl.formatMessage({
           id: 'pages.resources.images.location',
-          defaultMessage: '位置',
+          defaultMessage: 'Location',
         })}
         tooltip={intl.formatMessage({
           id: 'pages.resources.images.location.tooltip',
-          defaultMessage: '点击地图选择位置，或点击"获取当前位置"按钮',
+          defaultMessage: 'Click the map to select a location, or click "Get Current Location".',
         })}
       >
         <MapPicker
@@ -374,12 +376,12 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       <Form.Item
         label={intl.formatMessage({
           id: 'pages.resources.images.photos',
-          defaultMessage: '照片',
+          defaultMessage: 'Photos',
         })}
         required
         tooltip={intl.formatMessage({
           id: 'pages.resources.images.photos.tooltip',
-          defaultMessage: '支持 jpg、png、gif、webp、heic 格式',
+          defaultMessage: 'Supports jpg, png, gif, webp, and heic formats',
         })}
       >
         <Upload {...uploadProps}>{fileList.length >= 1 ? null : uploadButton}</Upload>

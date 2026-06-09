@@ -1,5 +1,19 @@
+import { formatGlobalMessage } from '@/utils/i18n';
+
 export const imageCategoryFallbackOptions = [
-  { label: '进度', value: 'progress', color: 'blue' },
-  { label: '安全', value: 'safety', color: 'error' },
-  { label: '质量', value: 'quality', color: 'success' },
+  {
+    label: formatGlobalMessage('pages.resources.images.category.progress', 'Progress'),
+    value: 'progress',
+    color: 'blue',
+  },
+  {
+    label: formatGlobalMessage('pages.resources.images.category.safety', 'Safety'),
+    value: 'safety',
+    color: 'error',
+  },
+  {
+    label: formatGlobalMessage('pages.resources.images.category.quality', 'Quality'),
+    value: 'quality',
+    color: 'success',
+  },
 ];

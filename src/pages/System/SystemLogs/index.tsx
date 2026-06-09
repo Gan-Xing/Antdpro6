@@ -13,11 +13,12 @@ import {
 import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
 import moment from 'moment';
-import { useAccess } from '@umijs/max';
+import { useAccess, useIntl } from '@umijs/max';
 
 const SystemLogs: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const access = useAccess();
+  const intl = useIntl();
   const [detailOpen, setDetailOpen] = useState(false);
   const [currentLog, setCurrentLog] = useState<API.SystemLogDetail>();
   const [currentRows, setCurrentRows] = useState<API.SystemLog[]>([]);
@@ -30,32 +31,35 @@ const SystemLogs: React.FC = () => {
       setCurrentLog(data);
       setDetailOpen(true);
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '系统日志详情加载失败');
+      message.error(
+        error?.response?.data?.message ??
+          intl.formatMessage({ id: 'pages.system.logs.loadDetailFailed' }),
+      );
     }
   };
 
   const columns: ProColumns<API.SystemLog>[] = [
     {
-      title: 'ID',
+      title: intl.formatMessage({ id: 'common.id' }),
       dataIndex: 'id',
       search: false,
       responsive: ['lg'],
       width: 60,
     },
     {
-      title: '用户名',
+      title: intl.formatMessage({ id: 'common.username' }),
       dataIndex: 'username',
       ellipsis: true,
       width: 100,
     },
     {
-      title: '请求内容',
+      title: intl.formatMessage({ id: 'pages.system.logs.requestContent' }),
       dataIndex: 'requestDescription',
       ellipsis: true,
       search: false,
     },
     {
-      title: '国家',
+      title: intl.formatMessage({ id: 'pages.system.logs.country' }),
       dataIndex: 'country',
       search: false,
       ellipsis: true,
@@ -63,7 +67,7 @@ const SystemLogs: React.FC = () => {
       width: 80,
     },
     {
-      title: '城市',
+      title: intl.formatMessage({ id: 'pages.system.logs.city' }),
       dataIndex: 'city',
       search: false,
       ellipsis: true,
@@ -71,7 +75,7 @@ const SystemLogs: React.FC = () => {
       width: 100,
     },
     {
-      title: '运营商',
+      title: intl.formatMessage({ id: 'pages.system.logs.isp' }),
       dataIndex: 'isp',
       search: false,
       ellipsis: true,
@@ -79,7 +83,7 @@ const SystemLogs: React.FC = () => {
       width: 80,
     },
     {
-      title: '耗时(ms)',
+      title: intl.formatMessage({ id: 'pages.system.logs.durationMs' }),
       dataIndex: 'duration',
       search: false,
       responsive: ['md'],
@@ -87,16 +91,20 @@ const SystemLogs: React.FC = () => {
       render: (_, record) => `${record.duration}ms`,
     },
     {
-      title: '状态',
+      title: intl.formatMessage({ id: 'common.status' }),
       dataIndex: 'success',
       search: false,
       width: 80,
       render: (_, record) => (
-        <Tag color={record.success ? 'success' : 'error'}>{record.success ? '成功' : '失败'}</Tag>
+        <Tag color={record.success ? 'success' : 'error'}>
+          {record.success
+            ? intl.formatMessage({ id: 'common.success' })
+            : intl.formatMessage({ id: 'common.failure' })}
+        </Tag>
       ),
     },
     {
-      title: '创建时间',
+      title: intl.formatMessage({ id: 'common.createdAt' }),
       dataIndex: 'createdAt',
       valueType: 'dateTimeRange',
       responsive: ['sm'],
@@ -104,14 +112,14 @@ const SystemLogs: React.FC = () => {
       render: (_, record) => moment(record.createdAt).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-      title: '操作',
+      title: intl.formatMessage({ id: 'common.action' }),
       valueType: 'option',
       width: 90,
       render: (_, record) =>
         access.canViewSystemLogDetail
           ? [
               <a key="detail" onClick={() => openDetail(record)}>
-                详情
+                {intl.formatMessage({ id: 'common.detail' })}
               </a>,
             ]
           : [],
@@ -120,16 +128,21 @@ const SystemLogs: React.FC = () => {
 
   const handleClear = () => {
     Modal.confirm({
-      title: '确认清理',
+      title: intl.formatMessage({ id: 'pages.system.logs.confirmClearTitle' }),
       icon: <ExclamationCircleOutlined />,
-      content: '是否确认清理30天前的日志？此操作不可恢复！',
+      content: intl.formatMessage({ id: 'pages.system.logs.confirmClearContent' }),
       onOk: async () => {
         try {
           const result = unwrapResponse<any>(await systemLogControllerClear({ days: 30 }));
-          message.success(`清理成功：${result.message}`);
+          message.success(
+            intl.formatMessage(
+              { id: 'pages.system.logs.clearSuccess' },
+              { message: result.message },
+            ),
+          );
           actionRef.current?.reload();
         } catch (error) {
-          message.error('清理失败');
+          message.error(intl.formatMessage({ id: 'pages.system.logs.clearFailed' }));
         }
       },
     });
@@ -147,14 +160,14 @@ const SystemLogs: React.FC = () => {
       link.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      message.error('导出失败');
+      message.error(intl.formatMessage({ id: 'pages.system.logs.exportFailed' }));
     }
   };
 
   return (
     <PageContainer>
       <ProTable<API.SystemLog>
-        headerTitle="系统日志"
+        headerTitle={intl.formatMessage({ id: 'pages.system.logs.title' })}
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -163,12 +176,12 @@ const SystemLogs: React.FC = () => {
         toolBarRender={() => [
           access.canDeleteSystemLogs ? (
             <Button key="clear" onClick={handleClear}>
-              清理日志
+              {intl.formatMessage({ id: 'pages.system.logs.clear' })}
             </Button>
           ) : null,
           access.canExportSystemLogs ? (
             <Button key="export" type="primary" onClick={handleExport}>
-              导出日志
+              {intl.formatMessage({ id: 'pages.system.logs.export' })}
             </Button>
           ) : null,
           access.canExportData ? (
@@ -177,13 +190,25 @@ const SystemLogs: React.FC = () => {
               filename="system-logs.csv"
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '用户名', dataIndex: 'username' },
-                { title: '请求内容', dataIndex: 'requestDescription' },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                { title: intl.formatMessage({ id: 'common.username' }), dataIndex: 'username' },
+                {
+                  title: intl.formatMessage({ id: 'pages.system.logs.requestContent' }),
+                  dataIndex: 'requestDescription',
+                },
                 { title: 'IP', dataIndex: 'ip' },
-                { title: '耗时', dataIndex: 'duration' },
-                { title: '成功', renderText: (record) => (record.success ? '成功' : '失败') },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                {
+                  title: intl.formatMessage({ id: 'pages.system.status.latency' }),
+                  dataIndex: 'duration',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.security.loginLogs.result' }),
+                  renderText: (record) =>
+                    record.success
+                      ? intl.formatMessage({ id: 'common.success' })
+                      : intl.formatMessage({ id: 'common.failure' }),
+                },
+                { title: intl.formatMessage({ id: 'common.createdAt' }), dataIndex: 'createdAt' },
               ]}
             />
           ) : null,
@@ -219,7 +244,7 @@ const SystemLogs: React.FC = () => {
       <Drawer
         width={680}
         open={detailOpen}
-        title="系统日志详情"
+        title={intl.formatMessage({ id: 'pages.system.logs.detailTitle' })}
         onClose={() => {
           setDetailOpen(false);
           setCurrentLog(undefined);
@@ -230,27 +255,37 @@ const SystemLogs: React.FC = () => {
           column={1}
           dataSource={currentLog}
           columns={[
-            { title: 'ID', dataIndex: 'id' },
-            { title: '用户 ID', dataIndex: 'userId' },
-            { title: '用户名', dataIndex: 'username' },
-            { title: '请求地址', dataIndex: 'requestUrl', copyable: true },
-            { title: '请求方法', dataIndex: 'method' },
-            { title: 'HTTP 状态', dataIndex: 'status' },
+            { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+            { title: intl.formatMessage({ id: 'common.userId' }), dataIndex: 'userId' },
+            { title: intl.formatMessage({ id: 'common.username' }), dataIndex: 'username' },
+            {
+              title: intl.formatMessage({ id: 'pages.system.logs.requestUrl' }),
+              dataIndex: 'requestUrl',
+              copyable: true,
+            },
+            {
+              title: intl.formatMessage({ id: 'pages.system.logs.requestMethod' }),
+              dataIndex: 'method',
+            },
+            {
+              title: intl.formatMessage({ id: 'pages.system.logs.httpStatus' }),
+              dataIndex: 'status',
+            },
             { title: 'IP', dataIndex: 'ip' },
             { title: 'User Agent', dataIndex: 'userAgent' },
             {
-              title: '耗时',
+              title: intl.formatMessage({ id: 'pages.system.status.latency' }),
               dataIndex: 'duration',
               render: (_, entity) => `${entity.duration ?? 0}ms`,
             },
             {
-              title: '创建时间',
+              title: intl.formatMessage({ id: 'common.createdAt' }),
               dataIndex: 'createdAt',
               render: (_, entity) =>
                 entity.createdAt ? moment(entity.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-',
             },
             {
-              title: '请求数据',
+              title: intl.formatMessage({ id: 'pages.system.logs.requestData' }),
               dataIndex: 'requestData',
               render: (_, entity) => (
                 <Typography.Paragraph style={{ whiteSpace: 'pre-wrap', marginBottom: 0 }}>
@@ -258,7 +293,10 @@ const SystemLogs: React.FC = () => {
                 </Typography.Paragraph>
               ),
             },
-            { title: '错误信息', dataIndex: 'errorMsg' },
+            {
+              title: intl.formatMessage({ id: 'pages.system.logs.errorMessage' }),
+              dataIndex: 'errorMsg',
+            },
           ]}
         />
       </Drawer>

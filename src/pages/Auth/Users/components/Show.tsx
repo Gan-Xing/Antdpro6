@@ -1,6 +1,7 @@
 import { usersControllerFindOne } from '@/services/nest-web/users';
 import { unwrapResponse } from '@/utils/apiResponse';
 import { ProDescriptions, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
 import { Card, Drawer, Empty, List, message, Space, Spin, Tag, Typography } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { renderUserStatus } from '../constants';
@@ -23,6 +24,7 @@ const Show: React.FC<Props> = (props) => {
   const { onClose, open, currentRow } = props;
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<User.UsersEntity | undefined>();
+  const intl = useIntl();
   const user = detail ?? currentRow;
 
   useEffect(() => {
@@ -40,7 +42,10 @@ const Show: React.FC<Props> = (props) => {
           setDetail(data);
         }
       } catch (error: any) {
-        message.error(error?.response?.data?.message ?? '用户详情加载失败');
+        message.error(
+          error?.response?.data?.message ??
+            intl.formatMessage({ id: 'pages.users.detailLoadFailed' }),
+        );
       } finally {
         if (mounted) {
           setLoading(false);
@@ -53,7 +58,7 @@ const Show: React.FC<Props> = (props) => {
     return () => {
       mounted = false;
     };
-  }, [currentRow?.id, open]);
+  }, [currentRow?.id, intl, open]);
 
   const permissions = useMemo(() => {
     const map = new Map<number, NestWebAPI.PermissionEntity>();
@@ -70,7 +75,7 @@ const Show: React.FC<Props> = (props) => {
       width="72%"
       open={open}
       onClose={onClose}
-      title={user?.username ?? user?.email ?? '用户详情'}
+      title={user?.username ?? user?.email ?? intl.formatMessage({ id: 'pages.users.detailTitle' })}
       destroyOnClose
     >
       <Spin spinning={loading}>
@@ -80,34 +85,45 @@ const Show: React.FC<Props> = (props) => {
               column={2}
               dataSource={user}
               columns={[
-                { title: '用户名', dataIndex: 'username' },
-                { title: '邮箱', dataIndex: 'email', copyable: true },
-                { title: '性别', dataIndex: 'gender' },
+                { title: intl.formatMessage({ id: 'common.username' }), dataIndex: 'username' },
                 {
-                  title: '状态',
+                  title: intl.formatMessage({ id: 'common.email' }),
+                  dataIndex: 'email',
+                  copyable: true,
+                },
+                { title: intl.formatMessage({ id: 'pages.users.gender' }), dataIndex: 'gender' },
+                {
+                  title: intl.formatMessage({ id: 'common.status' }),
                   dataIndex: 'status',
                   render: (_, entity) => renderUserStatus(entity.status),
                 },
                 {
-                  title: '超级管理员',
+                  title: intl.formatMessage({ id: 'pages.users.isSuperAdmin' }),
                   dataIndex: 'isAdmin',
                   render: (_, entity) =>
-                    entity.isAdmin ? <Tag color="success">是</Tag> : <Tag>否</Tag>,
+                    entity.isAdmin ? (
+                      <Tag color="success">{intl.formatMessage({ id: 'common.yes' })}</Tag>
+                    ) : (
+                      <Tag>{intl.formatMessage({ id: 'common.no' })}</Tag>
+                    ),
                 },
                 {
-                  title: '最近登录',
+                  title: intl.formatMessage({ id: 'pages.users.recentLogin' }),
                   dataIndex: 'lastLoginAt',
                   render: (_, entity) => formatTime(entity.lastLoginAt),
                 },
-                { title: '最近登录 IP', dataIndex: 'lastLoginIp' },
                 {
-                  title: '密码更新时间',
+                  title: intl.formatMessage({ id: 'pages.account.status.lastLoginIp' }),
+                  dataIndex: 'lastLoginIp',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.account.status.passwordUpdatedAt' }),
                   dataIndex: 'passwordUpdatedAt',
                   render: (_, entity) => formatTime(entity.passwordUpdatedAt),
                 },
               ]}
             />
-            <Card title="角色">
+            <Card title={intl.formatMessage({ id: 'pages.users.roles' })}>
               {user.roles?.length ? (
                 <Space wrap>
                   {user.roles.map((role) => (
@@ -120,10 +136,13 @@ const Show: React.FC<Props> = (props) => {
                   ))}
                 </Space>
               ) : (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无角色" />
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={intl.formatMessage({ id: 'pages.users.rolesEmpty' })}
+                />
               )}
             </Card>
-            <Card title="权限">
+            <Card title={intl.formatMessage({ id: 'pages.roles.permissions' })}>
               {permissions.length ? (
                 <Space wrap>
                   {permissions.map((permission) => (
@@ -136,10 +155,13 @@ const Show: React.FC<Props> = (props) => {
                   ))}
                 </Space>
               ) : (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无权限" />
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={intl.formatMessage({ id: 'pages.users.permissionsEmpty' })}
+                />
               )}
             </Card>
-            <Card title="最近登录">
+            <Card title={intl.formatMessage({ id: 'pages.users.recentLogin' })}>
               {user.loginLogs?.length ? (
                 <List
                   dataSource={user.loginLogs}
@@ -149,7 +171,9 @@ const Show: React.FC<Props> = (props) => {
                         title={
                           <Space>
                             <Tag color={item.success ? 'success' : 'error'}>
-                              {item.success ? '成功' : '失败'}
+                              {item.success
+                                ? intl.formatMessage({ id: 'common.success' })
+                                : intl.formatMessage({ id: 'common.failure' })}
                             </Tag>
                             <span>{formatTime(item.createdAt)}</span>
                           </Space>
@@ -157,7 +181,12 @@ const Show: React.FC<Props> = (props) => {
                         description={
                           <Space direction="vertical" size={2}>
                             <span>IP：{item.ip || '-'}</span>
-                            <span>失败原因：{item.failureReason || '-'}</span>
+                            <span>
+                              {intl.formatMessage({
+                                id: 'pages.security.loginLogs.failureReason',
+                              })}
+                              : {item.failureReason || '-'}
+                            </span>
                           </Space>
                         }
                       />
@@ -165,7 +194,10 @@ const Show: React.FC<Props> = (props) => {
                   )}
                 />
               ) : (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无登录记录" />
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={intl.formatMessage({ id: 'pages.users.loginLogsEmpty' })}
+                />
               )}
             </Card>
           </Space>

@@ -8,6 +8,7 @@ import {
   ensureValidAccessToken,
   isPublicRequestUrl,
 } from '@/utils/session';
+import { formatGlobalMessage, getBackendLocale, getFrontendLocale } from '@/utils/i18n';
 
 const { base_url, request_timeout } = config;
 
@@ -81,16 +82,41 @@ export const errorConfig: RequestConfig = {
             clearSessionAndRedirect();
           }
         } else if (status === 403) {
-          message.error('当前操作没有权限');
+          message.error(
+            formatGlobalMessage(
+              'request.error.forbidden',
+              'You do not have permission to perform this action',
+            ),
+          );
         } else if (status === 500) {
-          message.error('服务器问题，请联系管理员处理');
+          message.error(
+            formatGlobalMessage(
+              'request.error.server',
+              'Server error. Please contact the administrator.',
+            ),
+          );
         } else {
-          message.error(`请求失败，HTTP 状态码：${error.response.status}`);
+          message.error(
+            formatGlobalMessage(
+              'request.error.httpStatus',
+              'Request failed, HTTP status: {status}',
+              {
+                status: error.response.status,
+              },
+            ),
+          );
         }
       } else if (error.request) {
-        message.error('网络异常或服务未响应，请检查连接后重试。');
+        message.error(
+          formatGlobalMessage(
+            'request.error.network',
+            'Network error or service unavailable. Check the connection and try again.',
+          ),
+        );
       } else {
-        message.error('请求失败，请稍后重试。');
+        message.error(
+          formatGlobalMessage('request.error.generic', 'Request failed. Please try again later.'),
+        );
       }
     },
   },
@@ -101,6 +127,8 @@ export const errorConfig: RequestConfig = {
       const headers = { ...(config.headers || {}) } as Record<string, any>;
       const isTokenRequired = headers.isToken !== false && !isPublicRequestUrl(url);
       delete headers.isToken;
+      headers['x-custom-lang'] = getBackendLocale();
+      headers['Accept-Language'] = getFrontendLocale();
 
       if (isTokenRequired) {
         try {
@@ -130,7 +158,7 @@ export const errorConfig: RequestConfig = {
       const data = response?.data as Common.ResponseStructure<any>;
 
       if (data?.success === false) {
-        message.error('请求失败！');
+        message.error(formatGlobalMessage('request.error.failed', 'Request failed!'));
       }
       return response;
     },

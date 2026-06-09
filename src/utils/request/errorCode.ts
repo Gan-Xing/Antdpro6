@@ -1,3 +1,5 @@
+import { formatGlobalMessage } from '@/utils/i18n';
+
 type ErrorCodeType = {
   '401': string;
   '403': string;
@@ -7,10 +9,19 @@ type ErrorCodeType = {
 };
 
 const errorCode: ErrorCodeType = {
-  '401': '认证失败，无法访问系统资源',
-  '403': '当前操作没有权限',
-  '404': '访问资源不存在',
-  default: '系统未知错误，请反馈给管理员',
+  '401': formatGlobalMessage(
+    'common.error.401',
+    'Authentication failed. System resources cannot be accessed.',
+  ),
+  '403': formatGlobalMessage(
+    'common.error.403',
+    'You do not have permission to perform this action.',
+  ),
+  '404': formatGlobalMessage('common.error.404', 'The requested resource does not exist.'),
+  default: formatGlobalMessage(
+    'common.error.default',
+    'Unknown system error. Please contact the administrator.',
+  ),
 };
 
 export default errorCode;

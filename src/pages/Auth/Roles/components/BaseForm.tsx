@@ -127,7 +127,10 @@ const BaseForm: React.FC<Props> = (props) => {
         setTreeData(data);
         setExpandedKeys(collectExpandableKeys(data));
       } catch (error: any) {
-        message.error(error?.response?.data?.message ?? '权限树加载失败');
+        message.error(
+          error?.response?.data?.message ??
+            intl.formatMessage({ id: 'pages.roles.permissionTreeLoadFailed' }),
+        );
       } finally {
         if (mounted) {
           setLoadingTree(false);
@@ -173,15 +176,15 @@ const BaseForm: React.FC<Props> = (props) => {
             rules={[
               {
                 required: true,
-                message: '请输入角色编码',
+                message: intl.formatMessage({ id: 'pages.roles.codeRequired' }),
               },
               {
                 pattern: /^[a-z][a-z0-9._-]*$/,
-                message: '角色编码必须以小写字母开头，仅支持小写字母、数字、点、下划线和短横线',
+                message: intl.formatMessage({ id: 'pages.roles.codePattern' }),
               },
             ]}
-            extra="创建后不可修改，例如 admin、user、project.manager"
-            label="角色编码"
+            extra={intl.formatMessage({ id: 'pages.roles.codeExtra' })}
+            label={intl.formatMessage({ id: 'pages.roles.code' })}
             width="md"
             name="code"
           />
@@ -206,7 +209,7 @@ const BaseForm: React.FC<Props> = (props) => {
           name="name"
         />
         <ProFormDigit
-          label="排序"
+          label={intl.formatMessage({ id: 'pages.roles.sort' })}
           width="sm"
           name="sort"
           min={0}
@@ -214,25 +217,28 @@ const BaseForm: React.FC<Props> = (props) => {
           initialValue={0}
         />
         <ProFormSwitch
-          label="是否启用"
+          label={intl.formatMessage({ id: 'pages.roles.enabled' })}
           name="enabled"
           initialValue
-          checkedChildren="启用"
-          unCheckedChildren="停用"
+          checkedChildren={intl.formatMessage({ id: 'common.enabled' })}
+          unCheckedChildren={intl.formatMessage({ id: 'pages.roles.disabled' })}
         />
         <ProFormTextArea
-          label="职责说明"
+          label={intl.formatMessage({ id: 'pages.roles.description' })}
           name="description"
           width="xl"
           fieldProps={{
             autoSize: { minRows: 2, maxRows: 4 },
           }}
-          placeholder="说明这个角色代表的岗位、职责或能力包"
+          placeholder={intl.formatMessage({ id: 'pages.roles.descriptionPlaceholder' })}
         />
-        <Form.Item label="选择权限" name="permissions">
+        <Form.Item
+          label={intl.formatMessage({ id: 'pages.roles.permissionSelect' })}
+          name="permissions"
+        >
           <div style={{ minWidth: 560 }}>
             <Typography.Paragraph type="secondary" style={{ marginBottom: 8 }}>
-              按菜单分组授权。日常只需要勾选业务动作；权限码用于排查接口授权问题。
+              {intl.formatMessage({ id: 'pages.roles.permissionSelectHelp' })}
             </Typography.Paragraph>
             <Spin spinning={loadingTree}>
               <div
@@ -260,7 +266,10 @@ const BaseForm: React.FC<Props> = (props) => {
               </div>
             </Spin>
             <Typography.Text type="secondary">
-              已选择 {selectedPermissionCount} 个权限
+              {intl.formatMessage(
+                { id: 'pages.roles.permissionsSelected' },
+                { count: selectedPermissionCount },
+              )}
             </Typography.Text>
           </div>
         </Form.Item>

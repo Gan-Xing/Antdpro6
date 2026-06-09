@@ -44,7 +44,7 @@ export async function loginAsAdmin(page: Page) {
 
   await page.getByPlaceholder(/邮箱|Email/i).fill(admin.email);
   await page.getByPlaceholder(/密码|Password/i).fill(admin.password);
-  await page.getByRole('button', { name: /登录|Login/i }).click();
+  await page.getByRole('button', { name: /登\s*录|Login/i }).click();
 
   await page.waitForURL(/\/dashboard(?:[/?#]|$)/);
   await expectDashboardReady(page);
@@ -60,12 +60,12 @@ export async function attemptInvalidLogin(page: Page) {
     (response) =>
       response.url().includes('/api/auth/login') && response.request().method() === 'POST',
   );
-  await page.getByRole('button', { name: /登录|Login/i }).click();
+  await page.getByRole('button', { name: /登\s*录|Login/i }).click();
   const response = await loginResponse;
 
   expect(response.status()).toBeGreaterThanOrEqual(400);
   await expect(page).toHaveURL(/\/user\/login(?:[/?#]|$)/);
-  await expect(page.getByRole('button', { name: /登录|Login/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /登\s*录|Login/i })).toBeVisible();
 }
 
 export async function logout(page: Page) {

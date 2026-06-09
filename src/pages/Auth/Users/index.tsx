@@ -10,6 +10,7 @@ import {
   usersControllerUpdate,
 } from '@/services/nest-web/users';
 import { unwrapResponse } from '@/utils/apiResponse';
+import { formatGlobalMessage } from '@/utils/i18n';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -27,11 +28,11 @@ import { genderFallbackOptions, renderUserStatus, userStatusFallbackOptions } fr
  * @param fields
  */
 const handleAdd = async (fields: User.UsersEntity) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading(formatGlobalMessage('common.loading.add', 'Adding'));
   try {
     await usersControllerCreate(fields as unknown as NestWebAPI.CreateUserDto);
     hide();
-    message.success('Added successfully');
+    message.success(formatGlobalMessage('common.message.addSuccess', 'Added successfully'));
     return true;
   } catch (error: any) {
     hide();
@@ -47,15 +48,18 @@ const handleAdd = async (fields: User.UsersEntity) => {
  * @param fields
  */
 const handleUpdate = async (fields: User.UpdateUserParams) => {
-  const hide = message.loading('正在更新');
+  const hide = message.loading(formatGlobalMessage('common.loading.update', 'Updating'));
   try {
     await usersControllerUpdate({ id: fields.id! }, fields as unknown as NestWebAPI.UpdateUserDto);
     hide();
-    message.success('更新成功');
+    message.success(formatGlobalMessage('common.message.updateSuccess', 'Updated successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.message ?? '更新失败,请重试');
+    message.error(
+      error?.message ??
+        formatGlobalMessage('common.message.updateFailure', 'Update failed, please try again'),
+    );
     return false;
   }
 };
@@ -67,44 +71,63 @@ const handleUpdate = async (fields: User.UpdateUserParams) => {
  * @param ids
  */
 const handleRemove = async (ids: number[]) => {
-  const hide = message.loading('正在删除');
+  const hide = message.loading(formatGlobalMessage('common.loading.delete', 'Deleting'));
   if (!ids) return true;
   try {
     await usersControllerRemoveByIds({ ids });
     hide();
-    message.success('Deleted successfully and will refresh soon');
+    message.success(formatGlobalMessage('common.message.deleteSuccess', 'Deleted successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Delete failed, please try again');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.deleteFailure', 'Delete failed, please try again'),
+    );
     return false;
   }
 };
 
 const handleUpdateStatus = async (id: number, status: NestWebAPI.UpdateUserStatusDto['status']) => {
-  const hide = message.loading(status === 'active' ? '正在启用' : '正在禁用');
+  const hide = message.loading(
+    status === 'active'
+      ? formatGlobalMessage('pages.users.enabling', 'Enabling')
+      : formatGlobalMessage('pages.users.disabling', 'Disabling'),
+  );
   try {
     await usersControllerUpdateStatus({ id }, { status });
     hide();
-    message.success(status === 'active' ? '用户已启用' : '用户已禁用');
+    message.success(
+      status === 'active'
+        ? formatGlobalMessage('pages.users.enabledSuccess', 'User enabled')
+        : formatGlobalMessage('pages.users.disabledSuccess', 'User disabled'),
+    );
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? '状态更新失败');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('pages.users.statusUpdateFailed', 'Failed to update user status'),
+    );
     return false;
   }
 };
 
 const handleResetPassword = async (id: number, password: string) => {
-  const hide = message.loading('正在重置密码');
+  const hide = message.loading(
+    formatGlobalMessage('pages.users.resettingPassword', 'Resetting password'),
+  );
   try {
     await usersControllerResetPassword({ id }, { password });
     hide();
-    message.success('密码已重置');
+    message.success(formatGlobalMessage('pages.users.resetPasswordSuccess', 'Password reset'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? '密码重置失败');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('pages.users.resetPasswordFailed', 'Failed to reset password'),
+    );
     return false;
   }
 };
@@ -113,21 +136,31 @@ const openResetPasswordConfirm = (record: User.UsersEntity, onSuccess: () => voi
   let nextPassword = '';
 
   Modal.confirm({
-    title: `重置 ${record.username ?? record.email} 的密码`,
+    title: formatGlobalMessage('pages.users.resetPasswordTitle', 'Reset password for {name}', {
+      name: record.username ?? record.email ?? record.id,
+    }),
     content: (
       <Input.Password
         autoFocus
-        placeholder="请输入至少 8 位的新密码"
+        placeholder={formatGlobalMessage(
+          'pages.users.resetPasswordPlaceholder',
+          'Please enter a new password of at least 8 characters',
+        )}
         onChange={(event) => {
           nextPassword = event.target.value;
         }}
       />
     ),
-    okText: '确认重置',
-    cancelText: '取消',
+    okText: formatGlobalMessage('pages.users.confirmResetPassword', 'Confirm Reset'),
+    cancelText: formatGlobalMessage('common.cancel', 'Cancel'),
     onOk: async () => {
       if (nextPassword.length < 8) {
-        message.error('新密码至少 8 位');
+        message.error(
+          formatGlobalMessage(
+            'pages.users.resetPasswordMin',
+            'New password must be at least 8 characters',
+          ),
+        );
         return Promise.reject();
       }
 
@@ -183,9 +216,9 @@ const TableList: React.FC = () => {
   const isCurrentUser = (user?: Partial<User.UsersEntity>) => user?.id === currentUserId;
   const rawColumns: Array<ProColumns<User.UsersEntity> | false> = [
     {
-      title: <FormattedMessage id="pages.users.username" defaultMessage="姓名" />,
+      title: <FormattedMessage id="pages.users.username" defaultMessage="Name" />,
       dataIndex: 'username',
-      tip: '用户姓名',
+      tip: intl.formatMessage({ id: 'pages.users.username' }),
       ellipsis: true,
       sorter: (a: User.UsersEntity, b: User.UsersEntity) =>
         String(a.username ?? '').localeCompare(String(b.username ?? '')), // 添加这一行
@@ -200,37 +233,43 @@ const TableList: React.FC = () => {
           >
             <Space size={8}>
               {dom}
-              {isCurrentUser(entity) ? <Tag color="blue">当前用户</Tag> : null}
+              {isCurrentUser(entity) ? (
+                <Tag color="blue">{intl.formatMessage({ id: 'pages.users.currentUser' })}</Tag>
+              ) : null}
             </Space>
           </a>
         );
       },
     },
     {
-      title: <FormattedMessage id="pages.users.email" defaultMessage="邮箱" />,
+      title: <FormattedMessage id="pages.users.email" defaultMessage="Email" />,
       dataIndex: 'email',
       copyable: true,
       ellipsis: true,
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.users.gender" defaultMessage="性别" />,
+      title: <FormattedMessage id="pages.users.gender" defaultMessage="Gender" />,
       dataIndex: 'gender',
       valueEnum: genderValueEnum,
     },
     {
-      title: <FormattedMessage id="pages.users.isSuperAdmin" defaultMessage="是否超级管理员" />,
+      title: <FormattedMessage id="pages.users.isSuperAdmin" defaultMessage="Super Admin" />,
       dataIndex: 'isAdmin',
       render: (_, entity) => {
-        return entity?.isAdmin ? <Tag color="success">是</Tag> : <Tag color="default">否</Tag>;
+        return entity?.isAdmin ? (
+          <Tag color="success">{intl.formatMessage({ id: 'common.yes' })}</Tag>
+        ) : (
+          <Tag color="default">{intl.formatMessage({ id: 'common.no' })}</Tag>
+        );
       },
       valueEnum: {
-        true: { text: '是' },
-        false: { text: '否' },
+        true: { text: intl.formatMessage({ id: 'common.yes' }) },
+        false: { text: intl.formatMessage({ id: 'common.no' }) },
       },
     },
     {
-      title: <FormattedMessage id="pages.users.roles" defaultMessage="角色" />,
+      title: <FormattedMessage id="pages.users.roles" defaultMessage="Roles" />,
       dataIndex: 'roles',
       renderText: (val: { name: string }[]) => {
         return val.map((item) => item.name).join(', ');
@@ -259,27 +298,27 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.users.status" defaultMessage="在职状态" />,
+      title: <FormattedMessage id="pages.users.status" defaultMessage="Status" />,
       dataIndex: 'status',
       render: (_, entity) => renderUserStatus(entity?.status),
       valueEnum: userStatusValueEnum,
     },
     {
-      title: '最近登录',
+      title: intl.formatMessage({ id: 'pages.users.recentLogin' }),
       hideInSearch: true,
       dataIndex: 'lastLoginAt',
       valueType: 'dateTime',
       responsive: ['md'],
     },
     {
-      title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
+      title: <FormattedMessage id="pages.users.createTime" defaultMessage="Created At" />,
       hideInSearch: true,
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       ellipsis: true,
     },
     (canDeleteUser || canEditUser || canDisableUser || canResetUserPassword) && {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Actions" />,
       dataIndex: 'option',
       valueType: 'option',
       ellipsis: true,
@@ -301,34 +340,44 @@ const TableList: React.FC = () => {
           ),
           canDeleteUser &&
             (currentUserRecord ? (
-              <Tooltip key="delete-disabled" title="不能删除当前登录用户">
-                <Typography.Text type="secondary">删除</Typography.Text>
+              <Tooltip
+                key="delete-disabled"
+                title={intl.formatMessage({ id: 'pages.users.cannotDeleteCurrent' })}
+              >
+                <Typography.Text type="secondary">
+                  {intl.formatMessage({ id: 'common.delete' })}
+                </Typography.Text>
               </Tooltip>
             ) : (
               <a
                 key="delete"
                 onClick={() => {
                   return Modal.confirm({
-                    title: '确认删除？',
+                    title: intl.formatMessage({ id: 'common.confirmDelete' }),
                     onOk: async () => {
                       await handleRemove([record.id!]);
                       setSelectedRows([]);
                       actionRef.current?.reloadAndRest?.();
                     },
-                    content: '确认删除吗？',
-                    okText: '确认',
-                    cancelText: '取消',
+                    content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                    okText: intl.formatMessage({ id: 'common.confirm' }),
+                    cancelText: intl.formatMessage({ id: 'common.cancel' }),
                   });
                 }}
               >
-                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="Delete" />
               </a>
             )),
           canDisableUser &&
             (currentUserRecord ? (
-              <Tooltip key="status-disabled" title="不能禁用当前登录用户">
+              <Tooltip
+                key="status-disabled"
+                title={intl.formatMessage({ id: 'pages.users.cannotDisableCurrent' })}
+              >
                 <Typography.Text type="secondary">
-                  {record.status === 'active' || record.status === '1' ? '禁用' : '启用'}
+                  {record.status === 'active' || record.status === '1'
+                    ? intl.formatMessage({ id: 'pages.users.disable' })
+                    : intl.formatMessage({ id: 'pages.users.enable' })}
                 </Typography.Text>
               </Tooltip>
             ) : (
@@ -338,13 +387,16 @@ const TableList: React.FC = () => {
                   const nextStatus =
                     record.status === 'active' || record.status === '1' ? 'disabled' : 'active';
                   Modal.confirm({
-                    title: nextStatus === 'active' ? '确认启用用户？' : '确认禁用用户？',
+                    title:
+                      nextStatus === 'active'
+                        ? intl.formatMessage({ id: 'pages.users.confirmEnableTitle' })
+                        : intl.formatMessage({ id: 'pages.users.confirmDisableTitle' }),
                     content:
                       nextStatus === 'active'
-                        ? '启用后该用户可以重新登录系统。'
-                        : '禁用后该用户不能登录，现有 refresh token 会失效。',
-                    okText: '确认',
-                    cancelText: '取消',
+                        ? intl.formatMessage({ id: 'pages.users.enableContent' })
+                        : intl.formatMessage({ id: 'pages.users.disableContent' }),
+                    okText: intl.formatMessage({ id: 'common.confirm' }),
+                    cancelText: intl.formatMessage({ id: 'common.cancel' }),
                     onOk: async () => {
                       const success = await handleUpdateStatus(record.id, nextStatus);
                       if (success) {
@@ -354,7 +406,9 @@ const TableList: React.FC = () => {
                   });
                 }}
               >
-                {record.status === 'active' || record.status === '1' ? '禁用' : '启用'}
+                {record.status === 'active' || record.status === '1'
+                  ? intl.formatMessage({ id: 'pages.users.disable' })
+                  : intl.formatMessage({ id: 'pages.users.enable' })}
               </a>
             )),
           canResetUserPassword && (
@@ -364,7 +418,7 @@ const TableList: React.FC = () => {
                 openResetPasswordConfirm(record, () => actionRef.current?.reload());
               }}
             >
-              重置密码
+              {intl.formatMessage({ id: 'pages.users.resetPassword' })}
             </a>
           ),
         ].filter(Boolean);
@@ -399,16 +453,22 @@ const TableList: React.FC = () => {
               filename="users.csv"
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '姓名', dataIndex: 'username' },
-                { title: '邮箱', dataIndex: 'email' },
-                { title: '状态', dataIndex: 'status' },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
                 {
-                  title: '角色',
+                  title: intl.formatMessage({ id: 'pages.users.username' }),
+                  dataIndex: 'username',
+                },
+                { title: intl.formatMessage({ id: 'common.email' }), dataIndex: 'email' },
+                { title: intl.formatMessage({ id: 'common.status' }), dataIndex: 'status' },
+                {
+                  title: intl.formatMessage({ id: 'pages.users.roles' }),
                   renderText: (record) => record.roles?.map((role) => role.name).join(', '),
                 },
-                { title: '最近登录', dataIndex: 'lastLoginAt' },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                {
+                  title: intl.formatMessage({ id: 'pages.users.recentLogin' }),
+                  dataIndex: 'lastLoginAt',
+                },
+                { title: intl.formatMessage({ id: 'common.createdAt' }), dataIndex: 'createdAt' },
               ]}
             />
           ) : null,
@@ -462,7 +522,11 @@ const TableList: React.FC = () => {
           }
         >
           <Tooltip
-            title={selectedContainsCurrentUser ? '已选择当前登录用户，不能批量删除' : undefined}
+            title={
+              selectedContainsCurrentUser
+                ? intl.formatMessage({ id: 'pages.users.selectedCurrentDeleteTip' })
+                : undefined
+            }
           >
             <Button
               type="primary"
@@ -470,15 +534,15 @@ const TableList: React.FC = () => {
               disabled={selectedContainsCurrentUser}
               onClick={() => {
                 return Modal.confirm({
-                  title: '确认删除？',
+                  title: intl.formatMessage({ id: 'common.confirmDelete' }),
                   onOk: async () => {
                     await handleRemove(selectedRowsState?.map((item) => item.id!));
                     setSelectedRows([]);
                     actionRef.current?.reloadAndRest?.();
                   },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
+                  content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                  okText: intl.formatMessage({ id: 'common.confirm' }),
+                  cancelText: intl.formatMessage({ id: 'common.cancel' }),
                 });
               }}
             >

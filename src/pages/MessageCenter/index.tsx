@@ -9,18 +9,18 @@ import {
 import { unwrapResponse } from '@/utils/apiResponse';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { history, useAccess } from '@umijs/max';
+import { history, useAccess, useIntl } from '@umijs/max';
 import { Button, message, Modal, Space, Tabs, Tag, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 
 type MessageCategory = NestWebAPI.MessageEntity['category'];
 
-const messageCategoryMap: Record<MessageCategory, { text: string; color: string }> = {
-  SYSTEM: { text: '系统', color: 'blue' },
-  SECURITY: { text: '安全', color: 'red' },
-  APPROVAL: { text: '审批', color: 'purple' },
-  TASK: { text: '任务', color: 'geekblue' },
-  CUSTOM: { text: '自定义', color: 'default' },
+const messageCategoryMap: Record<MessageCategory, { messageId: string; color: string }> = {
+  SYSTEM: { messageId: 'pages.messages.category.system', color: 'blue' },
+  SECURITY: { messageId: 'pages.messages.category.security', color: 'red' },
+  APPROVAL: { messageId: 'pages.messages.category.approval', color: 'purple' },
+  TASK: { messageId: 'pages.messages.category.task', color: 'geekblue' },
+  CUSTOM: { messageId: 'pages.messages.category.custom', color: 'default' },
 };
 
 const formatTime = (value?: string | null) => {
@@ -30,20 +30,26 @@ const formatTime = (value?: string | null) => {
   return date.toLocaleString();
 };
 
-const renderMessageState = (record: NestWebAPI.MessageEntity) => {
+const renderMessageState = (record: NestWebAPI.MessageEntity, intl: ReturnType<typeof useIntl>) => {
   if (record.cancelledAt) {
-    return <Tag color="default">已取消</Tag>;
+    return (
+      <Tag color="default">{intl.formatMessage({ id: 'pages.messages.state.cancelled' })}</Tag>
+    );
   }
   if (record.completedAt) {
-    return <Tag color="success">已完成</Tag>;
+    return (
+      <Tag color="success">{intl.formatMessage({ id: 'pages.messages.state.completed' })}</Tag>
+    );
   }
   if (record.type === 'TODO') {
-    return <Tag color="processing">待处理</Tag>;
+    return (
+      <Tag color="processing">{intl.formatMessage({ id: 'pages.messages.state.pending' })}</Tag>
+    );
   }
   if (record.readAt) {
-    return <Tag color="success">已读</Tag>;
+    return <Tag color="success">{intl.formatMessage({ id: 'pages.messages.state.read' })}</Tag>;
   }
-  return <Tag color="warning">未读</Tag>;
+  return <Tag color="warning">{intl.formatMessage({ id: 'pages.messages.state.unread' })}</Tag>;
 };
 
 const queryByTab = (tab: string): Partial<NestWebAPI.MessagesControllerFindAllParams> => {
@@ -56,9 +62,33 @@ const queryByTab = (tab: string): Partial<NestWebAPI.MessagesControllerFindAllPa
   return { type: 'NOTIFICATION' };
 };
 
+const getDisplayTitle = (record: NestWebAPI.MessageEntity, intl: ReturnType<typeof useIntl>) => {
+  if (record.businessType !== 'approval_request') {
+    return record.title;
+  }
+
+  const pendingPrefix = '待审批：';
+  if (record.title?.startsWith(pendingPrefix)) {
+    return intl.formatMessage(
+      { id: 'pages.messages.approval.pendingTitle' },
+      { title: record.title.slice(pendingPrefix.length) },
+    );
+  }
+
+  const titleMap: Record<string, string> = {
+    审批请求已取消: 'pages.messages.approval.cancelledTitle',
+    审批请求已通过: 'pages.messages.approval.approvedTitle',
+    审批请求已驳回: 'pages.messages.approval.rejectedTitle',
+  };
+  const messageId = titleMap[record.title ?? ''];
+
+  return messageId ? intl.formatMessage({ id: messageId }) : record.title;
+};
+
 const MessageCenter: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const access = useAccess();
+  const intl = useIntl();
   const [activeTab, setActiveTab] = useState('todos');
   const [currentRows, setCurrentRows] = useState<NestWebAPI.MessageEntity[]>([]);
 
@@ -67,46 +97,50 @@ const MessageCenter: React.FC = () => {
   const handleMarkRead = async (id: number) => {
     try {
       unwrapResponse(await messagesControllerMarkRead({ id }));
-      message.success('已标记为已读');
+      message.success(intl.formatMessage({ id: 'pages.messages.markReadSuccess' }));
       reload();
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '操作失败');
+      message.error(error?.response?.data?.message ?? intl.formatMessage({ id: 'common.failure' }));
     }
   };
 
   const handleMarkAllRead = async () => {
     try {
       const result = unwrapResponse<{ count: number }>(await messagesControllerMarkAllRead());
-      message.success(`已标记 ${result.count} 条通知`);
+      message.success(
+        intl.formatMessage({ id: 'pages.messages.markAllReadSuccess' }, { count: result.count }),
+      );
       reload();
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '操作失败');
+      message.error(error?.response?.data?.message ?? intl.formatMessage({ id: 'common.failure' }));
     }
   };
 
   const handleComplete = async (record: NestWebAPI.MessageEntity) => {
     try {
       unwrapResponse(await messagesControllerCompleteTodo({ id: record.id }));
-      message.success('待办已完成');
+      message.success(intl.formatMessage({ id: 'pages.messages.completeSuccess' }));
       reload();
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '操作失败');
+      message.error(error?.response?.data?.message ?? intl.formatMessage({ id: 'common.failure' }));
     }
   };
 
   const handleCancel = async (record: NestWebAPI.MessageEntity) => {
     Modal.confirm({
-      title: '确认取消待办？',
-      content: record.title,
-      okText: '确认取消',
-      cancelText: '返回',
+      title: intl.formatMessage({ id: 'pages.messages.confirmCancelTitle' }),
+      content: getDisplayTitle(record, intl),
+      okText: intl.formatMessage({ id: 'pages.messages.confirmCancelOk' }),
+      cancelText: intl.formatMessage({ id: 'common.back' }),
       onOk: async () => {
         try {
           unwrapResponse(await messagesControllerCancelTodo({ id: record.id }));
-          message.success('待办已取消');
+          message.success(intl.formatMessage({ id: 'pages.messages.cancelSuccess' }));
           reload();
         } catch (error: any) {
-          message.error(error?.response?.data?.message ?? '操作失败');
+          message.error(
+            error?.response?.data?.message ?? intl.formatMessage({ id: 'common.failure' }),
+          );
           return Promise.reject(error);
         }
       },
@@ -115,18 +149,18 @@ const MessageCenter: React.FC = () => {
 
   const columns: ProColumns<NestWebAPI.MessageEntity>[] = [
     {
-      title: '关键词',
+      title: intl.formatMessage({ id: 'common.keyword' }),
       dataIndex: 'keyword',
       hideInTable: true,
     },
     {
-      title: '标题',
+      title: intl.formatMessage({ id: 'common.title' }),
       dataIndex: 'title',
       ellipsis: true,
-      render: (dom, record) => (
+      render: (_, record) => (
         <Space size={8}>
           <Typography.Text strong={record.type === 'TODO' && !record.completedAt}>
-            {dom}
+            {getDisplayTitle(record, intl)}
           </Typography.Text>
           {record.businessType ? (
             <Typography.Text type="secondary" code>
@@ -137,37 +171,37 @@ const MessageCenter: React.FC = () => {
       ),
     },
     {
-      title: '分类',
+      title: intl.formatMessage({ id: 'common.category' }),
       dataIndex: 'category',
       valueEnum: {
-        SYSTEM: { text: '系统' },
-        SECURITY: { text: '安全' },
-        APPROVAL: { text: '审批' },
-        TASK: { text: '任务' },
-        CUSTOM: { text: '自定义' },
+        SYSTEM: { text: intl.formatMessage({ id: 'pages.messages.category.system' }) },
+        SECURITY: { text: intl.formatMessage({ id: 'pages.messages.category.security' }) },
+        APPROVAL: { text: intl.formatMessage({ id: 'pages.messages.category.approval' }) },
+        TASK: { text: intl.formatMessage({ id: 'pages.messages.category.task' }) },
+        CUSTOM: { text: intl.formatMessage({ id: 'pages.messages.category.custom' }) },
       },
       render: (_, record) => {
         const category = messageCategoryMap[record.category];
-        return <Tag color={category.color}>{category.text}</Tag>;
+        return <Tag color={category.color}>{intl.formatMessage({ id: category.messageId })}</Tag>;
       },
       width: 90,
     },
     {
-      title: '状态',
+      title: intl.formatMessage({ id: 'common.status' }),
       dataIndex: 'state',
       hideInSearch: true,
-      render: (_, record) => renderMessageState(record),
+      render: (_, record) => renderMessageState(record, intl),
       width: 90,
     },
     {
-      title: '内容',
+      title: intl.formatMessage({ id: 'common.content' }),
       dataIndex: 'content',
       ellipsis: true,
       hideInSearch: true,
       responsive: ['md'],
     },
     {
-      title: '创建时间',
+      title: intl.formatMessage({ id: 'common.createdAt' }),
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       hideInSearch: true,
@@ -175,7 +209,7 @@ const MessageCenter: React.FC = () => {
       render: (_, record) => formatTime(record.createdAt),
     },
     {
-      title: '处理时间',
+      title: intl.formatMessage({ id: 'pages.approvals.decidedAt' }),
       dataIndex: 'completedAt',
       hideInSearch: true,
       responsive: ['lg'],
@@ -183,7 +217,7 @@ const MessageCenter: React.FC = () => {
       render: (_, record) => formatTime(record.completedAt ?? record.readAt ?? record.cancelledAt),
     },
     {
-      title: '操作',
+      title: intl.formatMessage({ id: 'common.action' }),
       valueType: 'option',
       width: 180,
       render: (_, record) => {
@@ -192,7 +226,7 @@ const MessageCenter: React.FC = () => {
         if (record.link) {
           actions.push(
             <a key="open" onClick={() => history.push(record.link!)}>
-              打开
+              {intl.formatMessage({ id: 'common.open' })}
             </a>,
           );
         }
@@ -200,7 +234,7 @@ const MessageCenter: React.FC = () => {
         if (record.type === 'NOTIFICATION' && !record.readAt) {
           actions.push(
             <a key="read" onClick={() => handleMarkRead(record.id)}>
-              标记已读
+              {intl.formatMessage({ id: 'pages.messages.markRead' })}
             </a>,
           );
         }
@@ -213,12 +247,12 @@ const MessageCenter: React.FC = () => {
         ) {
           actions.push(
             <a key="complete" onClick={() => handleComplete(record)}>
-              完成
+              {intl.formatMessage({ id: 'pages.messages.complete' })}
             </a>,
           );
           actions.push(
             <a key="cancel" onClick={() => handleCancel(record)}>
-              取消
+              {intl.formatMessage({ id: 'common.cancel' })}
             </a>,
           );
         }
@@ -237,13 +271,16 @@ const MessageCenter: React.FC = () => {
           actionRef.current?.reloadAndRest?.();
         }}
         items={[
-          { key: 'todos', label: '待办' },
-          { key: 'notifications', label: '通知' },
-          { key: 'done', label: '已处理' },
+          { key: 'todos', label: intl.formatMessage({ id: 'pages.messages.tab.todos' }) },
+          {
+            key: 'notifications',
+            label: intl.formatMessage({ id: 'pages.messages.tab.notifications' }),
+          },
+          { key: 'done', label: intl.formatMessage({ id: 'pages.messages.tab.done' }) },
         ]}
       />
       <ProTable<NestWebAPI.MessageEntity>
-        headerTitle="消息中心"
+        headerTitle={intl.formatMessage({ id: 'pages.messages.title' })}
         actionRef={actionRef}
         rowKey="id"
         search={{ labelWidth: 90 }}
@@ -252,7 +289,7 @@ const MessageCenter: React.FC = () => {
         toolBarRender={() => [
           activeTab === 'notifications' ? (
             <Button key="read-all" onClick={handleMarkAllRead}>
-              全部已读
+              {intl.formatMessage({ id: 'pages.messages.markAllRead' })}
             </Button>
           ) : null,
           access.canExportData ? (
@@ -261,12 +298,15 @@ const MessageCenter: React.FC = () => {
               filename={`messages-${activeTab}.csv`}
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '标题', dataIndex: 'title' },
-                { title: '分类', dataIndex: 'category' },
-                { title: '类型', dataIndex: 'type' },
-                { title: '内容', dataIndex: 'content' },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                {
+                  title: intl.formatMessage({ id: 'common.title' }),
+                  renderText: (record) => getDisplayTitle(record, intl),
+                },
+                { title: intl.formatMessage({ id: 'common.category' }), dataIndex: 'category' },
+                { title: intl.formatMessage({ id: 'common.type' }), dataIndex: 'type' },
+                { title: intl.formatMessage({ id: 'common.content' }), dataIndex: 'content' },
+                { title: intl.formatMessage({ id: 'common.createdAt' }), dataIndex: 'createdAt' },
               ]}
             />
           ) : null,

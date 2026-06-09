@@ -99,7 +99,7 @@ test.describe('S8 message and approval acceptance', () => {
     );
     await page
       .locator('.ant-modal .ant-btn-primary')
-      .filter({ hasText: /OK|提交/ })
+      .filter({ hasText: /OK|Submit|Confirm|确\s*定|提交/ })
       .click();
     await createResponse;
     await expect(page.getByText(/审批请求已提交/)).toBeVisible();

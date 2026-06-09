@@ -1,38 +1,50 @@
 import { Tag } from 'antd';
 import React from 'react';
+import { formatGlobalMessage } from '@/utils/i18n';
+
+const statusText = {
+  active: () => formatGlobalMessage('common.enabled', 'Enabled'),
+  disabled: () => formatGlobalMessage('pages.roles.disabled', 'Disabled'),
+  resigned: () => formatGlobalMessage('pages.users.resigned', 'Resigned'),
+};
+
+const genderText = {
+  male: () => formatGlobalMessage('pages.users.genderMale', 'Male'),
+  female: () => formatGlobalMessage('pages.users.genderFemale', 'Female'),
+};
 
 export const userStatusFallbackOptions = [
-  { label: '启用', value: 'active', color: 'success' },
-  { label: '禁用', value: 'disabled', color: 'error' },
-  { label: '离职', value: 'resigned', color: 'default' },
+  { label: statusText.active(), value: 'active', color: 'success' },
+  { label: statusText.disabled(), value: 'disabled', color: 'error' },
+  { label: statusText.resigned(), value: 'resigned', color: 'default' },
 ];
 
 export const genderFallbackOptions = [
-  { label: '男', value: 'Male', color: 'blue' },
-  { label: '女', value: 'Female', color: 'magenta' },
+  { label: genderText.male(), value: 'Male', color: 'blue' },
+  { label: genderText.female(), value: 'Female', color: 'magenta' },
 ];
 
 export const userStatusValueEnum = {
-  active: { text: '启用', status: 'Success' },
-  disabled: { text: '禁用', status: 'Error' },
-  resigned: { text: '离职', status: 'Default' },
+  active: { text: statusText.active(), status: 'Success' },
+  disabled: { text: statusText.disabled(), status: 'Error' },
+  resigned: { text: statusText.resigned(), status: 'Default' },
 };
 
 export const genderValueEnum = {
-  Male: '男',
-  Female: '女',
-  1: '男',
-  0: '女',
+  Male: genderText.male(),
+  Female: genderText.female(),
+  1: genderText.male(),
+  0: genderText.female(),
 };
 
 export function renderUserStatus(status?: string | null) {
   if (status === 'active' || status === '1') {
-    return React.createElement(Tag, { color: 'success' }, '启用');
+    return React.createElement(Tag, { color: 'success' }, statusText.active());
   }
 
   if (status === 'disabled') {
-    return React.createElement(Tag, { color: 'error' }, '禁用');
+    return React.createElement(Tag, { color: 'error' }, statusText.disabled());
   }
 
-  return React.createElement(Tag, { color: 'default' }, '离职');
+  return React.createElement(Tag, { color: 'default' }, statusText.resigned());
 }

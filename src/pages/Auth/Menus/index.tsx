@@ -6,6 +6,7 @@ import {
 } from '@/services/nest-web/menus';
 import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
+import { formatGlobalMessage } from '@/utils/i18n';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -51,15 +52,18 @@ const isSystemManagedMenu = (menu?: Partial<Menus.MenusType>) =>
  * @param fields
  */
 const handleAdd = async (fields: Menus.MenusType) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading(formatGlobalMessage('common.loading.add', 'Adding'));
   try {
     await menusControllerCreate(fields as unknown as NestWebAPI.CreateMenuDto);
     hide();
-    message.success('Added successfully');
+    message.success(formatGlobalMessage('common.message.addSuccess', 'Added successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Adding failed, please try again!');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.addFailure', 'Adding failed, please try again'),
+    );
     return false;
   }
 };
@@ -71,16 +75,19 @@ const handleAdd = async (fields: Menus.MenusType) => {
  * @param fields
  */
 const handleUpdate = async (fields: any) => {
-  const hide = message.loading('正在更新');
+  const hide = message.loading(formatGlobalMessage('common.loading.update', 'Updating'));
   try {
     await menusControllerUpdate({ id: fields.id }, fields as NestWebAPI.UpdateMenuDto);
     hide();
 
-    message.success('更新成功');
+    message.success(formatGlobalMessage('common.message.updateSuccess', 'Updated successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? '更新失败,请重试');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.updateFailure', 'Update failed, please try again'),
+    );
     return false;
   }
 };
@@ -92,16 +99,19 @@ const handleUpdate = async (fields: any) => {
  * @param ids
  */
 const handleRemove = async (ids: number[]) => {
-  const hide = message.loading('正在删除');
+  const hide = message.loading(formatGlobalMessage('common.loading.delete', 'Deleting'));
   if (!ids) return true;
   try {
     await menusControllerRemoveByIds({ ids });
     hide();
-    message.success('Deleted successfully and will refresh soon');
+    message.success(formatGlobalMessage('common.message.deleteSuccess', 'Deleted successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Delete failed, please try again');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.deleteFailure', 'Delete failed, please try again'),
+    );
     return false;
   }
 };
@@ -127,9 +137,9 @@ const TableList: React.FC = () => {
   const [currentRows, setCurrentRows] = useState<Menus.MenusType[]>([]);
   const rawColumns: Array<ProColumns<Menus.MenusType> | false> = [
     {
-      title: <FormattedMessage id="pages.roles.name" defaultMessage="名称" />,
+      title: <FormattedMessage id="pages.roles.name" defaultMessage="Name" />,
       dataIndex: 'name',
-      tip: '名称',
+      tip: intl.formatMessage({ id: 'pages.roles.name' }),
       ellipsis: true,
       render: (dom: any, entity: any) => {
         return (
@@ -141,35 +151,37 @@ const TableList: React.FC = () => {
           >
             <Space size={8}>
               {dom}
-              {isSystemManagedMenu(entity) ? <Tag color="blue">系统内置</Tag> : null}
+              {isSystemManagedMenu(entity) ? (
+                <Tag color="blue">{intl.formatMessage({ id: 'common.systemManaged' })}</Tag>
+              ) : null}
             </Space>
           </a>
         );
       },
     },
     {
-      title: '菜单编码',
+      title: intl.formatMessage({ id: 'pages.menus.code' }),
       dataIndex: 'code',
       copyable: true,
       ellipsis: true,
       hideInSearch: true,
     },
     {
-      title: '路由路径',
+      title: intl.formatMessage({ id: 'pages.menus.path' }),
       dataIndex: 'path',
       copyable: true,
       ellipsis: true,
       hideInSearch: true,
     },
     {
-      title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
+      title: <FormattedMessage id="pages.users.createTime" defaultMessage="Created At" />,
       hideInSearch: true,
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       ellipsis: true, // 添加此属性
     },
     {
-      title: <FormattedMessage id="pages.roles.updatedTime" defaultMessage="更新时间" />,
+      title: <FormattedMessage id="pages.roles.updatedTime" defaultMessage="Updated At" />,
       hideInSearch: true,
       // hideInTable: true,
       dataIndex: 'updatedAt',
@@ -177,7 +189,7 @@ const TableList: React.FC = () => {
       ellipsis: true, // 添加此属性
     },
     (canEditMenu || canDeleteMenu) && {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Actions" />,
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right' as const,
@@ -187,8 +199,13 @@ const TableList: React.FC = () => {
         return [
           canEditMenu &&
             (systemManaged ? (
-              <Tooltip key="update-disabled" title="系统内置菜单由代码种子维护，不能在后台编辑">
-                <Typography.Text type="secondary">编辑</Typography.Text>
+              <Tooltip
+                key="update-disabled"
+                title={intl.formatMessage({ id: 'pages.menus.systemManagedEditTip' })}
+              >
+                <Typography.Text type="secondary">
+                  {intl.formatMessage({ id: 'common.edit' })}
+                </Typography.Text>
               </Tooltip>
             ) : (
               <a
@@ -203,27 +220,32 @@ const TableList: React.FC = () => {
             )),
           canDeleteMenu &&
             (systemManaged ? (
-              <Tooltip key="delete-disabled" title="系统内置菜单由代码种子维护，不能在后台删除">
-                <Typography.Text type="secondary">删除</Typography.Text>
+              <Tooltip
+                key="delete-disabled"
+                title={intl.formatMessage({ id: 'pages.menus.systemManagedDeleteTip' })}
+              >
+                <Typography.Text type="secondary">
+                  {intl.formatMessage({ id: 'common.delete' })}
+                </Typography.Text>
               </Tooltip>
             ) : (
               <a
                 key="delete"
                 onClick={() => {
                   return Modal.confirm({
-                    title: '确认删除？',
+                    title: intl.formatMessage({ id: 'common.confirmDelete' }),
                     onOk: async () => {
                       await handleRemove([record.id!]);
                       setSelectedRows([]);
                       actionRef.current?.reloadAndRest?.();
                     },
-                    content: '确认删除吗？',
-                    okText: '确认',
-                    cancelText: '取消',
+                    content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                    okText: intl.formatMessage({ id: 'common.confirm' }),
+                    cancelText: intl.formatMessage({ id: 'common.cancel' }),
                   });
                 }}
               >
-                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="Delete" />
               </a>
             )),
         ].filter(Boolean);
@@ -252,8 +274,8 @@ const TableList: React.FC = () => {
       <Alert
         showIcon
         type="warning"
-        message="内部维护入口"
-        description="系统内置菜单由后端种子配置维护，后台只允许查看，不能编辑或删除。新增菜单仅用于临时扩展，正式菜单建议通过代码种子管理。"
+        message={intl.formatMessage({ id: 'pages.menus.systemManagedAlertTitle' })}
+        description={intl.formatMessage({ id: 'pages.menus.systemManagedAlertDescription' })}
         style={{ marginBottom: 16 }}
       />
       <ProTable
@@ -278,13 +300,13 @@ const TableList: React.FC = () => {
               filename="menus.csv"
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '菜单编码', dataIndex: 'code' },
-                { title: '名称', dataIndex: 'name' },
-                { title: '路由路径', dataIndex: 'path' },
-                { title: '图标', dataIndex: 'icon' },
-                { title: '排序', dataIndex: 'sort' },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                { title: intl.formatMessage({ id: 'pages.menus.code' }), dataIndex: 'code' },
+                { title: intl.formatMessage({ id: 'common.name' }), dataIndex: 'name' },
+                { title: intl.formatMessage({ id: 'pages.menus.path' }), dataIndex: 'path' },
+                { title: intl.formatMessage({ id: 'pages.menus.icon' }), dataIndex: 'icon' },
+                { title: intl.formatMessage({ id: 'common.sort' }), dataIndex: 'sort' },
+                { title: intl.formatMessage({ id: 'common.createdAt' }), dataIndex: 'createdAt' },
               ]}
             />
           ) : null,
@@ -341,7 +363,9 @@ const TableList: React.FC = () => {
         >
           <Tooltip
             title={
-              selectedContainsSystemManagedMenu ? '已选择系统内置菜单，不能批量删除' : undefined
+              selectedContainsSystemManagedMenu
+                ? intl.formatMessage({ id: 'pages.menus.selectedSystemManagedDeleteTip' })
+                : undefined
             }
           >
             <Button
@@ -350,15 +374,15 @@ const TableList: React.FC = () => {
               disabled={selectedContainsSystemManagedMenu}
               onClick={() => {
                 return Modal.confirm({
-                  title: '确认删除？',
+                  title: intl.formatMessage({ id: 'common.confirmDelete' }),
                   onOk: async () => {
                     await handleRemove(selectedRowsState?.map((item) => item.id!));
                     setSelectedRows([]);
                     actionRef.current?.reloadAndRest?.();
                   },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
+                  content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                  okText: intl.formatMessage({ id: 'common.confirm' }),
+                  cancelText: intl.formatMessage({ id: 'common.cancel' }),
                 });
               }}
             >

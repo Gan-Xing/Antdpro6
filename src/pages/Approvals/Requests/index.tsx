@@ -22,7 +22,7 @@ import {
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { useAccess, useLocation, useModel } from '@umijs/max';
+import { useAccess, useIntl, useLocation, useModel } from '@umijs/max';
 import {
   Button,
   Drawer,
@@ -44,18 +44,18 @@ const statusMap: Record<
   ApprovalRequestStatus,
   { text: string; color: string; status: 'Processing' | 'Success' | 'Error' | 'Default' }
 > = {
-  PENDING: { text: '待审批', color: 'processing', status: 'Processing' },
-  APPROVED: { text: '已通过', color: 'success', status: 'Success' },
-  REJECTED: { text: '已驳回', color: 'error', status: 'Error' },
-  CANCELLED: { text: '已取消', color: 'default', status: 'Default' },
+  PENDING: { text: 'pages.approvals.status.pending', color: 'processing', status: 'Processing' },
+  APPROVED: { text: 'pages.approvals.status.approved', color: 'success', status: 'Success' },
+  REJECTED: { text: 'pages.approvals.status.rejected', color: 'error', status: 'Error' },
+  CANCELLED: { text: 'pages.approvals.status.cancelled', color: 'default', status: 'Default' },
 };
 
 const actionMap: Record<ApprovalActionType, string> = {
-  SUBMIT: '提交',
-  APPROVE: '通过',
-  REJECT: '驳回',
-  CANCEL: '取消',
-  COMMENT: '评论',
+  SUBMIT: 'pages.approvals.action.submit',
+  APPROVE: 'pages.approvals.action.approve',
+  REJECT: 'pages.approvals.action.reject',
+  CANCEL: 'pages.approvals.action.cancel',
+  COMMENT: 'pages.approvals.action.comment',
 };
 
 const formatTime = (value?: string | null) => {
@@ -65,18 +65,27 @@ const formatTime = (value?: string | null) => {
   return date.toLocaleString();
 };
 
-const approverText = (record: NestWebAPI.ApprovalRequestEntity) => {
+const approverText = (
+  record: NestWebAPI.ApprovalRequestEntity,
+  intl: ReturnType<typeof useIntl>,
+) => {
   if (record.approverType === 'USER') {
     return (
-      record.approverUser?.username ?? record.approverUser?.email ?? `用户#${record.approverUserId}`
+      record.approverUser?.username ??
+      record.approverUser?.email ??
+      intl.formatMessage({ id: 'pages.approvals.userFallback' }, { id: record.approverUserId })
     );
   }
-  return `角色：${record.approverRoleCode ?? '-'}`;
+  return intl.formatMessage(
+    { id: 'pages.approvals.rolePrefix' },
+    { role: record.approverRoleCode ?? '-' },
+  );
 };
 
 const ApprovalRequestsPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const access = useAccess();
+  const intl = useIntl();
   const location = useLocation();
   const { initialState } = useModel('@@initialState');
   const currentUserId = initialState?.currentUser?.id;
@@ -103,7 +112,10 @@ const ApprovalRequestsPage: React.FC = () => {
           users
             .filter((user) => user.status === 'active')
             .map((user) => ({
-              label: user.username || user.email || `用户#${user.id}`,
+              label:
+                user.username ||
+                user.email ||
+                intl.formatMessage({ id: 'pages.approvals.userFallback' }, { id: user.id }),
               value: user.id,
             })),
         );
@@ -122,7 +134,7 @@ const ApprovalRequestsPage: React.FC = () => {
     };
 
     loadOptions();
-  }, []);
+  }, [intl]);
 
   useEffect(() => {
     const id = Number(new URLSearchParams(location.search).get('id'));
@@ -136,9 +148,12 @@ const ApprovalRequestsPage: React.FC = () => {
         setDetailOpen(true);
       })
       .catch((error: any) => {
-        message.error(error?.response?.data?.message ?? '审批详情加载失败');
+        message.error(
+          error?.response?.data?.message ??
+            intl.formatMessage({ id: 'pages.approvals.detailLoadFailed' }),
+        );
       });
-  }, [location.search]);
+  }, [intl, location.search]);
 
   const openDetail = async (record: NestWebAPI.ApprovalRequestEntity) => {
     try {
@@ -148,7 +163,10 @@ const ApprovalRequestsPage: React.FC = () => {
       setCurrentApproval(detail);
       setDetailOpen(true);
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '审批详情加载失败');
+      message.error(
+        error?.response?.data?.message ??
+          intl.formatMessage({ id: 'pages.approvals.detailLoadFailed' }),
+      );
     }
   };
 
@@ -157,26 +175,33 @@ const ApprovalRequestsPage: React.FC = () => {
     action: 'approve' | 'reject' | 'cancel' | 'comment',
   ) => {
     const labels = {
-      approve: '通过',
-      reject: '驳回',
-      cancel: '取消',
-      comment: '评论',
+      approve: intl.formatMessage({ id: 'pages.approvals.action.approve' }),
+      reject: intl.formatMessage({ id: 'pages.approvals.action.reject' }),
+      cancel: intl.formatMessage({ id: 'pages.approvals.action.cancel' }),
+      comment: intl.formatMessage({ id: 'pages.approvals.action.comment' }),
     };
     let comment = '';
 
     Modal.confirm({
-      title: `${labels[action]}审批请求`,
+      title: intl.formatMessage(
+        { id: 'pages.approvals.actionModalTitle' },
+        { action: labels[action] },
+      ),
       content: (
         <Input.TextArea
           rows={4}
-          placeholder={action === 'approve' ? '可选：填写处理意见' : '请填写原因或说明'}
+          placeholder={
+            action === 'approve'
+              ? intl.formatMessage({ id: 'pages.approvals.optionalApprovePlaceholder' })
+              : intl.formatMessage({ id: 'pages.approvals.commentPlaceholder' })
+          }
           onChange={(event) => {
             comment = event.target.value;
           }}
         />
       ),
       okText: labels[action],
-      cancelText: '返回',
+      cancelText: intl.formatMessage({ id: 'common.back' }),
       onOk: async () => {
         try {
           if (action === 'approve') {
@@ -192,13 +217,16 @@ const ApprovalRequestsPage: React.FC = () => {
             await approvalRequestsControllerComment({ id: record.id }, { comment });
           }
 
-          message.success('操作成功');
+          message.success(intl.formatMessage({ id: 'pages.approvals.actionSuccess' }));
           reload();
           if (detailOpen) {
             await openDetail(record);
           }
         } catch (error: any) {
-          message.error(error?.response?.data?.message ?? '操作失败');
+          message.error(
+            error?.response?.data?.message ??
+              intl.formatMessage({ id: 'pages.approvals.actionFailed' }),
+          );
           return Promise.reject(error);
         }
       },
@@ -213,12 +241,12 @@ const ApprovalRequestsPage: React.FC = () => {
 
   const columns: ProColumns<NestWebAPI.ApprovalRequestEntity>[] = [
     {
-      title: '关键词',
+      title: intl.formatMessage({ id: 'common.keyword' }),
       dataIndex: 'keyword',
       hideInTable: true,
     },
     {
-      title: '标题',
+      title: intl.formatMessage({ id: 'common.title' }),
       dataIndex: 'title',
       ellipsis: true,
       render: (dom, record) => (
@@ -232,21 +260,35 @@ const ApprovalRequestsPage: React.FC = () => {
       ),
     },
     {
-      title: '状态',
+      title: intl.formatMessage({ id: 'common.status' }),
       dataIndex: 'status',
       width: 110,
       valueEnum: {
-        PENDING: { text: statusMap.PENDING.text, status: statusMap.PENDING.status },
-        APPROVED: { text: statusMap.APPROVED.text, status: statusMap.APPROVED.status },
-        REJECTED: { text: statusMap.REJECTED.text, status: statusMap.REJECTED.status },
-        CANCELLED: { text: statusMap.CANCELLED.text, status: statusMap.CANCELLED.status },
+        PENDING: {
+          text: intl.formatMessage({ id: statusMap.PENDING.text }),
+          status: statusMap.PENDING.status,
+        },
+        APPROVED: {
+          text: intl.formatMessage({ id: statusMap.APPROVED.text }),
+          status: statusMap.APPROVED.status,
+        },
+        REJECTED: {
+          text: intl.formatMessage({ id: statusMap.REJECTED.text }),
+          status: statusMap.REJECTED.status,
+        },
+        CANCELLED: {
+          text: intl.formatMessage({ id: statusMap.CANCELLED.text }),
+          status: statusMap.CANCELLED.status,
+        },
       },
       render: (_, record) => (
-        <Tag color={statusMap[record.status].color}>{statusMap[record.status].text}</Tag>
+        <Tag color={statusMap[record.status].color}>
+          {intl.formatMessage({ id: statusMap[record.status].text })}
+        </Tag>
       ),
     },
     {
-      title: '业务类型',
+      title: intl.formatMessage({ id: 'pages.approvals.businessType' }),
       dataIndex: 'businessType',
       width: 130,
       render: (_, record) => (
@@ -256,21 +298,21 @@ const ApprovalRequestsPage: React.FC = () => {
       ),
     },
     {
-      title: '申请人',
+      title: intl.formatMessage({ id: 'pages.approvals.applicant' }),
       dataIndex: 'applicantId',
       hideInSearch: true,
       width: 130,
       render: (_, record) => record.applicant?.username ?? record.applicant?.email ?? '-',
     },
     {
-      title: '审批人',
+      title: intl.formatMessage({ id: 'pages.approvals.approver' }),
       dataIndex: 'approverRoleCode',
       hideInSearch: true,
       width: 160,
-      render: (_, record) => approverText(record),
+      render: (_, record) => approverText(record, intl),
     },
     {
-      title: '创建时间',
+      title: intl.formatMessage({ id: 'pages.approvals.createdAt' }),
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       hideInSearch: true,
@@ -278,7 +320,7 @@ const ApprovalRequestsPage: React.FC = () => {
       render: (_, record) => formatTime(record.createdAt),
     },
     {
-      title: '处理时间',
+      title: intl.formatMessage({ id: 'pages.approvals.decidedAt' }),
       dataIndex: 'decidedAt',
       valueType: 'dateTime',
       hideInSearch: true,
@@ -287,20 +329,20 @@ const ApprovalRequestsPage: React.FC = () => {
       render: (_, record) => formatTime(record.decidedAt),
     },
     {
-      title: '操作',
+      title: intl.formatMessage({ id: 'common.action' }),
       valueType: 'option',
       width: 230,
       render: (_, record) => {
         const actions = [
           <a key="detail" onClick={() => openDetail(record)}>
-            详情
+            {intl.formatMessage({ id: 'common.detail' })}
           </a>,
         ];
 
         if (record.status === 'PENDING' && access.canApproveApprovalRequests) {
           actions.push(
             <a key="approve" onClick={() => runAction(record, 'approve')}>
-              通过
+              {intl.formatMessage({ id: 'pages.approvals.action.approve' })}
             </a>,
           );
         }
@@ -308,7 +350,7 @@ const ApprovalRequestsPage: React.FC = () => {
         if (record.status === 'PENDING' && access.canRejectApprovalRequests) {
           actions.push(
             <a key="reject" onClick={() => runAction(record, 'reject')}>
-              驳回
+              {intl.formatMessage({ id: 'pages.approvals.action.reject' })}
             </a>,
           );
         }
@@ -316,7 +358,7 @@ const ApprovalRequestsPage: React.FC = () => {
         if (canCancelRecord(record)) {
           actions.push(
             <a key="cancel" onClick={() => runAction(record, 'cancel')}>
-              取消
+              {intl.formatMessage({ id: 'common.cancel' })}
             </a>,
           );
         }
@@ -335,13 +377,13 @@ const ApprovalRequestsPage: React.FC = () => {
           actionRef.current?.reloadAndRest?.();
         }}
         items={[
-          { key: 'all', label: '全部相关' },
-          { key: 'mine', label: '我的申请' },
-          { key: 'pending', label: '待我审批' },
+          { key: 'all', label: intl.formatMessage({ id: 'pages.approvals.scope.all' }) },
+          { key: 'mine', label: intl.formatMessage({ id: 'pages.approvals.scope.mine' }) },
+          { key: 'pending', label: intl.formatMessage({ id: 'pages.approvals.scope.pending' }) },
         ]}
       />
       <ProTable<NestWebAPI.ApprovalRequestEntity>
-        headerTitle="审批请求"
+        headerTitle={intl.formatMessage({ id: 'pages.approvals.title' })}
         actionRef={actionRef}
         rowKey="id"
         search={{ labelWidth: 90 }}
@@ -350,7 +392,7 @@ const ApprovalRequestsPage: React.FC = () => {
         toolBarRender={() => [
           access.canCreateApprovalRequests ? (
             <Button key="create" type="primary" onClick={() => setCreateOpen(true)}>
-              新建审批
+              {intl.formatMessage({ id: 'pages.approvals.create' })}
             </Button>
           ) : null,
           access.canExportData ? (
@@ -359,14 +401,29 @@ const ApprovalRequestsPage: React.FC = () => {
               filename={`approval-requests-${activeScope}.csv`}
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '标题', dataIndex: 'title' },
-                { title: '状态', dataIndex: 'status' },
-                { title: '业务类型', dataIndex: 'businessType' },
-                { title: '业务 ID', dataIndex: 'businessId' },
-                { title: '申请人', renderText: (record) => record.applicant?.username },
-                { title: '审批人', renderText: approverText },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                { title: intl.formatMessage({ id: 'common.title' }), dataIndex: 'title' },
+                { title: intl.formatMessage({ id: 'common.status' }), dataIndex: 'status' },
+                {
+                  title: intl.formatMessage({ id: 'pages.approvals.businessType' }),
+                  dataIndex: 'businessType',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.approvals.businessId' }),
+                  dataIndex: 'businessId',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.approvals.applicant' }),
+                  renderText: (record) => record.applicant?.username,
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.approvals.approver' }),
+                  renderText: (record) => approverText(record, intl),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.approvals.createdAt' }),
+                  dataIndex: 'createdAt',
+                },
               ]}
             />
           ) : null,
@@ -398,7 +455,7 @@ const ApprovalRequestsPage: React.FC = () => {
       />
 
       <ModalForm<NestWebAPI.CreateApprovalRequestDto>
-        title="新建审批请求"
+        title={intl.formatMessage({ id: 'pages.approvals.createTitle' })}
         open={createOpen}
         modalProps={{
           destroyOnClose: true,
@@ -411,65 +468,100 @@ const ApprovalRequestsPage: React.FC = () => {
         onFinish={async (values) => {
           try {
             await approvalRequestsControllerCreate(values);
-            message.success('审批请求已提交');
+            message.success(intl.formatMessage({ id: 'pages.approvals.submitSuccess' }));
             setCreateOpen(false);
             reload();
             return true;
           } catch (error: any) {
-            message.error(error?.response?.data?.message ?? '提交失败');
+            message.error(
+              error?.response?.data?.message ??
+                intl.formatMessage({ id: 'pages.approvals.submitFailed' }),
+            );
             return false;
           }
         }}
       >
         <ProFormText
           name="title"
-          label="标题"
-          rules={[{ required: true, message: '请输入审批标题' }]}
+          label={intl.formatMessage({ id: 'common.title' })}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({ id: 'pages.approvals.titleRequired' }),
+            },
+          ]}
         />
         <ProFormText
           name="businessType"
-          label="业务类型"
-          tooltip="用于二开时关联真实业务模块，例如 user_change、contract_review。"
-          rules={[{ required: true, message: '请输入业务类型' }]}
+          label={intl.formatMessage({ id: 'pages.approvals.businessType' })}
+          tooltip={intl.formatMessage({ id: 'pages.approvals.businessTypeTooltip' })}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({ id: 'pages.approvals.businessTypeRequired' }),
+            },
+          ]}
         />
-        <ProFormText name="businessId" label="业务 ID" />
+        <ProFormText
+          name="businessId"
+          label={intl.formatMessage({ id: 'pages.approvals.businessId' })}
+        />
         <ProFormSelect
           name="approverType"
-          label="审批人类型"
+          label={intl.formatMessage({ id: 'pages.approvals.approverType' })}
           valueEnum={{
-            USER: '指定用户',
-            ROLE: '指定角色',
+            USER: intl.formatMessage({ id: 'pages.approvals.approverType.user' }),
+            ROLE: intl.formatMessage({ id: 'pages.approvals.approverType.role' }),
           }}
-          rules={[{ required: true, message: '请选择审批人类型' }]}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({ id: 'pages.approvals.approverTypeRequired' }),
+            },
+          ]}
         />
         <ProFormDependency name={['approverType']}>
           {({ approverType }) =>
             approverType === 'ROLE' ? (
               <ProFormSelect
                 name="approverRoleCode"
-                label="审批角色"
+                label={intl.formatMessage({ id: 'pages.approvals.approverRole' })}
                 showSearch
                 options={roleOptions}
-                rules={[{ required: true, message: '请选择审批角色' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: intl.formatMessage({ id: 'pages.approvals.approverRoleRequired' }),
+                  },
+                ]}
               />
             ) : (
               <ProFormSelect
                 name="approverUserId"
-                label="审批用户"
+                label={intl.formatMessage({ id: 'pages.approvals.approverUser' })}
                 showSearch
                 options={userOptions}
-                rules={[{ required: true, message: '请选择审批用户' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: intl.formatMessage({ id: 'pages.approvals.approverUserRequired' }),
+                  },
+                ]}
               />
             )
           }
         </ProFormDependency>
-        <ProFormTextArea name="description" label="说明" fieldProps={{ rows: 4 }} />
+        <ProFormTextArea
+          name="description"
+          label={intl.formatMessage({ id: 'pages.approvals.description' })}
+          fieldProps={{ rows: 4 }}
+        />
       </ModalForm>
 
       <Drawer
         width={720}
         open={detailOpen}
-        title="审批请求详情"
+        title={intl.formatMessage({ id: 'pages.approvals.detailTitle' })}
         onClose={() => {
           setDetailOpen(false);
           setCurrentApproval(undefined);
@@ -480,18 +572,22 @@ const ApprovalRequestsPage: React.FC = () => {
             <Space>
               {currentApproval.status === 'PENDING' && access.canApproveApprovalRequests ? (
                 <Button type="primary" onClick={() => runAction(currentApproval, 'approve')}>
-                  通过
+                  {intl.formatMessage({ id: 'pages.approvals.action.approve' })}
                 </Button>
               ) : null}
               {currentApproval.status === 'PENDING' && access.canRejectApprovalRequests ? (
                 <Button danger onClick={() => runAction(currentApproval, 'reject')}>
-                  驳回
+                  {intl.formatMessage({ id: 'pages.approvals.action.reject' })}
                 </Button>
               ) : null}
               {canCancelRecord(currentApproval) ? (
-                <Button onClick={() => runAction(currentApproval, 'cancel')}>取消</Button>
+                <Button onClick={() => runAction(currentApproval, 'cancel')}>
+                  {intl.formatMessage({ id: 'common.cancel' })}
+                </Button>
               ) : null}
-              <Button onClick={() => runAction(currentApproval, 'comment')}>评论</Button>
+              <Button onClick={() => runAction(currentApproval, 'comment')}>
+                {intl.formatMessage({ id: 'pages.approvals.action.comment' })}
+              </Button>
             </Space>
           ) : null
         }
@@ -500,46 +596,57 @@ const ApprovalRequestsPage: React.FC = () => {
           column={1}
           dataSource={currentApproval}
           columns={[
-            { title: 'ID', dataIndex: 'id' },
-            { title: '标题', dataIndex: 'title' },
+            { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+            { title: intl.formatMessage({ id: 'common.title' }), dataIndex: 'title' },
             {
-              title: '状态',
+              title: intl.formatMessage({ id: 'common.status' }),
               dataIndex: 'status',
               render: (_, entity) =>
                 entity?.status ? (
-                  <Tag color={statusMap[entity.status].color}>{statusMap[entity.status].text}</Tag>
+                  <Tag color={statusMap[entity.status].color}>
+                    {intl.formatMessage({ id: statusMap[entity.status].text })}
+                  </Tag>
                 ) : (
                   '-'
                 ),
             },
-            { title: '业务类型', dataIndex: 'businessType' },
-            { title: '业务 ID', dataIndex: 'businessId' },
             {
-              title: '申请人',
+              title: intl.formatMessage({ id: 'pages.approvals.businessType' }),
+              dataIndex: 'businessType',
+            },
+            {
+              title: intl.formatMessage({ id: 'pages.approvals.businessId' }),
+              dataIndex: 'businessId',
+            },
+            {
+              title: intl.formatMessage({ id: 'pages.approvals.applicant' }),
               dataIndex: 'applicantId',
               render: (_, entity) =>
                 entity?.applicant?.username ?? entity?.applicant?.email ?? entity?.applicantId,
             },
             {
-              title: '审批人',
+              title: intl.formatMessage({ id: 'pages.approvals.approver' }),
               dataIndex: 'approverRoleCode',
-              render: (_, entity) => (entity ? approverText(entity) : '-'),
+              render: (_, entity) => (entity ? approverText(entity, intl) : '-'),
             },
             {
-              title: '创建时间',
+              title: intl.formatMessage({ id: 'pages.approvals.createdAt' }),
               dataIndex: 'createdAt',
               render: (_, entity) => formatTime(entity?.createdAt),
             },
             {
-              title: '处理时间',
+              title: intl.formatMessage({ id: 'pages.approvals.decidedAt' }),
               dataIndex: 'decidedAt',
               render: (_, entity) => formatTime(entity?.decidedAt),
             },
-            { title: '说明', dataIndex: 'description' },
+            {
+              title: intl.formatMessage({ id: 'pages.approvals.description' }),
+              dataIndex: 'description',
+            },
           ]}
         />
         <Typography.Title level={5} style={{ marginTop: 24 }}>
-          处理记录
+          {intl.formatMessage({ id: 'pages.approvals.actionRecords' })}
         </Typography.Title>
         <Timeline
           items={(currentApproval?.actions ?? []).map((action) => ({
@@ -554,8 +661,13 @@ const ApprovalRequestsPage: React.FC = () => {
             children: (
               <Space direction="vertical" size={2}>
                 <Typography.Text>
-                  {actionMap[action.action]} ·{' '}
-                  {action.actor?.username ?? action.actor?.email ?? `用户#${action.actorId}`}
+                  {intl.formatMessage({ id: actionMap[action.action] })} ·{' '}
+                  {action.actor?.username ??
+                    action.actor?.email ??
+                    intl.formatMessage(
+                      { id: 'pages.approvals.userFallback' },
+                      { id: action.actorId },
+                    )}
                 </Typography.Text>
                 <Typography.Text type="secondary">{formatTime(action.createdAt)}</Typography.Text>
                 {action.comment ? (

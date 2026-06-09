@@ -8,6 +8,7 @@ const localesDir = path.join(root, 'src', 'locales');
 const allowedLocales = ['en-US', 'zh-CN'];
 const namespaces = [
   'component',
+  'common',
   'form',
   'globalHeader',
   'menu',
@@ -16,6 +17,15 @@ const namespaces = [
   'settingDrawer',
   'settings',
 ];
+const sourceDirs = ['src'];
+const ignoredSourceDirs = new Set([
+  '.umi',
+  '.umi-production',
+  '.umi-test',
+  'locales',
+  'services',
+  'assets',
+]);
 
 function listLocaleEntries() {
   return fs
@@ -80,6 +90,78 @@ function compareRootKeys() {
   );
 }
 
+function collectSourceFiles(dir, files = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (!ignoredSourceDirs.has(entry.name)) {
+        collectSourceFiles(entryPath, files);
+      }
+      continue;
+    }
+
+    if (/\.(j|t)sx?$/.test(entry.name) && !/\.(test|spec)\.(j|t)sx?$/.test(entry.name)) {
+      files.push(entryPath);
+    }
+  }
+  return files;
+}
+
+function extractUsedMessageIds(source) {
+  const ids = new Set();
+  const patterns = [
+    /<FormattedMessage\b[^>]*\bid=["']([^"']+)["']/g,
+    /formatMessage\(\s*\{\s*id:\s*["']([^"']+)["']/g,
+    /formatGlobalMessage\(\s*["']([^"']+)["']/g,
+  ];
+
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(source))) {
+      ids.add(match[1]);
+    }
+  }
+  return ids;
+}
+
+function collectUsedMessageIds() {
+  const used = new Map();
+  for (const sourceDir of sourceDirs) {
+    const files = collectSourceFiles(path.join(root, sourceDir));
+    for (const file of files) {
+      const source = fs.readFileSync(file, 'utf8');
+      for (const id of extractUsedMessageIds(source)) {
+        if (!used.has(id)) {
+          used.set(id, new Set());
+        }
+        used.get(id).add(path.relative(root, file));
+      }
+    }
+  }
+  return used;
+}
+
+function compareUsedMessageIds() {
+  const zh = loadLocaleObject(path.join(localesDir, 'zh-CN.ts'));
+  const en = loadLocaleObject(path.join(localesDir, 'en-US.ts'));
+  const used = collectUsedMessageIds();
+  const missing = [];
+
+  for (const [id, files] of [...used.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    const missingLocales = [];
+    if (!Object.prototype.hasOwnProperty.call(zh, id)) {
+      missingLocales.push('zh-CN');
+    }
+    if (!Object.prototype.hasOwnProperty.call(en, id)) {
+      missingLocales.push('en-US');
+    }
+    if (missingLocales.length) {
+      missing.push({ id, files: [...files].sort(), missingLocales });
+    }
+  }
+  return missing;
+}
+
 function main() {
   const entries = listLocaleEntries();
   const allowedEntries = new Set([
@@ -89,11 +171,15 @@ function main() {
   const unexpected = entries.filter((entry) => !allowedEntries.has(entry));
   const missing = [...allowedEntries].filter((entry) => !entries.includes(entry));
 
-  const keyProblems = [compareRootKeys(), ...namespaces.map(compareNamespaceKeys)]
-    .filter(({ missingInEn, missingInZh }) => missingInEn.length || missingInZh.length);
+  const keyProblems = [compareRootKeys(), ...namespaces.map(compareNamespaceKeys)].filter(
+    ({ missingInEn, missingInZh }) => missingInEn.length || missingInZh.length,
+  );
+  const missingUsedIds = compareUsedMessageIds();
 
-  if (!unexpected.length && !missing.length && !keyProblems.length) {
-    console.log('i18n check passed: zh-CN and en-US are the only supported locales and keys match.');
+  if (!unexpected.length && !missing.length && !keyProblems.length && !missingUsedIds.length) {
+    console.log(
+      'i18n check passed: zh-CN and en-US are the only supported locales, keys match, and used message ids exist.',
+    );
     return;
   }
 
@@ -110,6 +196,11 @@ function main() {
     if (problem.missingInZh.length) {
       console.error(`[${problem.namespace}] Missing in zh-CN: ${problem.missingInZh.join(', ')}`);
     }
+  }
+  for (const problem of missingUsedIds) {
+    console.error(
+      `[used-id] ${problem.id} missing in ${problem.missingLocales.join(', ')}; used by ${problem.files.join(', ')}`,
+    );
   }
 
   process.exit(1);

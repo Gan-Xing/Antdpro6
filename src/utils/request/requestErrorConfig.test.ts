@@ -11,6 +11,12 @@ jest.mock('@/utils/session', () => ({
   isPublicRequestUrl: jest.fn(),
 }));
 
+jest.mock('@/utils/i18n', () => ({
+  formatGlobalMessage: jest.fn((_id: string, defaultMessage: string) => defaultMessage),
+  getBackendLocale: jest.fn(() => 'zh'),
+  getFrontendLocale: jest.fn(() => 'zh-CN'),
+}));
+
 describe('request session interceptor', () => {
   const interceptor = errorConfig.requestInterceptors?.[0] as any;
 
@@ -31,7 +37,9 @@ describe('request session interceptor', () => {
 
     expect(result.headers).toEqual({
       'Content-Type': 'application/json',
+      'Accept-Language': 'zh-CN',
       Authorization: 'Bearer access-token',
+      'x-custom-lang': 'zh',
     });
   });
 
@@ -44,6 +52,8 @@ describe('request session interceptor', () => {
     });
 
     expect(result.headers.Authorization).toBeUndefined();
+    expect(result.headers['x-custom-lang']).toBe('zh');
+    expect(result.headers['Accept-Language']).toBe('zh-CN');
     expect(clearSessionAndRedirect).toHaveBeenCalled();
   });
 
@@ -59,6 +69,8 @@ describe('request session interceptor', () => {
 
     expect(result.headers.Authorization).toBeUndefined();
     expect(result.headers.isToken).toBeUndefined();
+    expect(result.headers['x-custom-lang']).toBe('zh');
+    expect(result.headers['Accept-Language']).toBe('zh-CN');
     expect(ensureValidAccessToken).not.toHaveBeenCalled();
   });
 });

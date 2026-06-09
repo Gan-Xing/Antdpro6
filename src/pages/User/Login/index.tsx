@@ -1,5 +1,4 @@
 import Footer from '@/components/Footer';
-import { brand } from '@/config/brand';
 import {
   authControllerLogin,
   authControllerRegisterByEmail,
@@ -151,7 +150,12 @@ const Login: React.FC = () => {
 
       // 验证两次密码是否一致
       if (values.password !== values.confirmPassword) {
-        message.error('两次输入的密码不一致！');
+        message.error(
+          intl.formatMessage({
+            id: 'pages.login.password.mismatch',
+            defaultMessage: 'Passwords do not match!',
+          }),
+        );
         return;
       }
 
@@ -171,17 +175,32 @@ const Login: React.FC = () => {
       );
 
       if (response.isValid) {
-        message.success('验证码已发送到邮箱，请查收！');
+        message.success(
+          intl.formatMessage({
+            id: 'pages.login.captcha.emailSent',
+            defaultMessage: 'The verification code has been sent to your email.',
+          }),
+        );
         // 保存邮箱验证的token
         const token = response.token;
         if (token) {
           setCaptchaToken(token);
         }
       } else {
-        message.error('图形验证码验证失败，请重试！');
+        message.error(
+          intl.formatMessage({
+            id: 'pages.login.captcha.invalid',
+            defaultMessage: 'Captcha verification failed. Please try again.',
+          }),
+        );
       }
     } catch (error) {
-      message.error('验证失败，请检查表单内容并重试！');
+      message.error(
+        intl.formatMessage({
+          id: 'pages.login.captcha.validationFailed',
+          defaultMessage: 'Verification failed. Check the form content and try again.',
+        }),
+      );
     }
   };
 
@@ -213,17 +232,32 @@ const Login: React.FC = () => {
       const token = unwrapResponse<Auth.Token>(response as any);
 
       if (token?.accessToken) {
-        message.success('注册成功！');
+        message.success(
+          intl.formatMessage({
+            id: 'pages.register.success',
+            defaultMessage: 'Registration successful!',
+          }),
+        );
         // 设置token并登录
         authUtil.setToken(token);
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
       } else {
-        message.error('注册失败，请重试！');
+        message.error(
+          intl.formatMessage({
+            id: 'pages.register.failure',
+            defaultMessage: 'Registration failed. Please try again!',
+          }),
+        );
       }
     } catch (error) {
-      message.error('注册失败，请检查表单内容并重试！');
+      message.error(
+        intl.formatMessage({
+          id: 'pages.register.validationFailed',
+          defaultMessage: 'Registration failed. Check the form content and try again.',
+        }),
+      );
     }
   };
 
@@ -258,7 +292,10 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title={brand.zhName}
+          title={intl.formatMessage({
+            id: 'app.brand.name',
+            defaultMessage: 'Enterprise Admin Platform',
+          })}
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           onFinish={async (values) => {
             if (loginType === 'login') {

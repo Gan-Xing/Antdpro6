@@ -125,8 +125,8 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
     if (!('geolocation' in navigator)) {
       message.error(
         intl.formatMessage({
-          id: 'pages.resources.images.location.error',
-          defaultMessage: '您的浏览器不支持地理位置功能',
+          id: 'pages.resources.images.location.unsupported',
+          defaultMessage: 'Your browser does not support geolocation',
         }),
       );
       return;
@@ -135,7 +135,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
     message.loading({
       content: intl.formatMessage({
         id: 'pages.resources.images.location.getting',
-        defaultMessage: '正在获取位置...',
+        defaultMessage: 'Getting location...',
       }),
       key: 'getLocation',
     });
@@ -151,7 +151,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
         message.success(
           intl.formatMessage({
             id: 'pages.resources.images.location.success',
-            defaultMessage: '位置获取成功',
+            defaultMessage: 'Location acquired',
           }),
         );
       },
@@ -163,7 +163,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
             message.error(
               intl.formatMessage({
                 id: 'pages.resources.images.location.error.denied',
-                defaultMessage: '获取位置失败：您拒绝了位置访问权限',
+                defaultMessage: 'Failed to get location: permission denied',
               }),
             );
             break;
@@ -171,7 +171,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
             message.error(
               intl.formatMessage({
                 id: 'pages.resources.images.location.error.unavailable',
-                defaultMessage: '获取位置失败：位置信息不可用',
+                defaultMessage: 'Failed to get location: location unavailable',
               }),
             );
             break;
@@ -179,7 +179,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
             message.error(
               intl.formatMessage({
                 id: 'pages.resources.images.location.error.timeout',
-                defaultMessage: '获取位置失败：请求超时',
+                defaultMessage: 'Failed to get location: request timed out',
               }),
             );
             break;
@@ -187,7 +187,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
             message.error(
               intl.formatMessage({
                 id: 'pages.resources.images.location.error',
-                defaultMessage: '获取位置失败：',
+                defaultMessage: 'Failed to get location: ',
               }) + error.message,
             );
         }
@@ -207,7 +207,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
         <a onClick={handleGetCurrentLocation} style={{ cursor: 'pointer' }}>
           {intl.formatMessage({
             id: 'pages.resources.images.getCurrentLocation',
-            defaultMessage: '获取当前位置',
+            defaultMessage: 'Get Current Location',
           })}
         </a>
         {value && (
@@ -216,7 +216,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ value, locations = [], onChange }
               {intl.formatMessage(
                 {
                   id: 'pages.resources.images.location.current',
-                  defaultMessage: '当前位置: {latitude}, {longitude}',
+                  defaultMessage: 'Current location: {latitude}, {longitude}',
                 },
                 {
                   latitude: value.latitude.toFixed(6),

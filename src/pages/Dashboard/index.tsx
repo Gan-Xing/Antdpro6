@@ -7,7 +7,7 @@ import {
   TeamOutlined,
 } from '@ant-design/icons';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { history, useAccess, useModel } from '@umijs/max';
+import { history, useAccess, useIntl, useModel } from '@umijs/max';
 import { Alert, Button, Col, List, Row, Space, Statistic, Tag, Typography } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { dashboardControllerSummary } from '@/services/nest-web/dashboard';
@@ -33,6 +33,7 @@ const emptyValue = '-';
 
 const Dashboard: React.FC = () => {
   const access = useAccess();
+  const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const [loading, setLoading] = useState(true);
   const [health, setHealth] = useState<{ status?: string; service?: string }>({});
@@ -68,71 +69,90 @@ const Dashboard: React.FC = () => {
     () => [
       {
         key: 'health',
-        title: '服务状态',
-        value: health.status === 'ok' ? '正常' : '待检查',
+        title: intl.formatMessage({ id: 'pages.dashboard.metric.health' }),
+        value:
+          health.status === 'ok'
+            ? intl.formatMessage({ id: 'pages.dashboard.metric.health.ok' })
+            : intl.formatMessage({ id: 'pages.dashboard.metric.health.check' }),
         description: health.service ?? 'NestWeb API',
         icon: <CheckCircleOutlined />,
       },
       {
         key: 'users',
-        title: '用户',
+        title: intl.formatMessage({ id: 'pages.dashboard.metric.users' }),
         value: access.canShowUser ? (metrics.users ?? emptyValue) : emptyValue,
-        description: access.canShowUser ? '当前系统用户总数' : '无用户统计权限',
+        description: access.canShowUser
+          ? intl.formatMessage({ id: 'pages.dashboard.metric.users.description' })
+          : intl.formatMessage({ id: 'pages.dashboard.metric.users.noPermission' }),
         icon: <TeamOutlined />,
       },
       {
         key: 'roles',
-        title: '角色',
+        title: intl.formatMessage({ id: 'pages.dashboard.metric.roles' }),
         value: access.canShowRole ? (metrics.roles ?? emptyValue) : emptyValue,
-        description: access.canShowRole ? '可维护的角色数量' : '无角色统计权限',
+        description: access.canShowRole
+          ? intl.formatMessage({ id: 'pages.dashboard.metric.roles.description' })
+          : intl.formatMessage({ id: 'pages.dashboard.metric.roles.noPermission' }),
         icon: <SafetyCertificateOutlined />,
       },
       {
         key: 'images',
-        title: '资源',
+        title: intl.formatMessage({ id: 'pages.dashboard.metric.resources' }),
         value: access.canViewImage ? (metrics.images ?? emptyValue) : emptyValue,
-        description: access.canViewImage ? '图片资源数量' : '无资源统计权限',
+        description: access.canViewImage
+          ? intl.formatMessage({ id: 'pages.dashboard.metric.resources.description' })
+          : intl.formatMessage({ id: 'pages.dashboard.metric.resources.noPermission' }),
         icon: <PictureOutlined />,
       },
     ],
-    [access.canShowRole, access.canShowUser, access.canViewImage, health, metrics],
+    [access.canShowRole, access.canShowUser, access.canViewImage, health, intl, metrics],
   );
 
   const quickEntries = [
     {
-      title: '用户管理',
-      description: '维护系统用户、角色绑定和状态',
+      title: intl.formatMessage({ id: 'menu.auth.users' }),
+      description: intl.formatMessage({ id: 'pages.dashboard.quick.users.description' }),
       path: '/auth/users',
       enabled: access.canShowUser,
     },
     {
-      title: '角色管理',
-      description: '维护角色编码、显示名和权限分配',
+      title: intl.formatMessage({ id: 'menu.auth.roles' }),
+      description: intl.formatMessage({ id: 'pages.dashboard.quick.roles.description' }),
       path: '/auth/roles',
       enabled: access.canShowRole,
     },
     {
-      title: '系统日志',
-      description: '查看接口调用、登录和操作记录',
+      title: intl.formatMessage({ id: 'menu.system.logs' }),
+      description: intl.formatMessage({ id: 'pages.dashboard.quick.logs.description' }),
       path: '/system/logs',
       enabled: access.canViewSystemLogs,
     },
     {
-      title: '资源管理',
-      description: '管理图片资源和工程记录素材',
+      title: intl.formatMessage({ id: 'menu.resources' }),
+      description: intl.formatMessage({ id: 'pages.dashboard.quick.resources.description' }),
       path: '/resources/images',
       enabled: access.canViewImage,
     },
   ];
 
   return (
-    <PageContainer title="工作台" content="集中查看系统状态、关键资源和常用管理入口。">
+    <PageContainer
+      title={intl.formatMessage({ id: 'pages.dashboard.title' })}
+      content={intl.formatMessage({ id: 'pages.dashboard.content' })}
+    >
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
         <Alert
           showIcon
           type={health.status === 'ok' ? 'success' : 'warning'}
-          message={`当前登录用户：${initialState?.currentUser?.username ?? '未知用户'}`}
-          description="工作台只展示当前账号有权限读取的数据；没有对应权限的模块会显示为不可用。"
+          message={intl.formatMessage(
+            { id: 'pages.dashboard.alert.currentUser' },
+            {
+              username:
+                initialState?.currentUser?.username ??
+                intl.formatMessage({ id: 'pages.dashboard.alert.unknownUser' }),
+            },
+          )}
+          description={intl.formatMessage({ id: 'pages.dashboard.alert.description' })}
         />
 
         <Row gutter={[16, 16]}>
@@ -151,7 +171,11 @@ const Dashboard: React.FC = () => {
 
         <Row gutter={[16, 16]}>
           <Col xs={24} xl={14}>
-            <ProCard title="快捷入口" bordered extra={<AppstoreOutlined />}>
+            <ProCard
+              title={intl.formatMessage({ id: 'pages.dashboard.quick.title' })}
+              bordered
+              extra={<AppstoreOutlined />}
+            >
               <Row gutter={[12, 12]}>
                 {quickEntries.map((entry) => (
                   <Col xs={24} md={12} key={entry.path}>
@@ -169,7 +193,9 @@ const Dashboard: React.FC = () => {
                         <Space>
                           <Typography.Text strong>{entry.title}</Typography.Text>
                           <Tag color={entry.enabled ? 'blue' : 'default'}>
-                            {entry.enabled ? '可访问' : '无权限'}
+                            {entry.enabled
+                              ? intl.formatMessage({ id: 'pages.dashboard.quick.accessible' })
+                              : intl.formatMessage({ id: 'pages.dashboard.quick.forbidden' })}
                           </Tag>
                         </Space>
                         <Typography.Text type="secondary">{entry.description}</Typography.Text>
@@ -183,7 +209,7 @@ const Dashboard: React.FC = () => {
 
           <Col xs={24} xl={10}>
             <ProCard
-              title="最近日志"
+              title={intl.formatMessage({ id: 'pages.dashboard.recentLogs.title' })}
               bordered
               extra={<FileTextOutlined />}
               loading={loading && access.canViewSystemLogs}
@@ -191,29 +217,46 @@ const Dashboard: React.FC = () => {
               {access.canViewSystemLogs ? (
                 <List
                   dataSource={recentLogs}
-                  locale={{ emptyText: '暂无日志' }}
+                  locale={{
+                    emptyText: intl.formatMessage({ id: 'pages.dashboard.recentLogs.empty' }),
+                  }}
                   renderItem={(item) => (
                     <List.Item>
                       <List.Item.Meta
                         title={
                           <Space>
                             <Tag color={item.success ? 'success' : 'error'}>
-                              {item.success ? '成功' : '失败'}
+                              {item.success
+                                ? intl.formatMessage({ id: 'common.success' })
+                                : intl.formatMessage({ id: 'common.failure' })}
                             </Tag>
                             <Typography.Text ellipsis>
-                              {item.requestDescription ?? `日志 #${item.id}`}
+                              {item.requestDescription ??
+                                intl.formatMessage(
+                                  { id: 'pages.dashboard.recentLogs.fallback' },
+                                  { id: item.id },
+                                )}
                             </Typography.Text>
                           </Space>
                         }
-                        description={`${item.username ?? '系统'} · ${item.createdAt ?? ''}`}
+                        description={`${
+                          item.username ??
+                          intl.formatMessage({
+                            id: 'pages.dashboard.recentLogs.system',
+                          })
+                        } · ${item.createdAt ?? ''}`}
                       />
                     </List.Item>
                   )}
                 />
               ) : (
                 <Space direction="vertical">
-                  <Typography.Text type="secondary">当前账号没有系统日志查看权限。</Typography.Text>
-                  <Button disabled>查看系统日志</Button>
+                  <Typography.Text type="secondary">
+                    {intl.formatMessage({ id: 'pages.dashboard.recentLogs.noPermission' })}
+                  </Typography.Text>
+                  <Button disabled>
+                    {intl.formatMessage({ id: 'pages.dashboard.recentLogs.view' })}
+                  </Button>
                 </Space>
               )}
             </ProCard>

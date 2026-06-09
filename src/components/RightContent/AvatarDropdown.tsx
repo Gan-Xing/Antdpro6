@@ -94,7 +94,10 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: '个人中心',
+      label: intl.formatMessage({
+        id: 'component.avatar.profile',
+        defaultMessage: 'Profile',
+      }),
     },
     ...(menu
       ? [

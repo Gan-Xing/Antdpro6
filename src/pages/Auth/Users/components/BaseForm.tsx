@@ -139,9 +139,9 @@ const BaseForm: React.FC<Props> = (props) => {
             disabled: (protectAdminRole && role.code === 'admin') || role.enabled === false,
             label:
               protectAdminRole && role.code === 'admin'
-                ? `${role.name}（当前管理员角色）`
+                ? `${role.name} (${intl.formatMessage({ id: 'pages.users.currentAdminRole' })})`
                 : role.enabled === false
-                  ? `${role.name}（已停用）`
+                  ? `${role.name} (${intl.formatMessage({ id: 'pages.users.roleDisabled' })})`
                   : role.name,
             value: role.id,
           }),

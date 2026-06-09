@@ -1,6 +1,7 @@
 import { systemControllerGetStatus } from '@/services/nest-web/system';
 import { unwrapResponse } from '@/utils/apiResponse';
 import { PageContainer, ProCard, ProDescriptions } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
 import { Button, Empty, Space, Tag, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 
@@ -15,6 +16,7 @@ const dependencyLabels: Record<string, string> = {
 const statusColor = (status?: string) => (status === 'ok' ? 'success' : 'error');
 
 const SystemStatusPage: React.FC = () => {
+  const intl = useIntl();
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<NestWebAPI.SystemStatusEntity>();
 
@@ -24,7 +26,10 @@ const SystemStatusPage: React.FC = () => {
       const data = unwrapResponse<NestWebAPI.SystemStatusEntity>(await systemControllerGetStatus());
       setStatus(data);
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '系统状态加载失败');
+      message.error(
+        error?.response?.data?.message ??
+          intl.formatMessage({ id: 'pages.system.status.loadFailed' }),
+      );
     } finally {
       setLoading(false);
     }
@@ -40,7 +45,7 @@ const SystemStatusPage: React.FC = () => {
     <PageContainer
       extra={
         <Button loading={loading} onClick={loadStatus}>
-          刷新
+          {intl.formatMessage({ id: 'common.refresh' })}
         </Button>
       }
     >
@@ -52,14 +57,14 @@ const SystemStatusPage: React.FC = () => {
             loading={loading}
             columns={[
               {
-                title: '整体状态',
+                title: intl.formatMessage({ id: 'pages.system.status.overall' }),
                 dataIndex: 'status',
                 render: (_, entity) => (
                   <Tag color={statusColor(entity.status)}>{entity.status}</Tag>
                 ),
               },
               {
-                title: '检查时间',
+                title: intl.formatMessage({ id: 'pages.system.status.checkedAt' }),
                 dataIndex: 'checkedAt',
                 render: (_, entity) =>
                   entity.checkedAt ? new Date(entity.checkedAt).toLocaleString() : '-',
@@ -77,19 +82,19 @@ const SystemStatusPage: React.FC = () => {
                   dataSource={value}
                   columns={[
                     {
-                      title: '状态',
+                      title: intl.formatMessage({ id: 'pages.system.status.status' }),
                       dataIndex: 'status',
                       render: (_, entity) => (
                         <Tag color={statusColor(entity.status)}>{entity.status}</Tag>
                       ),
                     },
                     {
-                      title: '耗时',
+                      title: intl.formatMessage({ id: 'pages.system.status.latency' }),
                       dataIndex: 'latencyMs',
                       render: (_, entity) => `${entity.latencyMs ?? 0} ms`,
                     },
                     {
-                      title: '错误',
+                      title: intl.formatMessage({ id: 'pages.system.status.error' }),
                       dataIndex: 'error',
                       renderText: (value) => value || '-',
                     },
@@ -99,7 +104,7 @@ const SystemStatusPage: React.FC = () => {
             ))}
           </ProCard>
         ) : (
-          <Empty description="暂无系统状态" />
+          <Empty description={intl.formatMessage({ id: 'pages.system.status.empty' })} />
         )}
       </Space>
     </PageContainer>

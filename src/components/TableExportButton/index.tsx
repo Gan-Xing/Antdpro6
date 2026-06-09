@@ -1,4 +1,5 @@
 import { exportCsv } from '@/utils/csvExport';
+import { formatGlobalMessage } from '@/utils/i18n';
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 
@@ -27,13 +28,13 @@ export default function TableExportButton<T extends Record<string, any>>({
       disabled={disabled}
       onClick={() => {
         if (!rows.length) {
-          message.warning('当前没有可导出的数据');
+          message.warning(formatGlobalMessage('common.exportEmpty', 'There is no data to export'));
           return;
         }
         exportCsv(filename, columns, rows);
       }}
     >
-      导出当前页
+      {formatGlobalMessage('common.exportCurrentPage', 'Export current page')}
     </Button>
   );
 }

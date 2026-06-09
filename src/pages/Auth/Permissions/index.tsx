@@ -6,6 +6,7 @@ import {
 } from '@/services/nest-web/permissions';
 import TableExportButton from '@/components/TableExportButton';
 import { unwrapResponse } from '@/utils/apiResponse';
+import { formatGlobalMessage } from '@/utils/i18n';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProTable } from '@ant-design/pro-components';
@@ -82,15 +83,18 @@ const isSystemManagedPermission = (permission?: Partial<Permissions.Entity>) =>
  * @param fields
  */
 const handleAdd = async (fields: Permissions.CreateParams) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading(formatGlobalMessage('common.loading.add', 'Adding'));
   try {
     await permissionsControllerCreate(fields as NestWebAPI.CreatePermissionDto);
     hide();
-    message.success('Added successfully');
+    message.success(formatGlobalMessage('common.message.addSuccess', 'Added successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Adding failed, please try again!');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.addFailure', 'Adding failed, please try again'),
+    );
     return false;
   }
 };
@@ -102,7 +106,7 @@ const handleAdd = async (fields: Permissions.CreateParams) => {
  * @param fields
  */
 const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在更新');
+  const hide = message.loading(formatGlobalMessage('common.loading.update', 'Updating'));
   try {
     await permissionsControllerUpdate(
       { id: fields.id! },
@@ -110,11 +114,14 @@ const handleUpdate = async (fields: FormValueType) => {
     );
     hide();
 
-    message.success('更新成功');
+    message.success(formatGlobalMessage('common.message.updateSuccess', 'Updated successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? '更新失败,请重试');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.updateFailure', 'Update failed, please try again'),
+    );
     return false;
   }
 };
@@ -126,16 +133,19 @@ const handleUpdate = async (fields: FormValueType) => {
  * @param ids
  */
 const handleRemove = async (ids: number[]) => {
-  const hide = message.loading('正在删除');
+  const hide = message.loading(formatGlobalMessage('common.loading.delete', 'Deleting'));
   if (!ids) return true;
   try {
     await permissionsControllerRemoveMany({ ids });
     hide();
-    message.success('Deleted successfully and will refresh soon');
+    message.success(formatGlobalMessage('common.message.deleteSuccess', 'Deleted successfully'));
     return true;
   } catch (error: any) {
     hide();
-    message.error(error?.response?.data?.message ?? 'Delete failed, please try again');
+    message.error(
+      error?.response?.data?.message ??
+        formatGlobalMessage('common.message.deleteFailure', 'Delete failed, please try again'),
+    );
     return false;
   }
 };
@@ -168,9 +178,9 @@ const TableList: React.FC = () => {
   const [currentRows, setCurrentRows] = useState<Permissions.Entity[]>([]);
   const rawColumns: Array<ProColumns<Permissions.Entity> | false> = [
     {
-      title: <FormattedMessage id="pages.permission.name" defaultMessage="权限名称" />,
+      title: <FormattedMessage id="pages.permission.name" defaultMessage="Permission Name" />,
       dataIndex: 'name',
-      tip: '名称',
+      tip: intl.formatMessage({ id: 'pages.permission.name' }),
       sorter: (a: Permissions.Entity, b: Permissions.Entity) => a.name.localeCompare(b.name), // 添加这一行
       sortDirections: ['ascend', 'descend'], // 添加这一行
       render: (dom, entity) => {
@@ -183,14 +193,16 @@ const TableList: React.FC = () => {
           >
             <Space size={8}>
               {dom}
-              {isSystemManagedPermission(entity) ? <Tag color="blue">系统内置</Tag> : null}
+              {isSystemManagedPermission(entity) ? (
+                <Tag color="blue">{intl.formatMessage({ id: 'common.systemManaged' })}</Tag>
+              ) : null}
             </Space>
           </a>
         );
       },
     },
     {
-      title: '权限编码',
+      title: intl.formatMessage({ id: 'pages.permissions.code' }),
       dataIndex: 'code',
       copyable: true,
       ellipsis: true,
@@ -202,21 +214,21 @@ const TableList: React.FC = () => {
       ),
     },
     {
-      title: '请求方法',
+      title: intl.formatMessage({ id: 'pages.permissions.method' }),
       dataIndex: 'action',
       width: 96,
       hideInSearch: true,
       render: (_, record) => <Tag>{record.action}</Tag>,
     },
     {
-      title: '请求路径',
+      title: intl.formatMessage({ id: 'pages.permissions.path' }),
       dataIndex: 'path',
       copyable: true,
       ellipsis: true,
       hideInSearch: true,
     },
     {
-      title: <FormattedMessage id="pages.permissions.group" defaultMessage="所属权限组" />,
+      title: <FormattedMessage id="pages.permissions.group" defaultMessage="Permission Group" />,
       dataIndex: 'permissionGroup',
       renderText: (val) => {
         return `${val?.parent?.name ? `${val.parent.name}-` : ''}${val?.name ?? ''}`;
@@ -224,13 +236,13 @@ const TableList: React.FC = () => {
       hideInSearch: true,
     },
     {
-      title: <FormattedMessage id="pages.users.createTime" defaultMessage="创建时间" />,
+      title: <FormattedMessage id="pages.users.createTime" defaultMessage="Created At" />,
       hideInSearch: true,
       dataIndex: 'createdAt',
       valueType: 'dateTime',
     },
     (canDeletePermission || canEditPermission) && {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Actions" />,
       dataIndex: 'option',
       valueType: 'option',
       fixed: 'right',
@@ -240,8 +252,13 @@ const TableList: React.FC = () => {
         return [
           canEditPermission &&
             (systemManaged ? (
-              <Tooltip key="update-disabled" title="系统内置权限由代码种子维护，不能在后台编辑">
-                <Typography.Text type="secondary">编辑</Typography.Text>
+              <Tooltip
+                key="update-disabled"
+                title={intl.formatMessage({ id: 'pages.permissions.systemManagedEditTip' })}
+              >
+                <Typography.Text type="secondary">
+                  {intl.formatMessage({ id: 'common.edit' })}
+                </Typography.Text>
               </Tooltip>
             ) : (
               <a
@@ -256,27 +273,32 @@ const TableList: React.FC = () => {
             )),
           canDeletePermission &&
             (systemManaged ? (
-              <Tooltip key="delete-disabled" title="系统内置权限由代码种子维护，不能在后台删除">
-                <Typography.Text type="secondary">删除</Typography.Text>
+              <Tooltip
+                key="delete-disabled"
+                title={intl.formatMessage({ id: 'pages.permissions.systemManagedDeleteTip' })}
+              >
+                <Typography.Text type="secondary">
+                  {intl.formatMessage({ id: 'common.delete' })}
+                </Typography.Text>
               </Tooltip>
             ) : (
               <a
                 key="delete"
                 onClick={() => {
                   return Modal.confirm({
-                    title: '确认删除？',
+                    title: intl.formatMessage({ id: 'common.confirmDelete' }),
                     onOk: async () => {
                       await handleRemove([record.id!]);
                       setSelectedRows([]);
                       actionRef.current?.reloadAndRest?.();
                     },
-                    content: '确认删除吗？',
-                    okText: '确认',
-                    cancelText: '取消',
+                    content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                    okText: intl.formatMessage({ id: 'common.confirm' }),
+                    cancelText: intl.formatMessage({ id: 'common.cancel' }),
                   });
                 }}
               >
-                <FormattedMessage id="pages.searchTable.delete" defaultMessage="删除" />
+                <FormattedMessage id="pages.searchTable.delete" defaultMessage="Delete" />
               </a>
             )),
         ].filter(Boolean);
@@ -291,8 +313,10 @@ const TableList: React.FC = () => {
       <Alert
         showIcon
         type="warning"
-        message="内部维护入口"
-        description="系统内置权限由后端代码种子维护，后台只允许查看和分配给角色，不能编辑或删除。新增权限仅用于临时扩展，正式权限建议通过代码种子管理。"
+        message={intl.formatMessage({ id: 'pages.permissions.systemManagedAlertTitle' })}
+        description={intl.formatMessage({
+          id: 'pages.permissions.systemManagedAlertDescription',
+        })}
         style={{ marginBottom: 16 }}
       />
       <ProTable<Permissions.Entity, API.PageParams>
@@ -317,19 +341,22 @@ const TableList: React.FC = () => {
               filename="permissions.csv"
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '权限编码', dataIndex: 'code' },
-                { title: '权限名称', dataIndex: 'name' },
-                { title: '请求方法', dataIndex: 'action' },
-                { title: '请求路径', dataIndex: 'path' },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                { title: intl.formatMessage({ id: 'pages.permissions.code' }), dataIndex: 'code' },
+                { title: intl.formatMessage({ id: 'pages.permission.name' }), dataIndex: 'name' },
                 {
-                  title: '权限组',
+                  title: intl.formatMessage({ id: 'pages.permissions.method' }),
+                  dataIndex: 'action',
+                },
+                { title: intl.formatMessage({ id: 'pages.permissions.path' }), dataIndex: 'path' },
+                {
+                  title: intl.formatMessage({ id: 'pages.permissions.groupShort' }),
                   renderText: (record) =>
                     `${record.permissionGroup?.parent?.name ? `${record.permissionGroup.parent.name}-` : ''}${
                       record.permissionGroup?.name ?? ''
                     }`,
                 },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                { title: intl.formatMessage({ id: 'common.createdAt' }), dataIndex: 'createdAt' },
               ]}
             />
           ) : null,
@@ -379,7 +406,7 @@ const TableList: React.FC = () => {
           <Tooltip
             title={
               selectedContainsSystemManagedPermission
-                ? '已选择系统内置权限，不能批量删除'
+                ? intl.formatMessage({ id: 'pages.permissions.selectedSystemManagedDeleteTip' })
                 : undefined
             }
           >
@@ -389,15 +416,15 @@ const TableList: React.FC = () => {
               disabled={selectedContainsSystemManagedPermission}
               onClick={() => {
                 return Modal.confirm({
-                  title: '确认删除？',
+                  title: intl.formatMessage({ id: 'common.confirmDelete' }),
                   onOk: async () => {
                     await handleRemove(selectedRowsState?.map((item) => item.id!));
                     setSelectedRows([]);
                     actionRef.current?.reloadAndRest?.();
                   },
-                  content: '确认删除吗？',
-                  okText: '确认',
-                  cancelText: '取消',
+                  content: intl.formatMessage({ id: 'common.confirmDeleteContent' }),
+                  okText: intl.formatMessage({ id: 'common.confirm' }),
+                  cancelText: intl.formatMessage({ id: 'common.cancel' }),
                 });
               }}
             >

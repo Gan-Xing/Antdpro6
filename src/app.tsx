@@ -30,6 +30,7 @@ import { AccessDeniedResult, renderEmpty } from './components/ResultStates';
 import { menusControllerFindUserMenus } from './services/nest-web/menus';
 import { usersControllerFindCurrent } from './services/nest-web/users';
 import { unwrapResponse } from './utils/apiResponse';
+import { formatGlobalMessage } from './utils/i18n';
 import { errorConfig } from './utils/request/requestErrorConfig';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -119,7 +120,7 @@ export async function getInitialState(): Promise<{
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => (isDev ? [<SelectLang key="SelectLang" />] : []),
+    actionsRender: () => [<SelectLang key="SelectLang" />],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -156,7 +157,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       ? [
           <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
             <LinkOutlined />
-            <span>OpenAPI文档</span>
+            <span>{formatGlobalMessage('common.dev.openapi', 'OpenAPI Docs')}</span>
           </Link>,
         ]
       : [],

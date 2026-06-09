@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Image } from 'antd';
+import { formatGlobalMessage } from '@/utils/i18n';
 
 interface ImagePreviewProps {
   photos: string[];
@@ -69,7 +70,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ photos, thumbnails }) => {
         >
           <Image
             src={getThumbnailUrl('500x500')}
-            alt="缩略图"
+            alt={formatGlobalMessage('pages.resources.images.thumbnailAlt', 'Thumbnail')}
             style={{
               width: '100%',
               height: '100%',

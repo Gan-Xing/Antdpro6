@@ -9,7 +9,7 @@ import { unwrapResponse } from '@/utils/apiResponse';
 import { InboxOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { useAccess } from '@umijs/max';
+import { useAccess, useIntl } from '@umijs/max';
 import { Modal, Space, Tag, Upload, message } from 'antd';
 import type { UploadProps } from 'antd/es/upload/interface';
 import React, { useRef, useState } from 'react';
@@ -23,6 +23,7 @@ const formatFileSize = (size: number) => {
 const FilesPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const { canUploadFiles, canDownloadFiles, canDeleteFiles, canExportData } = useAccess();
+  const intl = useIntl();
   const [currentRows, setCurrentRows] = useState<NestWebAPI.FileAssetEntity[]>([]);
 
   const handleDownload = async (record: NestWebAPI.FileAssetEntity) => {
@@ -37,7 +38,10 @@ const FilesPage: React.FC = () => {
       link.download = data.originalName;
       link.click();
     } catch (error: any) {
-      message.error(error?.response?.data?.message ?? '下载地址获取失败');
+      message.error(
+        error?.response?.data?.message ??
+          intl.formatMessage({ id: 'pages.files.downloadUrlFailed' }),
+      );
     }
   };
 
@@ -50,18 +54,20 @@ const FilesPage: React.FC = () => {
       try {
         const uploaded = await filesControllerUpload({}, file as File);
         onSuccess?.(uploaded as any);
-        message.success('上传成功');
+        message.success(intl.formatMessage({ id: 'pages.files.uploadSuccess' }));
         actionRef.current?.reload();
       } catch (error: any) {
         onError?.(error);
-        message.error(error?.response?.data?.message ?? '上传失败');
+        message.error(
+          error?.response?.data?.message ?? intl.formatMessage({ id: 'pages.files.uploadFailed' }),
+        );
       }
     }) satisfies UploadProps['customRequest'],
   };
 
   const columns: ProColumns<NestWebAPI.FileAssetEntity>[] = [
     {
-      title: '文件名',
+      title: intl.formatMessage({ id: 'pages.files.fileName' }),
       dataIndex: 'originalName',
       ellipsis: true,
       render: (dom, record) => (
@@ -69,55 +75,59 @@ const FilesPage: React.FC = () => {
       ),
     },
     {
-      title: '类型',
+      title: intl.formatMessage({ id: 'pages.files.mimeType' }),
       dataIndex: 'mimeType',
       width: 180,
       ellipsis: true,
     },
     {
-      title: '分类',
+      title: intl.formatMessage({ id: 'pages.files.category' }),
       dataIndex: 'category',
       width: 120,
       render: (_, record) => record.category || '-',
     },
     {
-      title: '大小',
+      title: intl.formatMessage({ id: 'pages.files.size' }),
       dataIndex: 'size',
       search: false,
       width: 110,
       render: (_, record) => formatFileSize(record.size),
     },
     {
-      title: '上传人',
+      title: intl.formatMessage({ id: 'pages.files.uploader' }),
       dataIndex: ['uploader', 'username'],
       search: false,
       width: 130,
       render: (_, record) => record.uploader?.username || record.uploader?.email || '-',
     },
     {
-      title: '状态',
+      title: intl.formatMessage({ id: 'common.status' }),
       dataIndex: 'deletedAt',
       search: false,
       width: 90,
       render: (_, record) =>
-        record.deletedAt ? <Tag>已删除</Tag> : <Tag color="success">可用</Tag>,
+        record.deletedAt ? (
+          <Tag>{intl.formatMessage({ id: 'common.deleted' })}</Tag>
+        ) : (
+          <Tag color="success">{intl.formatMessage({ id: 'pages.files.available' })}</Tag>
+        ),
     },
     {
-      title: '上传时间',
+      title: intl.formatMessage({ id: 'pages.files.uploadTime' }),
       dataIndex: 'createdAt',
       valueType: 'dateTimeRange',
       width: 180,
       render: (_, record) => new Date(record.createdAt).toLocaleString(),
     },
     {
-      title: '操作',
+      title: intl.formatMessage({ id: 'common.action' }),
       valueType: 'option',
       width: 150,
       render: (_, record) =>
         [
           canDownloadFiles && (
             <a key="download" onClick={() => handleDownload(record)}>
-              下载
+              {intl.formatMessage({ id: 'common.download' })}
             </a>
           ),
           canDeleteFiles && (
@@ -125,17 +135,17 @@ const FilesPage: React.FC = () => {
               key="delete"
               onClick={() => {
                 Modal.confirm({
-                  title: '确认删除文件？',
-                  content: '删除会移除存储对象，并在文件中心标记为已删除。',
+                  title: intl.formatMessage({ id: 'pages.files.confirmDeleteTitle' }),
+                  content: intl.formatMessage({ id: 'pages.files.confirmDeleteContent' }),
                   onOk: async () => {
                     await filesControllerRemove({ id: record.id });
-                    message.success('删除成功');
+                    message.success(intl.formatMessage({ id: 'common.message.deleteSuccess' }));
                     actionRef.current?.reload();
                   },
                 });
               }}
             >
-              删除
+              {intl.formatMessage({ id: 'common.delete' })}
             </a>
           ),
         ].filter(Boolean),
@@ -150,12 +160,16 @@ const FilesPage: React.FC = () => {
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
-            <p className="ant-upload-text">拖拽文件到这里，或点击上传</p>
-            <p className="ant-upload-hint">单文件上限 50MB。文件中心会作为后续知识库附件复用。</p>
+            <p className="ant-upload-text">
+              {intl.formatMessage({ id: 'pages.files.uploadText' })}
+            </p>
+            <p className="ant-upload-hint">
+              {intl.formatMessage({ id: 'pages.files.uploadHint' })}
+            </p>
           </Upload.Dragger>
         ) : null}
         <ProTable<NestWebAPI.FileAssetEntity>
-          headerTitle="文件中心"
+          headerTitle={intl.formatMessage({ id: 'pages.files.title' })}
           actionRef={actionRef}
           rowKey="id"
           search={{ labelWidth: 90 }}
@@ -168,16 +182,28 @@ const FilesPage: React.FC = () => {
                 filename="files.csv"
                 rows={currentRows}
                 columns={[
-                  { title: 'ID', dataIndex: 'id' },
-                  { title: '文件名', dataIndex: 'originalName' },
-                  { title: '类型', dataIndex: 'mimeType' },
-                  { title: '分类', dataIndex: 'category' },
-                  { title: '大小', dataIndex: 'size' },
+                  { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
                   {
-                    title: '上传人',
+                    title: intl.formatMessage({ id: 'pages.files.fileName' }),
+                    dataIndex: 'originalName',
+                  },
+                  {
+                    title: intl.formatMessage({ id: 'pages.files.mimeType' }),
+                    dataIndex: 'mimeType',
+                  },
+                  {
+                    title: intl.formatMessage({ id: 'pages.files.category' }),
+                    dataIndex: 'category',
+                  },
+                  { title: intl.formatMessage({ id: 'pages.files.size' }), dataIndex: 'size' },
+                  {
+                    title: intl.formatMessage({ id: 'pages.files.uploader' }),
                     renderText: (record) => record.uploader?.username ?? record.uploader?.email,
                   },
-                  { title: '上传时间', dataIndex: 'createdAt' },
+                  {
+                    title: intl.formatMessage({ id: 'pages.files.uploadTime' }),
+                    dataIndex: 'createdAt',
+                  },
                 ]}
               />
             ) : null,

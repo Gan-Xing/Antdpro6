@@ -390,7 +390,7 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Actions" />,
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -402,7 +402,7 @@ const TableList: React.FC = () => {
               setCurrentRow(record);
             }}
           >
-            <FormattedMessage id="pages.resources.images.edit" defaultMessage="编辑" />
+            <FormattedMessage id="pages.resources.images.edit" defaultMessage="Edit" />
           </a>
         ),
         canDeleteImage && (
@@ -420,21 +420,14 @@ const TableList: React.FC = () => {
                   actionRef.current?.reloadAndRest?.();
                 },
                 content: intl.formatMessage({
-                  id: 'pages.resources.images.delete.confirm',
-                  defaultMessage: '确认删除吗？',
+                  id: 'pages.resources.images.delete.confirm.content',
                 }),
-                okText: intl.formatMessage({
-                  id: 'pages.system.ok',
-                  defaultMessage: '确认',
-                }),
-                cancelText: intl.formatMessage({
-                  id: 'pages.system.cancel',
-                  defaultMessage: '取消',
-                }),
+                okText: intl.formatMessage({ id: 'common.confirm' }),
+                cancelText: intl.formatMessage({ id: 'common.cancel' }),
               });
             }}
           >
-            <FormattedMessage id="pages.resources.images.delete" defaultMessage="删除" />
+            <FormattedMessage id="pages.resources.images.delete" defaultMessage="Delete" />
           </a>
         ),
       ],
@@ -465,18 +458,40 @@ const TableList: React.FC = () => {
               filename="images.csv"
               rows={currentRows}
               columns={[
-                { title: 'ID', dataIndex: 'id' },
-                { title: '描述', dataIndex: 'description' },
-                { title: '工程类别', dataIndex: 'area' },
-                { title: '分类', dataIndex: 'category' },
-                { title: '桩号', dataIndex: 'stakeNumber' },
-                { title: '标签', renderText: (record) => record.tags?.join(', ') },
+                { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
                 {
-                  title: '创建者',
-                  renderText: (record) =>
-                    record.createdBy?.username ?? `用户#${record.createdBy?.id ?? '-'}`,
+                  title: intl.formatMessage({ id: 'pages.resources.images.description' }),
+                  dataIndex: 'description',
                 },
-                { title: '创建时间', dataIndex: 'createdAt' },
+                {
+                  title: intl.formatMessage({ id: 'pages.resources.images.area' }),
+                  dataIndex: 'area',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.resources.images.category' }),
+                  dataIndex: 'category',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.resources.images.stakeNumber' }),
+                  dataIndex: 'stakeNumber',
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.resources.images.tags' }),
+                  renderText: (record) => record.tags?.join(', '),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.resources.images.creator' }),
+                  renderText: (record) =>
+                    record.createdBy?.username ??
+                    intl.formatMessage(
+                      { id: 'pages.resources.images.userFallback' },
+                      { id: record.createdBy?.id ?? '-' },
+                    ),
+                },
+                {
+                  title: intl.formatMessage({ id: 'pages.resources.images.createTime' }),
+                  dataIndex: 'createdAt',
+                },
               ]}
             />
           ) : null,
@@ -489,7 +504,7 @@ const TableList: React.FC = () => {
               }}
             >
               <PlusOutlined />{' '}
-              <FormattedMessage id="pages.resources.images.create" defaultMessage="新建图片" />
+              <FormattedMessage id="pages.resources.images.create" defaultMessage="New Image" />
             </Button>
           ),
         ]}
@@ -517,7 +532,7 @@ const TableList: React.FC = () => {
         <FooterToolbar
           extra={
             <div>
-              已选择{' '}
+              {intl.formatMessage({ id: 'common.table.chosen' })}{' '}
               <a
                 style={{
                   fontWeight: 600,
@@ -525,7 +540,7 @@ const TableList: React.FC = () => {
               >
                 {selectedRowsState.length}
               </a>{' '}
-              项
+              {intl.formatMessage({ id: 'common.table.item' })}
             </div>
           }
         >
@@ -536,7 +551,7 @@ const TableList: React.FC = () => {
               Modal.confirm({
                 title: intl.formatMessage({
                   id: 'pages.resources.images.batch.delete',
-                  defaultMessage: '批量删除',
+                  defaultMessage: 'Batch Delete',
                 }),
                 content: intl.formatMessage(
                   {
@@ -547,14 +562,8 @@ const TableList: React.FC = () => {
                     count: selectedRowsState.length,
                   },
                 ),
-                okText: intl.formatMessage({
-                  id: 'pages.system.ok',
-                  defaultMessage: '确认',
-                }),
-                cancelText: intl.formatMessage({
-                  id: 'pages.system.cancel',
-                  defaultMessage: '取消',
-                }),
+                okText: intl.formatMessage({ id: 'common.confirm' }),
+                cancelText: intl.formatMessage({ id: 'common.cancel' }),
                 onOk: async () => {
                   await handleRemove(selectedRowsState);
                   setSelectedRows([]);
@@ -563,7 +572,10 @@ const TableList: React.FC = () => {
               });
             }}
           >
-            <FormattedMessage id="pages.resources.images.batch.delete" defaultMessage="批量删除" />
+            <FormattedMessage
+              id="pages.resources.images.batch.delete"
+              defaultMessage="Batch Delete"
+            />
           </Button>
         </FooterToolbar>
       )}

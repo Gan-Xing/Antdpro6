@@ -22,7 +22,7 @@ import {
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { useAccess } from '@umijs/max';
+import { useAccess, useIntl } from '@umijs/max';
 import { Button, Modal, Space, Tag, Typography, message } from 'antd';
 import React, { useMemo, useRef, useState } from 'react';
 
@@ -61,13 +61,14 @@ const DictsPage: React.FC = () => {
   const [editingType, setEditingType] = useState<NestWebAPI.DictTypeEntity>();
   const [editingItem, setEditingItem] = useState<NestWebAPI.DictItemEntity>();
   const { canCreateDicts, canEditDicts, canDeleteDicts, canExportData } = useAccess();
+  const intl = useIntl();
   const [typeRows, setTypeRows] = useState<NestWebAPI.DictTypeEntity[]>([]);
   const [itemRows, setItemRows] = useState<NestWebAPI.DictItemEntity[]>([]);
 
   const typeColumns = useMemo<ProColumns<NestWebAPI.DictTypeEntity>[]>(
     () => [
       {
-        title: '字典编码',
+        title: intl.formatMessage({ id: 'pages.dicts.typeCode' }),
         dataIndex: 'code',
         render: (dom, record) => (
           <a
@@ -81,24 +82,29 @@ const DictsPage: React.FC = () => {
         ),
       },
       {
-        title: '名称',
+        title: intl.formatMessage({ id: 'common.name' }),
         dataIndex: 'name',
       },
       {
-        title: '状态',
+        title: intl.formatMessage({ id: 'common.status' }),
         dataIndex: 'enabled',
         search: false,
         width: 90,
-        render: (_, record) => (record.enabled ? <Tag color="success">启用</Tag> : <Tag>停用</Tag>),
+        render: (_, record) =>
+          record.enabled ? (
+            <Tag color="success">{intl.formatMessage({ id: 'common.enabled' })}</Tag>
+          ) : (
+            <Tag>{intl.formatMessage({ id: 'pages.dicts.disabled' })}</Tag>
+          ),
       },
       {
-        title: '排序',
+        title: intl.formatMessage({ id: 'common.sort' }),
         dataIndex: 'sort',
         search: false,
         width: 80,
       },
       {
-        title: '操作',
+        title: intl.formatMessage({ id: 'common.action' }),
         valueType: 'option',
         width: 130,
         render: (_, record) =>
@@ -111,7 +117,7 @@ const DictsPage: React.FC = () => {
                   setTypeModalOpen(true);
                 }}
               >
-                编辑
+                {intl.formatMessage({ id: 'common.edit' })}
               </a>
             ),
             canDeleteDicts && (
@@ -119,11 +125,11 @@ const DictsPage: React.FC = () => {
                 key="delete"
                 onClick={() => {
                   Modal.confirm({
-                    title: '确认删除字典类型？',
-                    content: '删除字典类型会同时删除其字典项。',
+                    title: intl.formatMessage({ id: 'pages.dicts.confirmDeleteType' }),
+                    content: intl.formatMessage({ id: 'pages.dicts.confirmDeleteTypeContent' }),
                     onOk: async () => {
                       await dictsControllerRemoveType({ id: record.id });
-                      message.success('删除成功');
+                      message.success(intl.formatMessage({ id: 'common.message.deleteSuccess' }));
                       if (currentType?.id === record.id) {
                         setCurrentType(undefined);
                       }
@@ -133,53 +139,58 @@ const DictsPage: React.FC = () => {
                   });
                 }}
               >
-                删除
+                {intl.formatMessage({ id: 'common.delete' })}
               </a>
             ),
           ].filter(Boolean),
       },
     ],
-    [canDeleteDicts, canEditDicts, currentType?.id],
+    [canDeleteDicts, canEditDicts, currentType?.id, intl],
   );
 
   const itemColumns = useMemo<ProColumns<NestWebAPI.DictItemEntity>[]>(
     () => [
       {
-        title: '编码',
+        title: intl.formatMessage({ id: 'common.code' }),
         dataIndex: 'code',
         render: (dom) => <Typography.Text code>{dom}</Typography.Text>,
       },
       {
-        title: '标签',
+        title: intl.formatMessage({ id: 'common.label' }),
         dataIndex: 'label',
       },
       {
-        title: '值',
+        title: intl.formatMessage({ id: 'common.value' }),
         dataIndex: 'value',
         render: (dom) => <Typography.Text code>{dom}</Typography.Text>,
       },
       {
-        title: '颜色',
+        title: intl.formatMessage({ id: 'common.color' }),
         dataIndex: 'color',
         search: false,
         render: (_, record) =>
           record.color ? <Tag color={record.color}>{record.color}</Tag> : '-',
       },
       {
-        title: '状态',
+        title: intl.formatMessage({ id: 'common.status' }),
         dataIndex: 'enabled',
         search: false,
         width: 90,
-        render: (_, record) => (record.enabled ? <Tag color="success">启用</Tag> : <Tag>停用</Tag>),
+        render: (_, record) =>
+          record.enabled ? (
+            <Tag color="success">{intl.formatMessage({ id: 'common.enabled' })}</Tag>
+          ) : (
+            <Tag>{intl.formatMessage({ id: 'pages.dicts.disabled' })}</Tag>
+          ),
       },
       {
-        title: '排序',
+        title: intl.formatMessage({ id: 'common.sort' }),
         dataIndex: 'sort',
         search: false,
         width: 80,
       },
       {
-        title: '操作',
+        title: intl.formatMessage({ id: 'common.action' }),
         valueType: 'option',
         width: 130,
         render: (_, record) =>
@@ -192,7 +203,7 @@ const DictsPage: React.FC = () => {
                   setItemModalOpen(true);
                 }}
               >
-                编辑
+                {intl.formatMessage({ id: 'common.edit' })}
               </a>
             ),
             canDeleteDicts && (
@@ -200,28 +211,28 @@ const DictsPage: React.FC = () => {
                 key="delete"
                 onClick={() => {
                   Modal.confirm({
-                    title: '确认删除字典项？',
+                    title: intl.formatMessage({ id: 'pages.dicts.confirmDeleteItem' }),
                     onOk: async () => {
                       await dictsControllerRemoveItem({ id: record.id });
-                      message.success('删除成功');
+                      message.success(intl.formatMessage({ id: 'common.message.deleteSuccess' }));
                       itemActionRef.current?.reload();
                     },
                   });
                 }}
               >
-                删除
+                {intl.formatMessage({ id: 'common.delete' })}
               </a>
             ),
           ].filter(Boolean),
       },
     ],
-    [canDeleteDicts, canEditDicts],
+    [canDeleteDicts, canEditDicts, intl],
   );
 
   return (
     <PageContainer>
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
-        <ProCard title="字典类型">
+        <ProCard title={intl.formatMessage({ id: 'pages.dicts.typeTitle' })}>
           <ProTable<NestWebAPI.DictTypeEntity>
             actionRef={typeActionRef}
             rowKey="id"
@@ -238,11 +249,17 @@ const DictsPage: React.FC = () => {
                   filename="dict-types.csv"
                   rows={typeRows}
                   columns={[
-                    { title: 'ID', dataIndex: 'id' },
-                    { title: '编码', dataIndex: 'code' },
-                    { title: '名称', dataIndex: 'name' },
-                    { title: '状态', renderText: (record) => (record.enabled ? '启用' : '停用') },
-                    { title: '排序', dataIndex: 'sort' },
+                    { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                    { title: intl.formatMessage({ id: 'common.code' }), dataIndex: 'code' },
+                    { title: intl.formatMessage({ id: 'common.name' }), dataIndex: 'name' },
+                    {
+                      title: intl.formatMessage({ id: 'common.status' }),
+                      renderText: (record) =>
+                        record.enabled
+                          ? intl.formatMessage({ id: 'common.enabled' })
+                          : intl.formatMessage({ id: 'pages.dicts.disabled' }),
+                    },
+                    { title: intl.formatMessage({ id: 'common.sort' }), dataIndex: 'sort' },
                   ]}
                 />
               ) : null,
@@ -256,7 +273,7 @@ const DictsPage: React.FC = () => {
                     setTypeModalOpen(true);
                   }}
                 >
-                  新增类型
+                  {intl.formatMessage({ id: 'pages.dicts.createType' })}
                 </Button>
               ),
             ]}
@@ -278,7 +295,14 @@ const DictsPage: React.FC = () => {
           />
         </ProCard>
         <ProCard
-          title={currentType ? `字典项：${currentType.name}` : '字典项'}
+          title={
+            currentType
+              ? intl.formatMessage(
+                  { id: 'pages.dicts.itemTitleWithName' },
+                  { name: currentType.name },
+                )
+              : intl.formatMessage({ id: 'pages.dicts.itemTitle' })
+          }
           extra={
             <Space>
               {canExportData ? (
@@ -287,13 +311,19 @@ const DictsPage: React.FC = () => {
                   rows={itemRows}
                   disabled={!currentType}
                   columns={[
-                    { title: 'ID', dataIndex: 'id' },
-                    { title: '编码', dataIndex: 'code' },
-                    { title: '标签', dataIndex: 'label' },
-                    { title: '值', dataIndex: 'value' },
-                    { title: '颜色', dataIndex: 'color' },
-                    { title: '状态', renderText: (record) => (record.enabled ? '启用' : '停用') },
-                    { title: '排序', dataIndex: 'sort' },
+                    { title: intl.formatMessage({ id: 'common.id' }), dataIndex: 'id' },
+                    { title: intl.formatMessage({ id: 'common.code' }), dataIndex: 'code' },
+                    { title: intl.formatMessage({ id: 'common.label' }), dataIndex: 'label' },
+                    { title: intl.formatMessage({ id: 'common.value' }), dataIndex: 'value' },
+                    { title: intl.formatMessage({ id: 'common.color' }), dataIndex: 'color' },
+                    {
+                      title: intl.formatMessage({ id: 'common.status' }),
+                      renderText: (record) =>
+                        record.enabled
+                          ? intl.formatMessage({ id: 'common.enabled' })
+                          : intl.formatMessage({ id: 'pages.dicts.disabled' }),
+                    },
+                    { title: intl.formatMessage({ id: 'common.sort' }), dataIndex: 'sort' },
                   ]}
                 />
               ) : null}
@@ -307,7 +337,7 @@ const DictsPage: React.FC = () => {
                     setItemModalOpen(true);
                   }}
                 >
-                  新增字典项
+                  {intl.formatMessage({ id: 'pages.dicts.createItem' })}
                 </Button>
               ) : null}
             </Space>
@@ -334,7 +364,11 @@ const DictsPage: React.FC = () => {
         </ProCard>
       </Space>
       <ModalForm<DictTypeFormValues>
-        title={editingType ? '编辑字典类型' : '新增字典类型'}
+        title={
+          editingType
+            ? intl.formatMessage({ id: 'pages.dicts.editType' })
+            : intl.formatMessage({ id: 'pages.dicts.createType' })
+        }
         open={typeModalOpen}
         initialValues={editingType ?? { enabled: true, sort: 0 }}
         modalProps={{ destroyOnClose: true, maskClosable: false }}
@@ -355,7 +389,7 @@ const DictsPage: React.FC = () => {
           } else {
             await dictsControllerCreateType(payload as NestWebAPI.CreateDictTypeDto);
           }
-          message.success('保存成功');
+          message.success(intl.formatMessage({ id: 'common.saveSuccess' }));
           setTypeModalOpen(false);
           typeActionRef.current?.reload();
           return true;
@@ -363,23 +397,39 @@ const DictsPage: React.FC = () => {
       >
         <ProFormText
           name="code"
-          label="字典编码"
+          label={intl.formatMessage({ id: 'pages.dicts.typeCode' })}
           disabled={Boolean(editingType)}
           rules={[
-            { required: true, message: '请输入字典编码' },
+            { required: true, message: intl.formatMessage({ id: 'pages.dicts.codeRequired' }) },
             {
               pattern: /^[a-z][a-z0-9._-]*$/,
-              message: '仅支持小写字母、数字、点、下划线和短横线',
+              message: intl.formatMessage({ id: 'pages.dicts.codePattern' }),
             },
           ]}
         />
-        <ProFormText name="name" label="名称" rules={[{ required: true }]} />
-        <ProFormDigit name="sort" label="排序" min={0} fieldProps={{ precision: 0 }} />
-        <ProFormSwitch name="enabled" label="是否启用" />
-        <ProFormTextArea name="description" label="说明" />
+        <ProFormText
+          name="name"
+          label={intl.formatMessage({ id: 'common.name' })}
+          rules={[{ required: true }]}
+        />
+        <ProFormDigit
+          name="sort"
+          label={intl.formatMessage({ id: 'common.sort' })}
+          min={0}
+          fieldProps={{ precision: 0 }}
+        />
+        <ProFormSwitch name="enabled" label={intl.formatMessage({ id: 'pages.dicts.enabled' })} />
+        <ProFormTextArea
+          name="description"
+          label={intl.formatMessage({ id: 'common.description' })}
+        />
       </ModalForm>
       <ModalForm<DictItemFormValues>
-        title={editingItem ? '编辑字典项' : '新增字典项'}
+        title={
+          editingItem
+            ? intl.formatMessage({ id: 'pages.dicts.editItem' })
+            : intl.formatMessage({ id: 'pages.dicts.createItem' })
+        }
         open={itemModalOpen}
         initialValues={editingItem ?? { enabled: true, sort: 0, dictTypeId: currentType?.id }}
         modalProps={{ destroyOnClose: true, maskClosable: false }}
@@ -405,31 +455,55 @@ const DictsPage: React.FC = () => {
           } else {
             await dictsControllerCreateItem(payload as NestWebAPI.CreateDictItemDto);
           }
-          message.success('保存成功');
+          message.success(intl.formatMessage({ id: 'common.saveSuccess' }));
           setItemModalOpen(false);
           itemActionRef.current?.reload();
           return true;
         }}
       >
-        <ProFormText name="dictTypeId" label="字典类型 ID" hidden />
+        <ProFormText
+          name="dictTypeId"
+          label={intl.formatMessage({ id: 'pages.dicts.typeId' })}
+          hidden
+        />
         <ProFormText
           name="code"
-          label="字典项编码"
+          label={intl.formatMessage({ id: 'pages.dicts.itemCode' })}
           disabled={Boolean(editingItem)}
           rules={[
-            { required: true, message: '请输入字典项编码' },
+            { required: true, message: intl.formatMessage({ id: 'pages.dicts.codeRequired' }) },
             {
               pattern: /^[a-z][a-z0-9._-]*$/,
-              message: '仅支持小写字母、数字、点、下划线和短横线',
+              message: intl.formatMessage({ id: 'pages.dicts.codePattern' }),
             },
           ]}
         />
-        <ProFormText name="label" label="标签" rules={[{ required: true }]} />
-        <ProFormText name="value" label="值" rules={[{ required: true }]} />
-        <ProFormText name="color" label="颜色" placeholder="success / error / blue / default" />
-        <ProFormDigit name="sort" label="排序" min={0} fieldProps={{ precision: 0 }} />
-        <ProFormSwitch name="enabled" label="是否启用" />
-        <ProFormTextArea name="description" label="说明" />
+        <ProFormText
+          name="label"
+          label={intl.formatMessage({ id: 'common.label' })}
+          rules={[{ required: true }]}
+        />
+        <ProFormText
+          name="value"
+          label={intl.formatMessage({ id: 'common.value' })}
+          rules={[{ required: true }]}
+        />
+        <ProFormText
+          name="color"
+          label={intl.formatMessage({ id: 'common.color' })}
+          placeholder="success / error / blue / default"
+        />
+        <ProFormDigit
+          name="sort"
+          label={intl.formatMessage({ id: 'common.sort' })}
+          min={0}
+          fieldProps={{ precision: 0 }}
+        />
+        <ProFormSwitch name="enabled" label={intl.formatMessage({ id: 'pages.dicts.enabled' })} />
+        <ProFormTextArea
+          name="description"
+          label={intl.formatMessage({ id: 'common.description' })}
+        />
       </ModalForm>
     </PageContainer>
   );
