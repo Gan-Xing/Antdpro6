@@ -104,8 +104,8 @@ export default defineConfig({
     // default zh-CN
     default: 'zh-CN',
     antd: true,
-    // default true, when it is true, will use `navigator.language` overwrite default
-    baseNavigator: true,
+    // 企业后台默认使用中文，避免浏览器语言把页签和标题切成英文。
+    baseNavigator: false,
     baseSeparator: '-',
   },
   /**
