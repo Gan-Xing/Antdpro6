@@ -53,6 +53,9 @@ jobs:
         env:
           OPENAPI_SCHEMA_URL: ${{ github.workspace }}/.ci/NestWeb/docs/openapi/nestweb.openapi.json
 
+      - name: Verify i18n locales are current
+        run: pnpm run i18n:check
+
       - name: Typecheck
         run: pnpm run tsc
 

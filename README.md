@@ -18,6 +18,7 @@ The current target is a single-tenant enterprise admin template with:
 
 - [Frontend deployment](docs/deployment.md)
 - [Frontend environment variables](docs/env-vars.md)
+- [Internationalization](docs/i18n.md)
 - [Playwright E2E](e2e/README.md)
 
 Backend handoff and system-level docs live in the `NestWeb` repository. Use the NestWeb v2 handoff, page inventory, permission inventory, operations runbook, and release checklist for delivery acceptance.
@@ -28,6 +29,7 @@ Backend handoff and system-level docs live in the `NestWeb` repository. Use the 
 pnpm install
 pnpm run tsc
 pnpm run lint:js
+pnpm run i18n:check
 pnpm run openapi:nest:check
 pnpm test -- --runInBand
 pnpm run build

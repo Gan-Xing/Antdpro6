@@ -92,7 +92,7 @@ describe('Login Page', () => {
     });
 
     expect(rootContainer.baseElement?.querySelector('.ant-pro-form-login-desc')?.textContent).toBe(
-      'Enterprise-ready user, permission, resource and audit management.',
+      '面向企业自部署的用户、权限、资源与审计管理底座',
     );
 
     expect(rootContainer.getByPlaceholderText(/邮箱|email/i)).toBeTruthy();
@@ -121,7 +121,7 @@ describe('Login Page', () => {
       fireEvent.change(passwordInput, { target: { value: 'Admin1234.' } });
     });
 
-    fireEvent.click(rootContainer.getByRole('button', { name: /login|登录/i }));
+    fireEvent.click(rootContainer.getByRole('button', { name: /login|登\s*录/i }));
 
     await waitFor(() => {
       expect(authControllerLogin).toHaveBeenCalledWith(
